@@ -1,39 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../constants/colors.dart';
 
-class App_BarTheme {
-  App_BarTheme._();
+class AppAppBarTheme {
+  AppAppBarTheme._();
 
   static const AppBarTheme lightAppBarTheme = AppBarTheme(
-    foregroundColor: Colors.transparent,
-    surfaceTintColor: Colors.transparent,
+    foregroundColor: AppColors.transparent,
+    surfaceTintColor: AppColors.transparent,
     elevation: 0,
-    backgroundColor: Colors.white,
-    iconTheme: IconThemeData(color: Colors.black),
-
+    backgroundColor: AppColors.white,
+    iconTheme: IconThemeData(color: AppColors.black),
     titleTextStyle: TextStyle(
-      color: Colors.black,
+      color: AppColors.black,
       fontSize: 20.0,
       fontWeight: FontWeight.bold,
     ),
-    actionsIconTheme: IconThemeData(color: Colors.black),
+    actionsIconTheme: IconThemeData(color: AppColors.black),
     centerTitle: true,
-    systemOverlayStyle: SystemUiOverlayStyle.dark, // Control status bar color and icons
+    systemOverlayStyle: SystemUiOverlayStyle.dark,
   );
 
   static final AppBarTheme darkAppBarTheme = AppBarTheme(
-    foregroundColor: Colors.transparent,
-    surfaceTintColor: Colors.transparent,
+    foregroundColor: AppColors.transparent,
+    surfaceTintColor: AppColors.transparent,
     elevation: 0,
-    backgroundColor: Colors.grey[900],
-    iconTheme: const IconThemeData(color: Colors.white),
+    backgroundColor: AppColors.backgroundDark,
+    iconTheme: const IconThemeData(color: AppColors.white),
     titleTextStyle: const TextStyle(
-      color: Colors.white,
+      color: AppColors.white,
       fontSize: 20.0,
       fontWeight: FontWeight.bold,
     ),
-    actionsIconTheme: const IconThemeData(color: Colors.white),
+    actionsIconTheme: const IconThemeData(color: AppColors.white),
     centerTitle: true,
-    systemOverlayStyle: SystemUiOverlayStyle.light, // Control status bar color and icons
+    systemOverlayStyle: SystemUiOverlayStyle.light,
   );
 }
+

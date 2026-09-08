@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../constants/colors.dart';
 
 class AppTextFormFieldTheme {
   AppTextFormFieldTheme._();
@@ -6,86 +7,84 @@ class AppTextFormFieldTheme {
   static final InputDecorationTheme lightInputDecorationTheme =
       InputDecorationTheme(
     errorMaxLines: 3,
-    prefixIconColor: Colors.grey,
-    suffixIconColor: Colors.grey,
+    prefixIconColor: AppColors.gray,
+    suffixIconColor: AppColors.gray,
     labelStyle: const TextStyle(
       fontSize: 14,
-      color: Colors.black,
+      color: AppColors.black,
     ),
     hintStyle: const TextStyle(
       fontSize: 14,
-      color: Colors.black,
+      color: AppColors.black,
     ),
     errorStyle: const TextStyle(
       fontSize: 12,
-      color: Colors.red,
+      color: AppColors.error,
     ),
     floatingLabelStyle: TextStyle(
-      color: Colors.black.withOpacity(0.8),
+      color: AppColors.black.withValues(alpha: 0.8),
     ),
     border: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(14)),
-      borderSide: BorderSide(color: Colors.grey),
+      borderSide: BorderSide(color: AppColors.border),
     ),
     enabledBorder: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(14)),
-      borderSide: BorderSide(color: Colors.grey),
+      borderSide: BorderSide(color: AppColors.divider),
     ),
     focusedBorder: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(14)),
-      borderSide: BorderSide(
-          color: Colors.black), // You can replace with a specific color
+      borderSide: BorderSide(color: AppColors.primary),
     ),
     errorBorder: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(14)),
-      borderSide: BorderSide(color: Colors.red),
+      borderSide: BorderSide(color: AppColors.error),
     ),
     focusedErrorBorder: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(14)),
-      borderSide: BorderSide(color: Colors.orange),
+      borderSide: BorderSide(color: AppColors.warning),
     ),
   );
 
-  static const InputDecorationTheme darkInputDecorationTheme =
+  static final InputDecorationTheme darkInputDecorationTheme =
       InputDecorationTheme(
     errorMaxLines: 3,
-    prefixIconColor: Colors.grey,
-    suffixIconColor: Colors.grey,
-    labelStyle: TextStyle(
+    prefixIconColor: AppColors.gray,
+    suffixIconColor: AppColors.gray,
+    labelStyle: const TextStyle(
       fontSize: 14,
-      color: Colors.white,
+      color: AppColors.white,
     ),
-    hintStyle: TextStyle(
+    hintStyle: const TextStyle(
       fontSize: 14,
-      color: Colors.white70,
+      color: AppColors.gray,
     ),
-    errorStyle: TextStyle(
+    errorStyle: const TextStyle(
       fontSize: 12,
-      color: Colors.redAccent,
+      color: AppColors.error,
     ),
     floatingLabelStyle: TextStyle(
-      color: Colors.white70,
+      color: AppColors.white.withValues(alpha: 0.8),
     ),
-    border: OutlineInputBorder(
+    border: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(14)),
-      borderSide: BorderSide(color: Colors.grey),
+      borderSide: BorderSide(color: AppColors.border),
     ),
-    enabledBorder: OutlineInputBorder(
+    enabledBorder: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(14)),
-      borderSide: BorderSide(color: Colors.grey),
+      borderSide: BorderSide(color: AppColors.divider),
     ),
-    focusedBorder: OutlineInputBorder(
+    focusedBorder: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(14)),
-      borderSide: BorderSide(
-          color: Colors.white), // You can replace with a specific color
+      borderSide: BorderSide(color: AppColors.primary),
     ),
-    errorBorder: OutlineInputBorder(
+    errorBorder: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(14)),
-      borderSide: BorderSide(color: Colors.redAccent),
+      borderSide: BorderSide(color: AppColors.error),
     ),
-    focusedErrorBorder: OutlineInputBorder(
+    focusedErrorBorder: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(14)),
-      borderSide: BorderSide(color: Colors.orangeAccent),
+      borderSide: BorderSide(color: AppColors.warning),
     ),
   );
 }

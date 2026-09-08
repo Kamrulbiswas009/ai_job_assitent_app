@@ -1,6 +1,7 @@
 {
-  "recommendations": [
-    "dart-code.dart-code",
-    "dart-code.flutter"
-  ]
+    "recommendations": [
+        "myml.vscode-markdown-plantuml-preview",
+        "esbenp.prettier-vscode",
+        "jebbs.plantuml"
+    ]
 }

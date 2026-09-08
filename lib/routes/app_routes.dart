@@ -1,36 +1,35 @@
 import 'package:get/get.dart';
 
-import '../features/onboarding/screens/about_speech_pro_screen1.dart';
-import '../features/onboarding/screens/about_speech_pro_screen2.dart';
-import '../features/onboarding/screens/about_speech_pro_screen3.dart';
-import '../features/onboarding/screens/checkout_screen.dart';
-import '../features/onboarding/screens/forgot_password_screen.dart';
-import '../features/onboarding/screens/membership_screen.dart';
-import '../features/onboarding/screens/onboarding_login_screen.dart';
-import '../features/onboarding/screens/registration_screen.dart';
-import '../features/onboarding/screens/reset_password_screen.dart';
-import '../features/onboarding/screens/reset_password_verification_screen.dart';
-import '../features/onboarding/screens/splash_get_started_screen.dart';
-import '../features/onboarding/screens/splash_logo_screen.dart';
-import '../features/onboarding/screens/uses_of_ai_screen.dart';
-import '../features/onboarding/screens/verification_screen.dart';
+import '../features/onboarding/presentation/screens/about_speech_pro_screen1.dart';
+import '../features/onboarding/presentation/screens/about_speech_pro_screen2.dart';
+import '../features/onboarding/presentation/screens/about_speech_pro_screen3.dart';
+import '../features/onboarding/presentation/screens/checkout_screen.dart';
+import '../features/onboarding/presentation/screens/forgot_password_screen.dart';
+import '../features/onboarding/presentation/screens/membership_screen.dart';
+import '../features/onboarding/presentation/screens/onboarding_login_screen.dart';
+import '../features/onboarding/presentation/screens/registration_screen.dart';
+import '../features/onboarding/presentation/screens/reset_password_screen.dart';
+import '../features/onboarding/presentation/screens/reset_password_verification_screen.dart';
+import '../features/onboarding/presentation/screens/splash_get_started_screen.dart';
+import '../features/onboarding/presentation/screens/splash_logo_screen.dart';
+import '../features/onboarding/presentation/screens/uses_of_ai_screen.dart';
+import '../features/onboarding/presentation/screens/verification_screen.dart';
 
 class AppRoute {
   static const String splash = '/';
-  static const String splashGetStarted = SplashGetStartedScreen.routeName;
-  static const String registration = RegistrationScreen.routeName;
-  static const String verification = VerificationScreen.routeName;
-  static const String login = OnboardingLoginScreen.routeName;
-  static const String forgotPassword = ForgotPasswordScreen.routeName;
-  static const String resetPasswordVerification =
-      ResetPasswordVerificationScreen.routeName;
-  static const String resetPassword = ResetPasswordScreen.routeName;
-  static const String about1 = AboutSpeechProScreen1.routeName;
-  static const String about2 = AboutSpeechProScreen2.routeName;
-  static const String about3 = AboutSpeechProScreen3.routeName;
-  static const String membership = MembershipScreen.routeName;
-  static const String checkout = CheckoutScreen.routeName;
-  static const String usesOfAi = UsesOfAiScreen.routeName;
+  static const String splashGetStarted = '/splash-get-started';
+  static const String registration = '/registration';
+  static const String verification = '/verification';
+  static const String login = '/onboarding-login';
+  static const String forgotPassword = '/forgot-password';
+  static const String resetPasswordVerification = '/reset-password-verification';
+  static const String resetPassword = '/reset-password';
+  static const String about1 = '/about-speech-pro-1';
+  static const String about2 = '/about-speech-pro-2';
+  static const String about3 = '/about-speech-pro-3';
+  static const String membership = '/membership';
+  static const String checkout = '/checkout';
+  static const String usesOfAi = '/uses-of-ai';
 
   static String getLoginScreen() => login;
 

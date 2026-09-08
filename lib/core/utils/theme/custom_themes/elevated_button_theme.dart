@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../constants/colors.dart';
 
 class AppElevatedButtonTheme {
   AppElevatedButtonTheme._();
@@ -10,21 +11,21 @@ class AppElevatedButtonTheme {
       foregroundColor: WidgetStateProperty.resolveWith<Color>(
         (states) {
           if (states.contains(WidgetState.disabled)) {
-            return Colors.grey; // Disabled text color
+            return AppColors.gray;
           }
-          return Colors.white; // Default text color
+          return AppColors.white;
         },
       ),
       backgroundColor: WidgetStateProperty.resolveWith<Color>(
         (states) {
           if (states.contains(WidgetState.disabled)) {
-            return Colors.grey.shade300; // Disabled background color
+            return AppColors.surfaceLight;
           }
-          return Colors.blue; // Default background color
+          return AppColors.primary;
         },
       ),
       side: WidgetStateProperty.all(
-        const BorderSide(color: Colors.blue),
+        const BorderSide(color: AppColors.primary),
       ),
       padding: WidgetStateProperty.all(
         const EdgeInsets.symmetric(vertical: 18),
@@ -50,22 +51,21 @@ class AppElevatedButtonTheme {
       foregroundColor: WidgetStateProperty.resolveWith<Color>(
         (states) {
           if (states.contains(WidgetState.disabled)) {
-            return Colors.grey.shade600; // Disabled text color in dark mode
+            return AppColors.gray;
           }
-          return Colors.white; // Default text color
+          return AppColors.white;
         },
       ),
       backgroundColor: WidgetStateProperty.resolveWith<Color>(
         (states) {
           if (states.contains(WidgetState.disabled)) {
-            return Colors
-                .grey.shade800; // Disabled background color in dark mode
+            return AppColors.surfaceDark;
           }
-          return Colors.blueGrey; // Default dark background color
+          return AppColors.primary;
         },
       ),
       side: WidgetStateProperty.all(
-        const BorderSide(color: Colors.blueGrey),
+        const BorderSide(color: AppColors.primary),
       ),
       padding: WidgetStateProperty.all(
         const EdgeInsets.symmetric(vertical: 18),

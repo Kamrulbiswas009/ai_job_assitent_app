@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:studioequip_mobile_app/features/authentication/controllers/login_controller.dart';
+import '../../../../core/utils/constants/colors.dart';
+import '../../controller/login_controller.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,7 +14,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Categories'),
-        backgroundColor: Color(0xFF103161),
+        backgroundColor: AppColors.primaryDark,
       ),
       body: SafeArea(
         child: Column(

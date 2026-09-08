@@ -1,14 +1,12 @@
-
-
 import 'package:get/get.dart';
+import '../../features/onboarding/controller/onboarding_controller.dart';
 
 class ControllerBinder extends Bindings {
   @override
   void dependencies() {
-    // Get.lazyPut<LogInController>(
-    //       () => LogInController(),
-    //   fenix: true,
-    // );
-
+    Get.lazyPut<OnboardingController>(
+      () => OnboardingController(),
+      fenix: true,
+    );
   }
 }
