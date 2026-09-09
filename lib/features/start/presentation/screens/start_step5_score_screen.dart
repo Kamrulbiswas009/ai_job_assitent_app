@@ -4,10 +4,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
-import '../../controller/start_controller.dart';
+import '../../controller/start_score_controller.dart';
 import '../widgets/start_header.dart';
 
-class StartStep5ScoreScreen extends GetView<StartController> {
+class StartStep5ScoreScreen extends GetView<StartScoreController> {
   const StartStep5ScoreScreen({super.key});
 
   @override
@@ -177,7 +177,7 @@ class StartStep5ScoreScreen extends GetView<StartController> {
                 children: [
                   SpPrimaryButton(
                     label: 'Start My First Session',
-                    onPressed: controller.finishStartFlow,
+                    onPressed: controller.finishOnboarding,
                   ),
                   SizedBox(height: 16.h),
                   GestureDetector(

@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
-import '../../controller/start_controller.dart';
+import '../../controller/start_goals_controller.dart';
 import '../widgets/goal_item_tile.dart';
 import '../widgets/start_header.dart';
 
-class StartStep1GoalsScreen extends GetView<StartController> {
+class StartStep1GoalsScreen extends GetView<StartGoalsController> {
   const StartStep1GoalsScreen({super.key});
 
   @override
@@ -29,15 +29,13 @@ class StartStep1GoalsScreen extends GetView<StartController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 16.h),
-                    Obx(
-                      () => Text(
-                        'Hey ${controller.userName.value}, you\'re in the right place, this is where we make it happen.',
-                        style: GoogleFonts.inter(
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w700,
-                          height: 1.5,
-                          color: AppColors.black,
-                        ),
+                    Text(
+                      'Hey Aycan, you\'re in the right place, this is where we make it happen.',
+                      style: GoogleFonts.inter(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w700,
+                        height: 1.5,
+                        color: AppColors.black,
                       ),
                     ),
                     SizedBox(height: 16.h),
@@ -85,7 +83,7 @@ class StartStep1GoalsScreen extends GetView<StartController> {
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
               child: SpPrimaryButton(
                 label: 'Continue',
-                onPressed: controller.goToStep2,
+                onPressed: controller.submitGoalAndProceed,
               ),
             ),
           ],
