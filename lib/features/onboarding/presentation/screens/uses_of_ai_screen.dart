@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/image_path.dart';
+import '../../../../routes/app_routes.dart';
 import '../widgets/onboarding_header.dart';
 import '../widgets/sp_primary_button.dart';
 
@@ -168,11 +169,7 @@ class UsesOfAiScreen extends StatelessWidget {
                       SpPrimaryButton(
                         label: 'I Understand,Continue',
                         onPressed: () {
-                          Get.snackbar(
-                            'Onboarding complete',
-                            'You can continue to the main app next.',
-                            snackPosition: SnackPosition.BOTTOM,
-                          );
+                          Get.toNamed(AppRoute.startMembershipIntro);
                         },
                       ),
                       SizedBox(height: 15.h),
