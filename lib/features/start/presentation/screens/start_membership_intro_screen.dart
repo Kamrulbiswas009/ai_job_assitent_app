@@ -5,9 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/image_path.dart';
-import '../../controller/start_controller.dart';
+import '../../controller/start_membership_controller.dart';
 
-class StartMembershipIntroScreen extends GetView<StartController> {
+class StartMembershipIntroScreen extends GetView<StartMembershipController> {
   const StartMembershipIntroScreen({super.key});
 
   @override

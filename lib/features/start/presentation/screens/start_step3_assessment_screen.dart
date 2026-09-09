@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
-import '../../controller/start_controller.dart';
+import '../../controller/start_assessment_controller.dart';
 import '../widgets/benchmark_scale_selector.dart';
 import '../widgets/start_header.dart';
 
-class StartStep3AssessmentScreen extends GetView<StartController> {
+class StartStep3AssessmentScreen extends GetView<StartAssessmentController> {
   const StartStep3AssessmentScreen({super.key});
 
   @override
@@ -90,7 +90,7 @@ class StartStep3AssessmentScreen extends GetView<StartController> {
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
               child: SpPrimaryButton(
                 label: 'Continue',
-                onPressed: controller.goToStep4,
+                onPressed: controller.submitAssessmentAndProceed,
               ),
             ),
           ],

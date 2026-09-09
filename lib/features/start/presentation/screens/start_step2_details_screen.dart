@@ -6,11 +6,11 @@ import '../../../../core/common/widgets/custom_card_text_field.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
-import '../../controller/start_controller.dart';
+import '../../controller/start_step2_details_controller.dart';
 import '../widgets/start_header.dart';
 import '../widgets/voice_recorder_card.dart';
 
-class StartStep2DetailsScreen extends GetView<StartController> {
+class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
   const StartStep2DetailsScreen({super.key});
 
   @override
@@ -41,15 +41,13 @@ class StartStep2DetailsScreen extends GetView<StartController> {
                           fit: BoxFit.contain,
                         ),
                         SizedBox(width: 8.w),
-                        Obx(
-                          () => Text(
-                            controller.selectedGoalTitle.value,
-                            style: GoogleFonts.inter(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w700,
-                              height: 1.5,
-                              color: AppColors.black,
-                            ),
+                        Text(
+                          'Job Interview',
+                          style: GoogleFonts.inter(
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.w700,
+                            height: 1.5,
+                            color: AppColors.black,
                           ),
                         ),
                       ],
@@ -139,9 +137,9 @@ class StartStep2DetailsScreen extends GetView<StartController> {
                     // Voice Recording Card
                     Obx(
                       () => VoiceRecorderCard(
-                        isRecording: controller.isStep2Recording.value,
-                        durationSeconds: controller.step2RecordDuration.value,
-                        onToggleRecord: controller.toggleStep2Recording,
+                        isRecording: controller.isRecording.value,
+                        durationSeconds: controller.recordDuration.value,
+                        onToggleRecord: controller.toggleRecording,
                         isCompactHorizontal: true,
                       ),
                     ),
@@ -173,7 +171,7 @@ class StartStep2DetailsScreen extends GetView<StartController> {
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
               child: SpPrimaryButton(
                 label: 'Continue',
-                onPressed: controller.goToBriefing,
+                onPressed: controller.submitDetailsAndProceed,
               ),
             ),
           ],

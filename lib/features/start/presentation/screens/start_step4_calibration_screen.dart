@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
-import '../../controller/start_controller.dart';
+import '../../controller/start_calibration_controller.dart';
 import '../widgets/start_header.dart';
 import '../widgets/voice_recorder_card.dart';
 
-class StartStep4CalibrationScreen extends GetView<StartController> {
+class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
   const StartStep4CalibrationScreen({super.key});
 
   @override
@@ -62,9 +62,9 @@ class StartStep4CalibrationScreen extends GetView<StartController> {
                     // Voice Recorder
                     Obx(
                       () => VoiceRecorderCard(
-                        isRecording: controller.isCalibrationRecording.value,
-                        durationSeconds: controller.calibrationDuration.value,
-                        onToggleRecord: controller.toggleCalibrationRecording,
+                        isRecording: controller.isRecording.value,
+                        durationSeconds: controller.durationSeconds.value,
+                        onToggleRecord: controller.toggleRecording,
                         label: 'Tap to speak your Answer',
                       ),
                     ),
@@ -72,7 +72,7 @@ class StartStep4CalibrationScreen extends GetView<StartController> {
                     // Skip Voice calibration
                     Center(
                       child: GestureDetector(
-                        onTap: controller.goToStep5,
+                        onTap: controller.proceedToStep5,
                         behavior: HitTestBehavior.opaque,
                         child: Text(
                           'Skip Voice calibration',
@@ -94,7 +94,7 @@ class StartStep4CalibrationScreen extends GetView<StartController> {
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
               child: SpPrimaryButton(
                 label: 'Continue',
-                onPressed: controller.goToStep5,
+                onPressed: controller.proceedToStep5,
               ),
             ),
           ],

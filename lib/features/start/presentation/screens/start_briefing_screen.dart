@@ -5,10 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/image_path.dart';
-import '../../controller/start_controller.dart';
+import '../../controller/start_briefing_controller.dart';
 import '../widgets/start_header.dart';
 
-class StartBriefingScreen extends GetView<StartController> {
+class StartBriefingScreen extends GetView<StartBriefingController> {
   const StartBriefingScreen({super.key});
 
   @override
@@ -39,7 +39,7 @@ class StartBriefingScreen extends GetView<StartController> {
                       ),
                       child: SpPrimaryButton(
                         label: 'Continue',
-                        onPressed: controller.goToStep3,
+                        onPressed: controller.proceedToAssessment,
                       ),
                     )
                   : const SizedBox.shrink(),
@@ -62,7 +62,7 @@ class StartBriefingScreen extends GetView<StartController> {
               _buildSpRedBadge(),
               SizedBox(width: 8.w),
               Text(
-                controller.selectedGoalTitle.value,
+                'Job Interview',
                 style: GoogleFonts.inter(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.w600,
@@ -74,7 +74,7 @@ class StartBriefingScreen extends GetView<StartController> {
           ),
           SizedBox(height: 12.h),
           Text(
-            '${controller.userFirstName.value}, your personal briefing',
+            'Aycan, your personal briefing',
             style: GoogleFonts.inter(
               fontSize: 36.sp,
               fontWeight: FontWeight.w800,
@@ -92,16 +92,20 @@ class StartBriefingScreen extends GetView<StartController> {
             ),
           ),
           SizedBox(height: 24.h),
-          _buildStepLoader(
-            'Absorbing what you have shared',
-            isComplete: controller.briefingLoadingStage.value >= 1,
-            isActive: controller.briefingLoadingStage.value == 0,
+          Obx(
+            () => _buildStepLoader(
+              'Absorbing what you have shared',
+              isComplete: controller.briefingLoadingStage.value >= 1,
+              isActive: controller.briefingLoadingStage.value == 0,
+            ),
           ),
           SizedBox(height: 16.h),
-          _buildStepLoader(
-            'Structuring our response',
-            isComplete: controller.briefingLoadingStage.value >= 2,
-            isActive: controller.briefingLoadingStage.value == 1,
+          Obx(
+            () => _buildStepLoader(
+              'Structuring our response',
+              isComplete: controller.briefingLoadingStage.value >= 2,
+              isActive: controller.briefingLoadingStage.value == 1,
+            ),
           ),
           const Spacer(),
           Center(
@@ -177,7 +181,7 @@ class StartBriefingScreen extends GetView<StartController> {
               _buildSpRedBadge(),
               SizedBox(width: 8.w),
               Text(
-                controller.selectedGoalTitle.value,
+                'Job Interview',
                 style: GoogleFonts.inter(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.w600,
@@ -189,7 +193,7 @@ class StartBriefingScreen extends GetView<StartController> {
           ),
           SizedBox(height: 8.h),
           Text(
-            '${controller.userFirstName.value}, your personal briefing',
+            'Aycan, your personal briefing',
             style: GoogleFonts.inter(
               fontSize: 36.sp,
               fontWeight: FontWeight.w800,
