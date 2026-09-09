@@ -12,4 +12,7 @@ class IconPath {
   static const String icFeatureMic = 'assets/icons/ic_feature_mic.svg';
   static const String icFeatureBolt = 'assets/icons/ic_feature_bolt.svg';
   static const String icFeatureCrown = 'assets/icons/ic_feature_crown.svg';
+  static const String icJobInterview = 'assets/icons/ic_job_interview.png';
+  static const String icMic = 'assets/icons/ic_mic.svg';
+  static const String icMicButton = 'assets/icons/ic_mic_button.png';
 }

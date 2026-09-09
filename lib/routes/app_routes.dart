@@ -14,6 +14,13 @@ import '../features/onboarding/presentation/screens/splash_get_started_screen.da
 import '../features/onboarding/presentation/screens/splash_logo_screen.dart';
 import '../features/onboarding/presentation/screens/uses_of_ai_screen.dart';
 import '../features/onboarding/presentation/screens/verification_screen.dart';
+import '../features/start/presentation/screens/start_briefing_screen.dart';
+import '../features/start/presentation/screens/start_membership_intro_screen.dart';
+import '../features/start/presentation/screens/start_step1_goals_screen.dart';
+import '../features/start/presentation/screens/start_step2_details_screen.dart';
+import '../features/start/presentation/screens/start_step3_assessment_screen.dart';
+import '../features/start/presentation/screens/start_step4_calibration_screen.dart';
+import '../features/start/presentation/screens/start_step5_score_screen.dart';
 
 class AppRoute {
   static const String splash = '/';
@@ -30,6 +37,13 @@ class AppRoute {
   static const String membership = '/membership';
   static const String checkout = '/checkout';
   static const String usesOfAi = '/uses-of-ai';
+  static const String startMembershipIntro = '/start-membership-intro';
+  static const String startStep1Goals = '/start-step1-goals';
+  static const String startStep2Details = '/start-step2-details';
+  static const String startBriefing = '/start-briefing';
+  static const String startStep3Assessment = '/start-step3-assessment';
+  static const String startStep4Calibration = '/start-step4-calibration';
+  static const String startStep5Score = '/start-step5-score';
 
   static String getLoginScreen() => login;
 
@@ -54,5 +68,33 @@ class AppRoute {
     GetPage(name: membership, page: () => const MembershipScreen()),
     GetPage(name: checkout, page: () => const CheckoutScreen()),
     GetPage(name: usesOfAi, page: () => const UsesOfAiScreen()),
+    GetPage(
+      name: startMembershipIntro,
+      page: () => const StartMembershipIntroScreen(),
+    ),
+    GetPage(
+      name: startStep1Goals,
+      page: () => const StartStep1GoalsScreen(),
+    ),
+    GetPage(
+      name: startStep2Details,
+      page: () => const StartStep2DetailsScreen(),
+    ),
+    GetPage(
+      name: startBriefing,
+      page: () => const StartBriefingScreen(),
+    ),
+    GetPage(
+      name: startStep3Assessment,
+      page: () => const StartStep3AssessmentScreen(),
+    ),
+    GetPage(
+      name: startStep4Calibration,
+      page: () => const StartStep4CalibrationScreen(),
+    ),
+    GetPage(
+      name: startStep5Score,
+      page: () => const StartStep5ScoreScreen(),
+    ),
   ];
 }
