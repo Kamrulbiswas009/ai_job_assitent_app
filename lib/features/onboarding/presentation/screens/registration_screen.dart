@@ -131,8 +131,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             Get.toNamed(AppRoute.verification),
                       ),
                       SizedBox(height: 12.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
                             'Already have an account? ',
@@ -144,7 +145,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () => Get.offAllNamed(AppRoute.login),
+                            onTap: () => Get.toNamed(AppRoute.login),
                             child: Text(
                               'Sign In',
                               style: GoogleFonts.inter(

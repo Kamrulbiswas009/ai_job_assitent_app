@@ -9,4 +9,7 @@ class IconPath {
   static const String icEmvChip = 'assets/icons/ic_emv_chip.svg';
   static const String icMastercard = 'assets/icons/ic_mastercard.svg';
   static const String icCheckSmall = 'assets/icons/ic_check_small.svg';
+  static const String icFeatureMic = 'assets/icons/ic_feature_mic.svg';
+  static const String icFeatureBolt = 'assets/icons/ic_feature_bolt.svg';
+  static const String icFeatureCrown = 'assets/icons/ic_feature_crown.svg';
 }
