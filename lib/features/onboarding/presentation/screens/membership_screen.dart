@@ -112,10 +112,7 @@ class MembershipScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 10.h),
-                            Divider(
-                              height: 1.h,
-                              color: AppColors.divider,
-                            ),
+                            Divider(height: 1.h, color: AppColors.divider),
                             SizedBox(height: 15.h),
                             ..._features.map(
                               (feature) => Padding(
@@ -127,10 +124,12 @@ class MembershipScreen extends StatelessWidget {
                                       width: 20.w,
                                       height: 20.w,
                                       decoration: BoxDecoration(
-                                        color: AppColors.primary
-                                            .withValues(alpha: 0.1),
-                                        borderRadius:
-                                            BorderRadius.circular(10.r),
+                                        color: AppColors.primary.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          10.r,
+                                        ),
                                       ),
                                       alignment: Alignment.center,
                                       child: SvgPicture.asset(
@@ -177,7 +176,7 @@ class MembershipScreen extends StatelessWidget {
                   color: AppColors.gray,
                 ),
               ),
-              SizedBox(height: 18.h),
+              SizedBox(height: 180.h),
             ],
           ),
         ),

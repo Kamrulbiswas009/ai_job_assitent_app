@@ -124,7 +124,11 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
     );
   }
 
-  Widget _buildStepLoader(String title, {required bool isComplete, required bool isActive}) {
+  Widget _buildStepLoader(
+    String title, {
+    required bool isComplete,
+    required bool isActive,
+  }) {
     return Row(
       children: [
         Container(
@@ -133,7 +137,9 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
           decoration: BoxDecoration(
             color: isComplete
                 ? AppColors.primary
-                : (isActive ? const Color(0xFFFFECEC) : const Color(0xFFF2F2F7)),
+                : (isActive
+                      ? const Color(0xFFFFECEC)
+                      : const Color(0xFFF2F2F7)),
             shape: BoxShape.circle,
             border: Border.all(
               color: isComplete || isActive
@@ -144,17 +150,17 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
           child: isComplete
               ? Icon(Icons.check, size: 13.sp, color: AppColors.white)
               : (isActive
-                  ? Center(
-                      child: Container(
-                        width: 8.r,
-                        height: 8.r,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
+                    ? Center(
+                        child: Container(
+                          width: 8.r,
+                          height: 8.r,
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
                         ),
-                      ),
-                    )
-                  : null),
+                      )
+                    : null),
         ),
         SizedBox(width: 12.w),
         Text(
@@ -162,7 +168,9 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
           style: GoogleFonts.inter(
             fontSize: 15.sp,
             fontWeight: FontWeight.w600,
-            color: isComplete || isActive ? AppColors.black : const Color(0xFF888888),
+            color: isComplete || isActive
+                ? AppColors.black
+                : const Color(0xFF888888),
           ),
         ),
       ],
@@ -305,45 +313,52 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
           ),
           SizedBox(height: 20.h),
           // First Principle Card
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF7F7),
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: const Color(0xFFFFD4D4), width: 1),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'First principle',
-                  style: GoogleFonts.inter(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w500,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16.r),
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFAF0F0),
+                border: Border(
+                  left: BorderSide(
                     color: AppColors.primary,
+                    width: 4.5,
                   ),
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  'The Private Room Rule',
-                  style: GoogleFonts.inter(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.black,
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'First principle',
+                    style: GoogleFonts.inter(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
                   ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'Before you enter the interview, your internal state sets the tone for everything that follows — this doctrine trains you to arrive already settled, already authoritative, so the room receives you that way from the first moment.',
-                  style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                    height: 1.5,
-                    color: const Color(0xFF0A0A0A),
+                  SizedBox(height: 6.h),
+                  Text(
+                    'The Private Room Rule',
+                    style: GoogleFonts.inter(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.black,
+                    ),
                   ),
-                ),
-              ],
+                  SizedBox(height: 8.h),
+                  Text(
+                    'Before you enter the interview, your internal state sets the tone for everything that follows — this doctrine trains you to arrive already settled, already authoritative, so the room receives you that way from the first moment.',
+                    style: GoogleFonts.inter(
+                      fontSize: 13.5.sp,
+                      fontWeight: FontWeight.w400,
+                      height: 1.45,
+                      color: const Color(0xFF1E1E1E),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(height: 28.h),
@@ -353,7 +368,7 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
           Text(
             'Think of the single most important thing you want the interviewer to believe about you by the end of that conversation. Say it aloud as one clear, unhedged sentence — no qualifiers, no softening — and hold the silence after it. That is where your authority lives.',
             style: GoogleFonts.inter(
-              fontSize: 20.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.w700,
               height: 1.4,
               color: const Color(0xFF0A0A0A),
