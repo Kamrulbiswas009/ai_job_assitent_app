@@ -35,8 +35,8 @@ class OnboardingHeader extends StatelessWidget {
                 onTap: onBack ?? Get.back,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
-                  width: 40.w,
-                  height: 40.w,
+                  width: 44.w,
+                  height: 44.w,
                   decoration: const BoxDecoration(
                     color: AppColors.surfaceGray,
                     shape: BoxShape.circle,
@@ -44,8 +44,8 @@ class OnboardingHeader extends StatelessWidget {
                   alignment: Alignment.center,
                   child: SvgPicture.asset(
                     IconPath.icBack,
-                    width: 20.w,
-                    height: 20.w,
+                    width: 22.w,
+                    height: 22.w,
                   ),
                 ),
               ),
@@ -53,7 +53,7 @@ class OnboardingHeader extends StatelessWidget {
               if (style == OnboardingHeaderStyle.logo)
                 Image.asset(
                   ImagePath.logoHeader,
-                  height: 26.h,
+                  height: 40.h,
                   fit: BoxFit.contain,
                 )
               else

@@ -67,14 +67,12 @@ class GoalItemTile extends StatelessWidget {
                 ),
               ),
             ),
-            // Chevron Icon
-            Icon(
-              isSelected
-                  ? Icons.keyboard_arrow_up_rounded
-                  : Icons.keyboard_arrow_down_rounded,
-              color: isSelected ? AppColors.primary : const Color(0xFF888888),
-              size: 20.sp,
-            ),
+            if (isSelected)
+              Icon(
+                Icons.check,
+                color: AppColors.primary,
+                size: 20.sp,
+              ),
           ],
         ),
       ),

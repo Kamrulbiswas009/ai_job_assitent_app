@@ -65,10 +65,9 @@ class UsesOfAiScreen extends StatelessWidget {
                       Image.asset(
                         ImagePath.spLogoWordmark,
                         width: 333.w,
-                        height: 96.h,
+                        height: 180.h,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(height: 24.h),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(

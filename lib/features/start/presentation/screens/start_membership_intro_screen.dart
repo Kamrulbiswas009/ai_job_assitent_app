@@ -98,7 +98,7 @@ class StartMembershipIntroScreen extends GetView<StartMembershipController> {
                 label: 'What do you want to achieve',
                 onPressed: controller.goToStep1,
               ),
-              SizedBox(height: 20.h),
+              SizedBox(height: 120.h),
             ],
           ),
         ),
