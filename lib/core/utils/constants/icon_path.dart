@@ -1,4 +1,3 @@
-
 class IconPath {
   IconPath._();
 
@@ -15,4 +14,5 @@ class IconPath {
   static const String icJobInterview = 'assets/icons/ic_job_interview.png';
   static const String icMic = 'assets/icons/ic_mic.svg';
   static const String icMicButton = 'assets/icons/ic_mic_button.png';
+  static const String onboarding = 'assets/icons/onboarding.png';
 }

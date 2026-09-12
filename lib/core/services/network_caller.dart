@@ -1,23 +1,29 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 import '../models/response_data.dart';
 
 class NetworkCaller {
-  final int timeoutDuration = 10;
+  final int timeoutDuration = 20;
 
   // GET method
   Future<ResponseData> getRequest(String url, {String? token}) async {
+    debugPrint('==================== [GET REQUEST] ====================');
+    debugPrint('URL: $url');
+    if (token != null) debugPrint('Token: $token');
     log('GET Request: $url');
-    log('GET Token: $token');
+
     try {
       final Response response = await get(
         Uri.parse(url),
         headers: {
-          'Authorization': token.toString(),
-          'Content-type': 'application/json',
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+          if (token != null && token.isNotEmpty)
+            'Authorization': token.startsWith('Bearer ') ? token : 'Bearer $token',
         },
       ).timeout(
         Duration(seconds: timeoutDuration),
@@ -30,16 +36,30 @@ class NetworkCaller {
   }
 
   // POST method
-  Future<ResponseData> postRequest(String url,
-      {Map<String, String>? body, String? token}) async {
-    log('POST Request: $url');
-    log('Request Body: ${jsonEncode(body)}');
+  Future<ResponseData> postRequest(
+    String url, {
+    dynamic body,
+    String? token,
+  }) async {
+    final bodyString = body != null ? jsonEncode(body) : '';
+    debugPrint('==================== [POST REQUEST] ====================');
+    debugPrint('URL: $url');
+    debugPrint('Body: $bodyString');
+    if (token != null) debugPrint('Token: $token');
+    log('POST Request: $url, Body: $bodyString');
 
     try {
-      final Response response = await post(Uri.parse(url),
-          headers: {'Content-type': 'application/json'},
-          body: jsonEncode(body))
-          .timeout(Duration(seconds: timeoutDuration));
+      final Response response = await post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+          if (token != null && token.isNotEmpty)
+            'Authorization': token.startsWith('Bearer ') ? token : 'Bearer $token',
+        },
+        body: bodyString.isNotEmpty ? bodyString : null,
+      ).timeout(Duration(seconds: timeoutDuration));
+
       return _handleResponse(response);
     } catch (e) {
       return _handleError(e);
@@ -48,48 +68,61 @@ class NetworkCaller {
 
   // Handle response
   ResponseData _handleResponse(Response response) {
-    log('Response Status: ${response.statusCode}');
-    log('Response Body: ${response.body}');
+    debugPrint('==================== [API RESPONSE] ====================');
+    debugPrint('Status Code: ${response.statusCode}');
+    debugPrint('Response Body: ${response.body}');
+    log('Response Code: ${response.statusCode}, Body: ${response.body}');
 
-    final decodedResponse = jsonDecode(response.body);
+    dynamic decodedResponse;
+    try {
+      decodedResponse = jsonDecode(response.body);
+    } catch (e) {
+      decodedResponse = response.body;
+    }
 
-    if (response.statusCode == 200) {
-      if (decodedResponse['success'] == true) {
-        return ResponseData(
-          isSuccess: true,
-          statusCode: response.statusCode,
-          responseData: decodedResponse,
-          errorMessage: '',
-        );
-      } else {
-        return ResponseData(
-          isSuccess: false,
-          statusCode: response.statusCode,
-          responseData: decodedResponse,
-          errorMessage: decodedResponse['message'] ?? 'Unknown error occurred',
-        );
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return ResponseData(
+        isSuccess: true,
+        statusCode: response.statusCode,
+        responseData: decodedResponse,
+        errorMessage: '',
+      );
+    } else if (response.statusCode == 400 || response.statusCode == 422) {
+      String errorMessage = 'Validation error';
+      if (decodedResponse is Map) {
+        if (decodedResponse['errorSources'] != null) {
+          errorMessage = _extractErrorMessages(decodedResponse['errorSources']);
+        } else if (decodedResponse['message'] != null) {
+          errorMessage = decodedResponse['message'].toString();
+        }
       }
-    } else if (response.statusCode == 400) {
       return ResponseData(
         isSuccess: false,
         statusCode: response.statusCode,
         responseData: decodedResponse,
-        errorMessage: _extractErrorMessages(decodedResponse['errorSources']),
+        errorMessage: errorMessage,
       );
-    } else if (response.statusCode == 500) {
+    } else if (response.statusCode == 401) {
+      String errorMessage = 'Unauthorized';
+      if (decodedResponse is Map && decodedResponse['message'] != null) {
+        errorMessage = decodedResponse['message'].toString();
+      }
       return ResponseData(
         isSuccess: false,
         statusCode: response.statusCode,
-        responseData: '',
-        errorMessage:
-        decodedResponse['message'] ?? 'An unexpected error occurred!',
+        responseData: decodedResponse,
+        errorMessage: errorMessage,
       );
     } else {
+      String errorMessage = 'An unexpected error occurred!';
+      if (decodedResponse is Map && decodedResponse['message'] != null) {
+        errorMessage = decodedResponse['message'].toString();
+      }
       return ResponseData(
         isSuccess: false,
         statusCode: response.statusCode,
         responseData: decodedResponse,
-        errorMessage: decodedResponse['message'] ?? 'An unknown error occurred',
+        errorMessage: errorMessage,
       );
     }
   }
@@ -106,6 +139,8 @@ class NetworkCaller {
 
   // Handle errors
   ResponseData _handleError(dynamic error) {
+    debugPrint('==================== [REQUEST ERROR] ====================');
+    debugPrint('Error: $error');
     log('Request Error: $error');
 
     if (error is ClientException) {
@@ -127,7 +162,7 @@ class NetworkCaller {
         isSuccess: false,
         statusCode: 500,
         responseData: '',
-        errorMessage: 'Unexpected error occurred.',
+        errorMessage: 'Unexpected error occurred: $error',
       );
     }
   }

@@ -10,10 +10,19 @@ import '../../../../routes/app_routes.dart';
 import 'sp_primary_button.dart';
 
 class PaymentSuccessSheet extends StatelessWidget {
-  const PaymentSuccessSheet({super.key});
+  final Map? planArgs;
+
+  const PaymentSuccessSheet({super.key, this.planArgs});
 
   @override
   Widget build(BuildContext context) {
+    final String amount = (planArgs != null && planArgs!['price'] != null)
+        ? planArgs!['price'].toString()
+        : '£49';
+    final String billing = (planArgs != null && planArgs!['billingCycle'] != null)
+        ? planArgs!['billingCycle'].toString()
+        : 'Monthly';
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -72,7 +81,7 @@ class PaymentSuccessSheet extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '£49',
+                      amount,
                       style: GoogleFonts.inter(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w700,
@@ -126,7 +135,7 @@ class PaymentSuccessSheet extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Monthly',
+                      billing,
                       style: GoogleFonts.inter(
                         fontSize: 14.sp,
                         color: AppColors.gray,

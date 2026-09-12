@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.studioequip.studioequip_mobile_app"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

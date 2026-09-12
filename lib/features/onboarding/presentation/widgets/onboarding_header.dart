@@ -14,10 +14,12 @@ class OnboardingHeader extends StatelessWidget {
   const OnboardingHeader({
     super.key,
     this.style = OnboardingHeaderStyle.logo,
+    this.showBackButton = true,
     this.onBack,
   });
 
   final OnboardingHeaderStyle style;
+  final bool showBackButton;
   final VoidCallback? onBack;
 
   @override
@@ -31,25 +33,27 @@ class OnboardingHeader extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              GestureDetector(
-                onTap: onBack ?? Get.back,
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  width: 44.w,
-                  height: 44.w,
-                  decoration: const BoxDecoration(
-                    color: AppColors.surfaceGray,
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset(
-                    IconPath.icBack,
-                    width: 22.w,
-                    height: 22.w,
+              if (showBackButton) ...[
+                GestureDetector(
+                  onTap: onBack ?? Get.back,
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    width: 32.w,
+                    height: 32.w,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF2F2F7),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: SvgPicture.asset(
+                      IconPath.icBack,
+                      width: 16.w,
+                      height: 16.w,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 10.w),
+                SizedBox(width: 12.w),
+              ],
               if (style == OnboardingHeaderStyle.logo)
                 Image.asset(
                   ImagePath.logoHeader,

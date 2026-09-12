@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
-import '../../../../core/utils/constants/image_path.dart';
 import '../../../../routes/app_routes.dart';
 
 class SplashGetStartedScreen extends StatelessWidget {
@@ -23,40 +21,45 @@ class SplashGetStartedScreen extends StatelessWidget {
           builder: (context, constraints) {
             return SingleChildScrollView(
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
                 child: IntrinsicHeight(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     child: Column(
                       children: [
-                        SizedBox(height: 20.h),
-                        // Top Brand Header
-                        Text(
-                          'welcome to',
-                          style: GoogleFonts.inter(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 1.2,
-                            color: const Color(0xFF767676),
+                        const Spacer(flex: 2),
+                        // Red square box with SP logo
+                        Container(
+                          width: 52.w,
+                          height: 52.w,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'SP',
+                              style: GoogleFonts.inter(
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.5,
+                                color: AppColors.white,
+                              ),
+                            ),
                           ),
                         ),
-                        SizedBox(height: 10.h),
-                        // Unboxed SP Logo Mark in its original intended shape
-                        Image.asset(
-                          ImagePath.spLogoMark,
-                          width: 72.w,
-                          height: 34.h,
-                          fit: BoxFit.contain,
-                        ),
-                        SizedBox(height: 8.h),
+                        SizedBox(height: 18.h),
                         // SpeechPro Brand Name
                         RichText(
+                          textAlign: TextAlign.center,
                           text: TextSpan(
                             children: [
                               TextSpan(
                                 text: 'Speech',
                                 style: GoogleFonts.inter(
-                                  fontSize: 27.sp,
+                                  fontSize: 34.sp,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: -0.5,
                                   color: AppColors.black,
@@ -65,7 +68,7 @@ class SplashGetStartedScreen extends StatelessWidget {
                               TextSpan(
                                 text: 'Pro',
                                 style: GoogleFonts.inter(
-                                  fontSize: 27.sp,
+                                  fontSize: 34.sp,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: -0.5,
                                   color: AppColors.primary,
@@ -75,70 +78,66 @@ class SplashGetStartedScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 4.h),
+                        // WINNING WITH WORDS
                         Text(
-                          'winning with words',
+                          'WINNING WITH WORDS',
                           style: GoogleFonts.inter(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: 2.2,
-                            color: const Color(0xFF9E9E9E),
-                          ),
-                        ),
-
-                        SizedBox(height: 28.h),
-
-                        // Title and Description
-                        Text(
-                          'Before we begin — we want to\nlisten.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            fontSize: 21.sp,
+                            fontSize: 13.sp,
                             fontWeight: FontWeight.w700,
-                            height: 1.3,
+                            letterSpacing: 3.0,
                             color: AppColors.black,
                           ),
                         ),
-                        SizedBox(height: 12.h),
-                        Text(
-                          "SpeechPro doesn't start by telling you what\nto do. It starts by understanding what you\nactually need.",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            height: 1.45,
-                            color: const Color(0xFF555555),
+                        SizedBox(height: 24.h),
+                        // Subtitle Description
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: Text(
+                            'AI coaching for the speaking situations that define your career — built on proprietary coaching doctrine, not generic AI.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 13.5.sp,
+                              fontWeight: FontWeight.w400,
+                              height: 1.45,
+                              color: const Color(0xFF707070),
+                            ),
                           ),
                         ),
-
-                        SizedBox(height: 28.h),
-
-                        // Feature Pillars with red icons
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12.w),
+                        const Spacer(flex: 1),
+                        // Feature list with dividers
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              top: BorderSide(
+                                color: const Color(0xFFE5E5EA),
+                                width: 1.w,
+                              ),
+                              bottom: BorderSide(
+                                color: const Color(0xFFE5E5EA),
+                                width: 1.w,
+                              ),
+                            ),
+                          ),
                           child: Column(
                             children: [
-                              _FeatureRow(
-                                iconPath: IconPath.icFeatureMic,
-                                label: 'Power through speech',
+                              _buildFeatureItem('Power Through Speech'),
+                              Divider(
+                                height: 1.h,
+                                thickness: 1.w,
+                                color: const Color(0xFFE5E5EA),
                               ),
-                              SizedBox(height: 16.h),
-                              _FeatureRow(
-                                iconPath: IconPath.icFeatureBolt,
-                                label: 'Influence through impact',
+                              _buildFeatureItem('Influence Through Impact'),
+                              Divider(
+                                height: 1.h,
+                                thickness: 1.w,
+                                color: const Color(0xFFE5E5EA),
                               ),
-                              SizedBox(height: 16.h),
-                              _FeatureRow(
-                                iconPath: IconPath.icFeatureCrown,
-                                label: 'Authority through presence',
-                              ),
+                              _buildFeatureItem('Authority Through Presence'),
                             ],
                           ),
                         ),
-
-                        const Spacer(),
-                        SizedBox(height: 20.h),
-
-                        // Primary Action Button
+                        const Spacer(flex: 3),
+                        // Get Started Button
                         SizedBox(
                           width: double.infinity,
                           height: 52.h,
@@ -148,44 +147,20 @@ class SplashGetStartedScreen extends StatelessWidget {
                               backgroundColor: AppColors.primary,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
+                                borderRadius: BorderRadius.circular(16.r),
                               ),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Create account →',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 14.h),
-
-                        // Sign-in sub-link
-                        GestureDetector(
-                          onTap: () => Get.toNamed(AppRoute.login),
-                          behavior: HitTestBehavior.opaque,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 4.h),
                             child: Text(
-                              'Already have an account? Sign in',
-                              textAlign: TextAlign.center,
+                              'Get Started',
                               style: GoogleFonts.inter(
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.primary,
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.white,
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: 18.h),
+                        SizedBox(height: 24.h),
                       ],
                     ),
                   ),
@@ -197,38 +172,31 @@ class SplashGetStartedScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-class _FeatureRow extends StatelessWidget {
-  const _FeatureRow({
-    required this.iconPath,
-    required this.label,
-  });
-
-  final String iconPath;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SvgPicture.asset(
-          iconPath,
-          width: 22.w,
-          height: 22.w,
-        ),
-        SizedBox(width: 14.w),
-        Expanded(
-          child: Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.black,
+  Widget _buildFeatureItem(String title) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 8.w),
+      child: Row(
+        children: [
+          Image.asset(
+            IconPath.onboarding,
+            width: 22.w,
+            height: 22.w,
+            fit: BoxFit.contain,
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.black,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -8,11 +8,13 @@ class SpPrimaryButton extends StatelessWidget {
   const SpPrimaryButton({
     super.key,
     required this.label,
-    required this.onPressed,
+    this.onPressed,
+    this.isLoading = false,
   });
 
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +22,10 @@ class SpPrimaryButton extends StatelessWidget {
       width: double.infinity,
       height: 53.h,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
           foregroundColor: AppColors.white,
           elevation: 0,
           shadowColor: AppColors.transparent,
@@ -31,16 +34,25 @@ class SpPrimaryButton extends StatelessWidget {
           ),
           padding: EdgeInsets.symmetric(vertical: 16.h),
         ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.inter(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            height: 1.5,
-            color: AppColors.white,
-          ),
-        ),
+        child: isLoading
+            ? SizedBox(
+                width: 22.w,
+                height: 22.w,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Text(
+                label,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  height: 1.5,
+                  color: AppColors.white,
+                ),
+              ),
       ),
     );
   }
