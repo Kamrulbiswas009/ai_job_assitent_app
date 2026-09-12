@@ -19,6 +19,8 @@ class OnboardingController extends GetxController {
   final RxBool isForgotPasswordLoading = false.obs;
   final RxBool isResetPasswordLoading = false.obs;
   final RxBool isCheckoutLoading = false.obs;
+  final RxBool isPaymentLaunched = false.obs;
+  final RxString checkoutUrl = ''.obs;
 
   // Registered email holder for verification flow
   final RxString registeredEmail = ''.obs;
@@ -554,6 +556,22 @@ class OnboardingController extends GetxController {
         margin: const EdgeInsets.all(16),
       );
       return false;
+    }
+  }
+
+  void resetCheckoutState() {
+    isPaymentLaunched.value = false;
+    checkoutUrl.value = '';
+  }
+
+  Future<void> handleProceedToPayment(String planId) async {
+    final url = await createCheckoutSession(planId: planId);
+    if (url != null && url.isNotEmpty) {
+      checkoutUrl.value = url;
+      final launched = await launchCheckoutUrl(url);
+      if (launched) {
+        isPaymentLaunched.value = true;
+      }
     }
   }
 
