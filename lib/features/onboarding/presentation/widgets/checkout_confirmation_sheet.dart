@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../controller/onboarding_controller.dart';
 import '../../model/membership_plan_model.dart';
+import 'payment_success_sheet.dart';
 import 'sp_primary_button.dart';
 
 class CheckoutConfirmationSheet extends StatelessWidget {
@@ -33,8 +34,18 @@ class CheckoutConfirmationSheet extends StatelessWidget {
       planId: plan.planId,
     );
     if (checkoutUrl != null && checkoutUrl.isNotEmpty) {
-      Get.back(); // close modal sheet
+      Get.back(); // close confirmation sheet
+
+      // Launch Stripe checkout
       await controller.launchCheckoutUrl(checkoutUrl);
+
+      // When user returns to the app, show payment success sheet & continue flow
+      PaymentSuccessSheet.show(
+        planArgs: plan.toMap(),
+        txnId: controller.lastSessionId.value.isNotEmpty
+            ? controller.lastSessionId.value
+            : null,
+      );
     }
   }
 

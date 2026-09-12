@@ -25,6 +25,7 @@ class OnboardingController extends GetxController {
   // Forgot password email & OTP holder
   final RxString resetPasswordEmail = ''.obs;
   final RxString resetPasswordOtp = ''.obs;
+  final RxString lastSessionId = ''.obs;
 
   final RxInt selectedPlanIndex = 0.obs;
   final RxBool isPasswordVisible = false.obs;
@@ -484,6 +485,12 @@ class OnboardingController extends GetxController {
         final checkoutUrl = (data != null && data is Map)
             ? data['checkoutUrl']?.toString()
             : null;
+        final sessionId = (data != null && data is Map)
+            ? data['sessionId']?.toString()
+            : null;
+        if (sessionId != null && sessionId.isNotEmpty) {
+          lastSessionId.value = sessionId;
+        }
 
         if (checkoutUrl == null || checkoutUrl.isEmpty) {
           Get.snackbar(
