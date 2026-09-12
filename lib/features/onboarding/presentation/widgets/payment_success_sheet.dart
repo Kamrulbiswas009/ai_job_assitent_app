@@ -11,12 +11,10 @@ import 'sp_primary_button.dart';
 
 class PaymentSuccessSheet extends StatelessWidget {
   final Map? planArgs;
-  final String? txnId;
 
   const PaymentSuccessSheet({
     super.key,
     this.planArgs,
-    this.txnId,
   });
 
   static Future<void> show({
@@ -31,14 +29,12 @@ class PaymentSuccessSheet extends StatelessWidget {
         backgroundColor: AppColors.transparent,
         builder: (_) => PaymentSuccessSheet(
           planArgs: planArgs,
-          txnId: txnId,
         ),
       );
     }
     return Get.bottomSheet(
       PaymentSuccessSheet(
         planArgs: planArgs,
-        txnId: txnId,
       ),
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
@@ -54,11 +50,6 @@ class PaymentSuccessSheet extends StatelessWidget {
         (planArgs != null && planArgs!['billingCycle'] != null)
             ? planArgs!['billingCycle'].toString()
             : 'Monthly';
-    final String formattedTxn = (txnId != null && txnId!.isNotEmpty)
-        ? (txnId!.length > 12
-            ? 'TXN-${txnId!.substring(txnId!.length - 6).toUpperCase()}'
-            : txnId!)
-        : 'TXN-4522';
 
     return Container(
       width: double.infinity,
@@ -123,39 +114,6 @@ class PaymentSuccessSheet extends StatelessWidget {
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w700,
                         color: AppColors.black,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 11.h),
-                Divider(height: 1.h, color: AppColors.divider),
-                SizedBox(height: 11.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Transaction ID',
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        color: AppColors.gray,
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.purpleSoft,
-                        borderRadius: BorderRadius.circular(17.r),
-                        border: Border.all(color: AppColors.purple),
-                      ),
-                      child: Text(
-                        formattedTxn,
-                        style: GoogleFonts.inter(
-                          fontSize: 14.sp,
-                          color: AppColors.purple,
-                        ),
                       ),
                     ),
                   ],
