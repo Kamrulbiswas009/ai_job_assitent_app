@@ -76,7 +76,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
     );
 
     if (isSuccess) {
-      Get.offAllNamed(AppRoute.about1);
+      Get.offAllNamed(
+        AppRoute.login,
+        arguments: {'email': _email},
+      );
     }
   }
 
