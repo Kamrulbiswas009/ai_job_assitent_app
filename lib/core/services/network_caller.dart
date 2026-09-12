@@ -42,11 +42,12 @@ class NetworkCaller {
     String? token,
   }) async {
     final bodyString = body != null ? jsonEncode(body) : '';
+    final logBody = _formatSanitizedBody(body);
     debugPrint('==================== [POST REQUEST] ====================');
     debugPrint('URL: $url');
-    debugPrint('Body: $bodyString');
+    debugPrint('Body: $logBody');
     if (token != null) debugPrint('Token: $token');
-    log('POST Request: $url, Body: $bodyString');
+    log('POST Request: $url, Body: $logBody');
 
     try {
       final Response response = await post(
@@ -68,10 +69,11 @@ class NetworkCaller {
 
   // Handle response
   ResponseData _handleResponse(Response response) {
+    final logResponseBody = _formatSanitizedBody(response.body);
     debugPrint('==================== [API RESPONSE] ====================');
     debugPrint('Status Code: ${response.statusCode}');
-    debugPrint('Response Body: ${response.body}');
-    log('Response Code: ${response.statusCode}, Body: ${response.body}');
+    debugPrint('Response Body: $logResponseBody');
+    log('Response Code: ${response.statusCode}, Body: $logResponseBody');
 
     dynamic decodedResponse;
     try {
@@ -165,5 +167,45 @@ class NetworkCaller {
         errorMessage: 'Unexpected error occurred: $error',
       );
     }
+  }
+
+  // Format and sanitize body to mask passwords and sensitive values
+  String _formatSanitizedBody(dynamic body) {
+    if (body == null) return '';
+    try {
+      if (body is String) {
+        final trimmed = body.trim();
+        if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+          final decoded = jsonDecode(trimmed);
+          return jsonEncode(_sanitizeData(decoded));
+        }
+        return body;
+      }
+      return jsonEncode(_sanitizeData(body));
+    } catch (_) {
+      return body.toString();
+    }
+  }
+
+  // Sanitizes sensitive fields like passwords from logging
+  dynamic _sanitizeData(dynamic data) {
+    if (data is Map) {
+      final sanitized = <String, dynamic>{};
+      data.forEach((key, value) {
+        final keyLower =
+            key.toString().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+        if (keyLower.contains('password')) {
+          sanitized[key.toString()] = '******';
+        } else if (value is Map || value is List) {
+          sanitized[key.toString()] = _sanitizeData(value);
+        } else {
+          sanitized[key.toString()] = value;
+        }
+      });
+      return sanitized;
+    } else if (data is List) {
+      return data.map((item) => _sanitizeData(item)).toList();
+    }
+    return data;
   }
 }

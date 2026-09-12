@@ -26,6 +26,17 @@ class _OnboardingLoginScreenState extends State<OnboardingLoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    final args = Get.arguments;
+    if (args is Map && args['email'] != null) {
+      _emailController.text = args['email'].toString();
+    } else if (_controller.registeredEmail.value.isNotEmpty) {
+      _emailController.text = _controller.registeredEmail.value;
+    }
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
