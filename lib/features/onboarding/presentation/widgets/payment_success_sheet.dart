@@ -10,10 +10,56 @@ import '../../../../routes/app_routes.dart';
 import 'sp_primary_button.dart';
 
 class PaymentSuccessSheet extends StatelessWidget {
-  const PaymentSuccessSheet({super.key});
+  final Map? planArgs;
+  final String? txnId;
+
+  const PaymentSuccessSheet({
+    super.key,
+    this.planArgs,
+    this.txnId,
+  });
+
+  static Future<void> show({
+    BuildContext? context,
+    Map? planArgs,
+    String? txnId,
+  }) {
+    if (context != null) {
+      return showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppColors.transparent,
+        builder: (_) => PaymentSuccessSheet(
+          planArgs: planArgs,
+          txnId: txnId,
+        ),
+      );
+    }
+    return Get.bottomSheet(
+      PaymentSuccessSheet(
+        planArgs: planArgs,
+        txnId: txnId,
+      ),
+      isScrollControlled: true,
+      backgroundColor: AppColors.transparent,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final String amount = (planArgs != null && planArgs!['price'] != null)
+        ? planArgs!['price'].toString()
+        : '£49';
+    final String billing =
+        (planArgs != null && planArgs!['billingCycle'] != null)
+            ? planArgs!['billingCycle'].toString()
+            : 'Monthly';
+    final String formattedTxn = (txnId != null && txnId!.isNotEmpty)
+        ? (txnId!.length > 12
+            ? 'TXN-${txnId!.substring(txnId!.length - 6).toUpperCase()}'
+            : txnId!)
+        : 'TXN-4522';
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -72,7 +118,7 @@ class PaymentSuccessSheet extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '£49',
+                      amount,
                       style: GoogleFonts.inter(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w700,
@@ -105,7 +151,7 @@ class PaymentSuccessSheet extends StatelessWidget {
                         border: Border.all(color: AppColors.purple),
                       ),
                       child: Text(
-                        'TXN-4522',
+                        formattedTxn,
                         style: GoogleFonts.inter(
                           fontSize: 14.sp,
                           color: AppColors.purple,
@@ -126,7 +172,7 @@ class PaymentSuccessSheet extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Monthly',
+                      billing,
                       style: GoogleFonts.inter(
                         fontSize: 14.sp,
                         color: AppColors.gray,

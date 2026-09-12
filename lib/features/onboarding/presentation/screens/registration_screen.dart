@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../routes/app_routes.dart';
+import '../../controller/onboarding_controller.dart';
 import '../widgets/onboarding_header.dart';
 import '../widgets/sp_primary_button.dart';
 import '../widgets/sp_underline_field.dart';
@@ -19,7 +20,99 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  final OnboardingController _controller = Get.find<OnboardingController>();
+
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
   bool _agreed = false;
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  void _handleRegister() async {
+    final fullName = _fullNameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    if (fullName.isEmpty) {
+      Get.snackbar(
+        'Required',
+        'Please enter your full name',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.shade800,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (email.isEmpty || !GetUtils.isEmail(email)) {
+      Get.snackbar(
+        'Required',
+        'Please enter a valid email address',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.shade800,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (password.isEmpty) {
+      Get.snackbar(
+        'Required',
+        'Please enter your password',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.shade800,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      Get.snackbar(
+        'Password Mismatch',
+        'Passwords do not match',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.shade800,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (!_agreed) {
+      Get.snackbar(
+        'Terms & Privacy',
+        'Please accept the Terms of Service to continue',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.shade800,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    final isSuccess = await _controller.register(
+      fullName: fullName,
+      email: email,
+      password: password,
+    );
+
+    if (isSuccess) {
+      Get.offNamed(
+        AppRoute.verification,
+        arguments: {'email': email},
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,25 +149,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         ),
                       ),
                       SizedBox(height: 35.h),
-                      const SpUnderlineField(
+                      SpUnderlineField(
+                        controller: _fullNameController,
                         label: 'Full Name',
                         hint: 'James Davidson',
                       ),
                       SizedBox(height: 20.h),
-                      const SpUnderlineField(
+                      SpUnderlineField(
+                        controller: _emailController,
                         label: 'Email Address',
                         hint: 'james@example.com',
                         keyboardType: TextInputType.emailAddress,
                       ),
                       SizedBox(height: 20.h),
-                      const SpUnderlineField(
+                      SpUnderlineField(
+                        controller: _passwordController,
                         label: 'Password',
                         hint: 'Enter your password',
                         obscureText: true,
                         showObscureToggle: true,
                       ),
                       SizedBox(height: 20.h),
-                      const SpUnderlineField(
+                      SpUnderlineField(
+                        controller: _confirmPasswordController,
                         label: 'Confirm Password',
                         hint: 'Re-enter your password',
                         obscureText: true,
@@ -125,10 +222,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         ],
                       ),
                       SizedBox(height: 48.h),
-                      SpPrimaryButton(
-                        label: 'Create Account',
-                        onPressed: () =>
-                            Get.toNamed(AppRoute.verification),
+                      Obx(
+                        () => SpPrimaryButton(
+                          label: 'Create Account',
+                          isLoading: _controller.isRegisterLoading.value,
+                          onPressed: _handleRegister,
+                        ),
                       ),
                       SizedBox(height: 12.h),
                       Wrap(

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../routes/app_routes.dart';
+import '../../controller/onboarding_controller.dart';
 import '../widgets/onboarding_header.dart';
 import '../widgets/sp_primary_button.dart';
 
@@ -21,9 +22,28 @@ class ResetPasswordVerificationScreen extends StatefulWidget {
 
 class _ResetPasswordVerificationScreenState
     extends State<ResetPasswordVerificationScreen> {
+  final OnboardingController _controller = Get.find<OnboardingController>();
+
   final List<TextEditingController> _controllers =
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _nodes = List.generate(6, (_) => FocusNode());
+
+  String _email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    final args = Get.arguments;
+    if (args is Map && args['email'] != null) {
+      _email = args['email'].toString();
+    } else if (_controller.resetPasswordEmail.value.isNotEmpty) {
+      _email = _controller.resetPasswordEmail.value;
+    } else if (_controller.registeredEmail.value.isNotEmpty) {
+      _email = _controller.registeredEmail.value;
+    } else {
+      _email = 'gulamrosul037@gmail.com';
+    }
+  }
 
   @override
   void dispose() {
@@ -34,6 +54,30 @@ class _ResetPasswordVerificationScreenState
       n.dispose();
     }
     super.dispose();
+  }
+
+  void _handleContinue() {
+    final otp = _controllers.map((c) => c.text.trim()).join();
+
+    if (otp.length < 6) {
+      Get.snackbar(
+        'Incomplete Code',
+        'Please enter the full 6-digit verification code',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.shade800,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    _controller.resetPasswordOtp.value = otp;
+    Get.toNamed(
+      AppRoute.resetPassword,
+      arguments: {
+        'email': _email,
+        'otp': otp,
+      },
+    );
   }
 
   @override
@@ -82,7 +126,7 @@ class _ResetPasswordVerificationScreenState
                                       text: 'We sent a 6-digit code to  ',
                                     ),
                                     TextSpan(
-                                      text: 'ZCX@gmail.com',
+                                      text: _email,
                                       style: GoogleFonts.inter(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w600,
@@ -150,6 +194,9 @@ class _ResetPasswordVerificationScreenState
                                         } else if (value.isEmpty && index > 0) {
                                           _nodes[index - 1].requestFocus();
                                         }
+                                        if (index == 5 && value.isNotEmpty) {
+                                          _nodes[index].unfocus();
+                                        }
                                       },
                                     ),
                                   );
@@ -159,32 +206,52 @@ class _ResetPasswordVerificationScreenState
                               SizedBox(height: 24.h),
                               SpPrimaryButton(
                                 label: 'Verify email',
-                                onPressed: () =>
-                                    Get.toNamed(AppRoute.resetPassword),
+                                onPressed: _handleContinue,
                               ),
                               SizedBox(height: 12.h),
                               Center(
-                                child: RichText(
-                                  text: TextSpan(
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w400,
-                                      height: 1.5,
-                                      color: AppColors.gray,
-                                    ),
-                                    children: [
-                                      const TextSpan(text: 'Resend in '),
-                                      TextSpan(
-                                        text: '25s',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.5,
-                                          color: AppColors.primary,
+                                child: Obx(
+                                  () {
+                                    final count =
+                                        _controller.resendCountdown.value;
+                                    return GestureDetector(
+                                      onTap: count == 0
+                                          ? () {
+                                              _controller.forgotPassword(
+                                                email: _email,
+                                              );
+                                            }
+                                          : null,
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w400,
+                                            height: 1.5,
+                                            color: AppColors.gray,
+                                          ),
+                                          children: [
+                                            TextSpan(
+                                              text: count > 0
+                                                  ? 'Resend in '
+                                                  : 'Didn\'t receive code? ',
+                                            ),
+                                            TextSpan(
+                                              text: count > 0
+                                                  ? '${count}s'
+                                                  : 'Resend',
+                                              style: GoogleFonts.inter(
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w600,
+                                                height: 1.5,
+                                                color: AppColors.primary,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    );
+                                  },
                                 ),
                               ),
                               SizedBox(height: 16.h),
@@ -203,3 +270,4 @@ class _ResetPasswordVerificationScreenState
     );
   }
 }
+

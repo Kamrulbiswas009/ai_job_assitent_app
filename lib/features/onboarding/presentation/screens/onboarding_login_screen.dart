@@ -5,14 +5,68 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../routes/app_routes.dart';
+import '../../controller/onboarding_controller.dart';
 import '../widgets/onboarding_header.dart';
 import '../widgets/sp_primary_button.dart';
 import '../widgets/sp_underline_field.dart';
 
-class OnboardingLoginScreen extends StatelessWidget {
+class OnboardingLoginScreen extends StatefulWidget {
   const OnboardingLoginScreen({super.key});
 
   static const String routeName = '/onboarding-login';
+
+  @override
+  State<OnboardingLoginScreen> createState() => _OnboardingLoginScreenState();
+}
+
+class _OnboardingLoginScreenState extends State<OnboardingLoginScreen> {
+  final OnboardingController _controller = Get.find<OnboardingController>();
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _handleLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || !GetUtils.isEmail(email)) {
+      Get.snackbar(
+        'Required',
+        'Please enter a valid email address',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.shade800,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (password.isEmpty) {
+      Get.snackbar(
+        'Required',
+        'Please enter your password',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.shade800,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    final isSuccess = await _controller.login(
+      email: email,
+      password: password,
+    );
+
+    if (isSuccess) {
+      Get.offAllNamed(AppRoute.about1);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +111,15 @@ class OnboardingLoginScreen extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 32.h),
-                              const SpUnderlineField(
+                              SpUnderlineField(
+                                controller: _emailController,
                                 label: 'Email Address',
                                 hint: 'james@example.com',
                                 keyboardType: TextInputType.emailAddress,
                               ),
                               SizedBox(height: 20.h),
-                              const SpUnderlineField(
+                              SpUnderlineField(
+                                controller: _passwordController,
                                 label: 'Password',
                                 hint: 'Enter your password',
                                 obscureText: true,
@@ -85,9 +141,12 @@ class OnboardingLoginScreen extends StatelessWidget {
                               ),
                               const Spacer(),
                               SizedBox(height: 24.h),
-                              SpPrimaryButton(
-                                label: 'Sign In',
-                                onPressed: () => Get.toNamed(AppRoute.about1),
+                              Obx(
+                                () => SpPrimaryButton(
+                                  label: 'Sign In',
+                                  isLoading: _controller.isLoginLoading.value,
+                                  onPressed: _handleLogin,
+                                ),
                               ),
                               SizedBox(height: 12.h),
                               Center(

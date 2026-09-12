@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../routes/app_routes.dart';
+import '../../model/membership_plan_model.dart';
 import '../widgets/onboarding_header.dart';
 import '../widgets/sp_primary_button.dart';
 
@@ -121,8 +122,11 @@ class AboutSpeechProScreen3 extends StatelessWidget {
                 ),
               ),
               SpPrimaryButton(
-                label: 'Start Training — £49/month',
-                onPressed: () => Get.toNamed(AppRoute.membership),
+                label: MembershipPlanModel.monthly.buttonText,
+                onPressed: () => Get.toNamed(
+                  AppRoute.membership,
+                  arguments: MembershipPlanModel.monthly.toMap(),
+                ),
               ),
               SizedBox(height: 13.h),
               Text(
@@ -135,7 +139,7 @@ class AboutSpeechProScreen3 extends StatelessWidget {
                   color: AppColors.primary,
                 ),
               ),
-              SizedBox(height: 220.h),
+              SizedBox(height: 20.h),
             ],
           ),
         ),

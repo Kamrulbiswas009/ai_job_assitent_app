@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/constants/colors.dart';
@@ -15,17 +16,18 @@ class CheckoutScreen extends StatelessWidget {
 
   static const String routeName = '/checkout';
 
-  void _showPaymentSuccess(BuildContext context) {
+  void _showPaymentSuccess(BuildContext context, Map? planArgs) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
-      builder: (_) => const PaymentSuccessSheet(),
+      builder: (_) => PaymentSuccessSheet(planArgs: planArgs),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final planArgs = Get.arguments is Map ? Get.arguments as Map : null;
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -109,7 +111,7 @@ class CheckoutScreen extends StatelessWidget {
               ),
               SpPrimaryButton(
                 label: 'Pay Now',
-                onPressed: () => _showPaymentSuccess(context),
+                onPressed: () => _showPaymentSuccess(context, planArgs),
               ),
               SizedBox(height: 18.h),
             ],

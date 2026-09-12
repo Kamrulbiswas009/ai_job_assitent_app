@@ -6,7 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
-import '../../../../routes/app_routes.dart';
+import '../../model/membership_plan_model.dart';
+import '../widgets/checkout_confirmation_sheet.dart';
 import '../widgets/onboarding_header.dart';
 import '../widgets/sp_primary_button.dart';
 
@@ -25,6 +26,11 @@ class MembershipScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final args = Get.arguments;
+    final MembershipPlanModel plan = args is Map
+        ? MembershipPlanModel.fromMap(args.cast<String, dynamic>())
+        : (args is MembershipPlanModel ? args : MembershipPlanModel.monthly);
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -79,7 +85,7 @@ class MembershipScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  '£49',
+                                  plan.price,
                                   style: GoogleFonts.inter(
                                     fontSize: 52.sp,
                                     fontWeight: FontWeight.w900,
@@ -91,7 +97,7 @@ class MembershipScreen extends StatelessWidget {
                                 Padding(
                                   padding: EdgeInsets.only(bottom: 8.h),
                                   child: Text(
-                                    '/month',
+                                    plan.period,
                                     style: GoogleFonts.inter(
                                       fontSize: 18.sp,
                                       fontWeight: FontWeight.w400,
@@ -162,12 +168,15 @@ class MembershipScreen extends StatelessWidget {
                 ),
               ),
               SpPrimaryButton(
-                label: 'Start Training — £49/month',
-                onPressed: () => Get.toNamed(AppRoute.checkout),
+                label: plan.buttonText,
+                onPressed: () => CheckoutConfirmationSheet.show(
+                  context,
+                  plan: plan,
+                ),
               ),
               SizedBox(height: 13.h),
               Text(
-                'Billed monthly. Cancel anytime in your App Store settings.',
+                plan.billingText,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 12.sp,
@@ -176,7 +185,7 @@ class MembershipScreen extends StatelessWidget {
                   color: AppColors.gray,
                 ),
               ),
-              SizedBox(height: 180.h),
+              SizedBox(height: 18.h),
             ],
           ),
         ),
