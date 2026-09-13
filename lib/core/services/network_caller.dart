@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
@@ -145,7 +146,14 @@ class NetworkCaller {
     debugPrint('Error: $error');
     log('Request Error: $error');
 
-    if (error is ClientException) {
+    if (error is SocketException) {
+      return ResponseData(
+        isSuccess: false,
+        statusCode: 500,
+        responseData: '',
+        errorMessage: 'Network error: Unable to reach server. Please check your internet connection.',
+      );
+    } else if (error is ClientException) {
       return ResponseData(
         isSuccess: false,
         statusCode: 500,
