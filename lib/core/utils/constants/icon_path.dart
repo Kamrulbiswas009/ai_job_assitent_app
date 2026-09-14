@@ -15,4 +15,7 @@ class IconPath {
   static const String icMic = 'assets/icons/ic_mic.svg';
   static const String icMicButton = 'assets/icons/ic_mic_button.png';
   static const String onboarding = 'assets/icons/onboarding.png';
+  static const String icFire = 'assets/icons/ic_fire.png';
+  static const String icBoltColor = 'assets/icons/ic_bolt_color.png';
+  static const String icCrownColor = 'assets/icons/ic_crown_color.png';
 }

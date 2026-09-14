@@ -48,64 +48,62 @@ class UsesOfAiScreen extends StatelessWidget {
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 17.w),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Column(
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 3.w),
-                child: const OnboardingHeader(
-                  style: OnboardingHeaderStyle.backOnly,
-                ),
-              ),
+              const OnboardingHeader(style: OnboardingHeaderStyle.backOnly),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.only(top: 9.h, bottom: 20.h),
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.only(top: 16.h, bottom: 24.h),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        ImagePath.spLogoWordmark,
-                        width: 333.w,
-                        height: 180.h,
-                        fit: BoxFit.contain,
-                      ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'How SpeechPro uses AI',
-                          style: GoogleFonts.inter(
-                            fontSize: 26.sp,
-                            fontWeight: FontWeight.w700,
-                            height: 1.5,
-                            color: AppColors.black,
+                      Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          child: Image.asset(
+                            ImagePath.logoHeader,
+                            height: 80.h,
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ),
-                      SizedBox(height: 8.h),
+                      SizedBox(height: 16.h),
                       Text(
-                        'SpeechPro uses four AI services to deliver your coaching. Here is exactly what each receives and what it does with it.',
+                        'How SpeechPro uses AI',
+                        style: GoogleFonts.inter(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.w800,
+                          height: 1.25,
+                          color: AppColors.pureBlack,
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
+                      Text(
+                        'SpeechPro is built on thirty years of real experience — building and growing companies, and closing deals at the highest level, with contracts worth hundreds of thousands of pounds. To deliver that experience to you personally, we use four AI services. Here is exactly what each one receives and what it does with it.',
                         style: GoogleFonts.inter(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w400,
-                          height: 1.5,
-                          color: AppColors.gray,
+                          height: 1.45,
+                          color: const Color(0xFF8E8E93),
                         ),
                       ),
-                      SizedBox(height: 17.h),
-                      Divider(
-                        height: 1.h,
-                        thickness: 1,
-                        color: AppColors.divider,
-                      ),
-                      SizedBox(height: 24.h),
+                      SizedBox(height: 12.h),
+                      const _AccentDivider(),
+                      SizedBox(height: 20.h),
                       ..._services.map(
                         (service) => Padding(
-                          padding: EdgeInsets.only(bottom: 15.h),
+                          padding: EdgeInsets.only(bottom: 14.h),
                           child: Container(
                             width: double.infinity,
-                            padding: EdgeInsets.all(16.w),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 16.h,
+                            ),
                             decoration: BoxDecoration(
-                              color: AppColors.surfaceGray,
-                              borderRadius: BorderRadius.circular(12.r),
+                              color: const Color(0xFFF7F7F9),
+                              borderRadius: BorderRadius.circular(14.r),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,8 +113,8 @@ class UsesOfAiScreen extends StatelessWidget {
                                   style: GoogleFonts.inter(
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.w700,
-                                    height: 1.5,
-                                    color: AppColors.black,
+                                    height: 1.3,
+                                    color: AppColors.pureBlack,
                                   ),
                                 ),
                                 SizedBox(height: 10.h),
@@ -125,18 +123,18 @@ class UsesOfAiScreen extends StatelessWidget {
                                   style: GoogleFonts.inter(
                                     fontSize: 10.sp,
                                     fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.2,
+                                    letterSpacing: 1.0,
                                     color: AppColors.primary,
                                   ),
                                 ),
-                                SizedBox(height: 8.h),
+                                SizedBox(height: 6.h),
                                 Text(
                                   service.receives,
                                   style: GoogleFonts.inter(
-                                    fontSize: 13.sp,
+                                    fontSize: 13.5.sp,
                                     fontWeight: FontWeight.w400,
-                                    height: 1.5,
-                                    color: AppColors.black,
+                                    height: 1.4,
+                                    color: AppColors.pureBlack,
                                   ),
                                 ),
                                 SizedBox(height: 10.h),
@@ -145,18 +143,18 @@ class UsesOfAiScreen extends StatelessWidget {
                                   style: GoogleFonts.inter(
                                     fontSize: 10.sp,
                                     fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.2,
+                                    letterSpacing: 1.0,
                                     color: AppColors.primary,
                                   ),
                                 ),
-                                SizedBox(height: 8.h),
+                                SizedBox(height: 6.h),
                                 Text(
                                   service.usedFor,
                                   style: GoogleFonts.inter(
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.w400,
-                                    height: 1.5,
-                                    color: AppColors.black,
+                                    height: 1.4,
+                                    color: AppColors.pureBlack,
                                   ),
                                 ),
                               ],
@@ -164,26 +162,29 @@ class UsesOfAiScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 15.h),
+                      SizedBox(height: 16.h),
                       SpPrimaryButton(
                         label: 'I Understand,Continue',
                         onPressed: () {
                           Get.toNamed(AppRoute.startMembershipIntro);
                         },
                       ),
-                      SizedBox(height: 15.h),
-                      GestureDetector(
-                        onTap: Get.back,
-                        child: Text(
-                          'Not Now',
-                          style: GoogleFonts.inter(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            height: 1.5,
-                            color: AppColors.gray,
+                      SizedBox(height: 14.h),
+                      Center(
+                        child: GestureDetector(
+                          onTap: Get.back,
+                          child: Text(
+                            'Not Now',
+                            style: GoogleFonts.inter(
+                              fontSize: 13.5.sp,
+                              fontWeight: FontWeight.w600,
+                              height: 1.4,
+                              color: const Color(0xFF8E8E93),
+                            ),
                           ),
                         ),
                       ),
+                      SizedBox(height: 10.h),
                     ],
                   ),
                 ),
@@ -194,4 +195,39 @@ class UsesOfAiScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _AccentDivider extends StatelessWidget {
+  const _AccentDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        CustomPaint(size: Size(8.w, 9.h), painter: _TrianglePainter()),
+        Expanded(
+          child: Container(height: 0.8.h, color: const Color(0xFFF0F0F2)),
+        ),
+      ],
+    );
+  }
+}
+
+class _TrianglePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFE5E7EB)
+      ..style = PaintingStyle.fill;
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, size.height / 2)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

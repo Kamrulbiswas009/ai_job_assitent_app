@@ -41,7 +41,7 @@ class _SpUnderlineFieldState extends State<SpUnderlineField> {
 
   @override
   Widget build(BuildContext context) {
-    final hintSize = (widget.hintFontSize ?? 16).toDouble().sp;
+    final hintSize = (widget.hintFontSize ?? 14.5).toDouble().sp;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,11 +51,11 @@ class _SpUnderlineFieldState extends State<SpUnderlineField> {
           style: GoogleFonts.inter(
             fontSize: 14.sp,
             fontWeight: FontWeight.w600,
-            height: 1.5,
+            height: 1.4,
             color: AppColors.pureBlack,
           ),
         ),
-        SizedBox(height: 15.h),
+        SizedBox(height: 8.h),
         TextField(
           controller: widget.controller,
           obscureText: _obscure,
@@ -63,8 +63,8 @@ class _SpUnderlineFieldState extends State<SpUnderlineField> {
           style: GoogleFonts.inter(
             fontSize: hintSize,
             fontWeight: FontWeight.w400,
-            height: 1.5,
-            color: AppColors.black,
+            height: 1.4,
+            color: AppColors.pureBlack,
           ),
           decoration: InputDecoration(
             isDense: true,
@@ -72,26 +72,36 @@ class _SpUnderlineFieldState extends State<SpUnderlineField> {
             hintStyle: GoogleFonts.inter(
               fontSize: hintSize,
               fontWeight: FontWeight.w400,
-              height: 1.5,
-              color: AppColors.placeholder,
+              height: 1.4,
+              color: const Color(0xFFB0B7C3),
             ),
-            border: InputBorder.none,
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.divider, width: 1),
+            border: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
             ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.primary, width: 1),
+            enabledBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
             ),
-            contentPadding: EdgeInsets.only(bottom: 10.h),
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+            ),
+            contentPadding: EdgeInsets.only(bottom: 8.h, top: 2.h),
             suffixIcon: widget.showObscureToggle
-                ? IconButton(
-                    onPressed: () => setState(() => _obscure = !_obscure),
-                    padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(minWidth: 20.w, minHeight: 20.h),
-                    icon: SvgPicture.asset(
-                      IconPath.icEyeSlash,
-                      width: 20.w,
-                      height: 20.h,
+                ? GestureDetector(
+                    onTap: () => setState(() => _obscure = !_obscure),
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 6.h),
+                      child: _obscure
+                          ? SvgPicture.asset(
+                              IconPath.icEyeSlash,
+                              width: 20.w,
+                              height: 20.w,
+                            )
+                          : Icon(
+                              Icons.visibility_outlined,
+                              size: 20.w,
+                              color: const Color(0xFFB8BFCA),
+                            ),
                     ),
                   )
                 : null,
