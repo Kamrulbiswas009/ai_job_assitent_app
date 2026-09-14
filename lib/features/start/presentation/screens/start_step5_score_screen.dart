@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
+import '../../../../core/utils/constants/icon_path.dart';
 import '../../controller/start_score_controller.dart';
 import '../widgets/start_header.dart';
 
@@ -286,25 +287,19 @@ class StartStep5ScoreScreen extends GetView<StartScoreController> {
                           Text(
                             'Hear why SpeechPro is different',
                             style: GoogleFonts.inter(
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 13.5.sp,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.pureBlack,
                               color: AppColors.pureBlack,
                             ),
                           ),
-                          SizedBox(width: 6.w),
-                          Container(
-                            width: 22.r,
-                            height: 22.r,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFFFF1F1),
-                              shape: BoxShape.circle,
-                            ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.play_arrow_rounded,
-                              size: 14.sp,
-                              color: AppColors.primary,
-                            ),
+                          SizedBox(width: 8.w),
+                          Image.asset(
+                            IconPath.icPlayRedCircle,
+                            width: 20.r,
+                            height: 20.r,
+                            fit: BoxFit.contain,
                           ),
                         ],
                       ),
