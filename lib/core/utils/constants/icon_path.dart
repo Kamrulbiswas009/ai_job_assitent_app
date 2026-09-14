@@ -18,4 +18,5 @@ class IconPath {
   static const String icFire = 'assets/icons/ic_fire.png';
   static const String icBoltColor = 'assets/icons/ic_bolt_color.png';
   static const String icCrownColor = 'assets/icons/ic_crown_color.png';
+  static const String icPlayRedCircle = 'assets/icons/ic_play_red_circle.png';
 }
