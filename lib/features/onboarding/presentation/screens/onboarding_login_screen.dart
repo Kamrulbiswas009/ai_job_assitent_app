@@ -69,10 +69,7 @@ class _OnboardingLoginScreenState extends State<OnboardingLoginScreen> {
       return;
     }
 
-    final isSuccess = await _controller.login(
-      email: email,
-      password: password,
-    );
+    final isSuccess = await _controller.login(email: email, password: password);
 
     if (isSuccess) {
       Get.offAllNamed(AppRoute.about1);
@@ -190,7 +187,7 @@ class _OnboardingLoginScreenState extends State<OnboardingLoginScreen> {
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 16.h),
+                              SizedBox(height: 90.h),
                             ],
                           ),
                         ),

@@ -107,10 +107,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
 
     if (isSuccess) {
-      Get.offNamed(
-        AppRoute.verification,
-        arguments: {'email': email},
-      );
+      Get.offNamed(AppRoute.verification, arguments: {'email': email});
     }
   }
 
@@ -126,29 +123,31 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               const OnboardingHeader(),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.only(top: 15.h, bottom: 20.h),
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.only(top: 24.h, bottom: 20.h),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Create your account',
                         style: GoogleFonts.inter(
-                          fontSize: 26.sp,
+                          fontSize: 24.sp,
                           fontWeight: FontWeight.w700,
-                          height: 1.5,
-                          color: AppColors.black,
+                          height: 1.25,
+                          color: AppColors.pureBlack,
                         ),
                       ),
+                      SizedBox(height: 6.h),
                       Text(
                         'Start your communication baseline today.',
                         style: GoogleFonts.inter(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w400,
-                          height: 1.5,
-                          color: AppColors.gray,
+                          height: 1.4,
+                          color: const Color(0xFF71717A),
                         ),
                       ),
-                      SizedBox(height: 35.h),
+                      SizedBox(height: 28.h),
                       SpUnderlineField(
                         controller: _fullNameController,
                         label: 'Full Name',
@@ -183,20 +182,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         children: [
                           GestureDetector(
                             onTap: () => setState(() => _agreed = !_agreed),
+                            behavior: HitTestBehavior.opaque,
                             child: Container(
                               width: 20.w,
                               height: 20.w,
+                              margin: EdgeInsets.only(top: 1.5.h),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(4.r),
                                 border: Border.all(
-                                  color: AppColors.gray.withValues(
-                                    alpha: 0.3,
-                                  ),
+                                  color: _agreed
+                                      ? AppColors.primary
+                                      : const Color(0xFFD1D5DB),
                                   width: 1.5,
                                 ),
                                 color: _agreed
                                     ? AppColors.primary
-                                    : AppColors.transparent,
+                                    : AppColors.white,
                               ),
                               child: _agreed
                                   ? Icon(
@@ -209,19 +210,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           ),
                           SizedBox(width: 10.w),
                           Expanded(
-                            child: Text(
-                              "By continuing you agree to SpeechPro's Terms of Service and Privacy Policy. Your voice data is processed securely and never shared.",
-                              style: GoogleFonts.inter(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                height: 1.5,
-                                color: AppColors.gray,
+                            child: GestureDetector(
+                              onTap: () => setState(() => _agreed = !_agreed),
+                              behavior: HitTestBehavior.opaque,
+                              child: Text(
+                                "By continuing you agree to SpeechPro's Terms of Service and Privacy Policy. Your voice data is processed securely and never shared.",
+                                style: GoogleFonts.inter(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.45,
+                                  color: const Color(0xFF71717A),
+                                ),
                               ),
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 48.h),
+                      SizedBox(height: 118.h),
                       Obx(
                         () => SpPrimaryButton(
                           label: 'Create Account',
@@ -229,34 +234,37 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           onPressed: _handleRegister,
                         ),
                       ),
-                      SizedBox(height: 12.h),
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Text(
-                            'Already have an account? ',
-                            style: GoogleFonts.inter(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w400,
-                              height: 1.5,
-                              color: AppColors.gray,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => Get.toNamed(AppRoute.login),
-                            child: Text(
-                              'Sign In',
+                      SizedBox(height: 16.h),
+                      Center(
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              'Already have an account? ',
                               style: GoogleFonts.inter(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                height: 1.5,
-                                color: AppColors.primary,
+                                fontSize: 12.5.sp,
+                                fontWeight: FontWeight.w400,
+                                height: 1.4,
+                                color: const Color(0xFF71717A),
                               ),
                             ),
-                          ),
-                        ],
+                            GestureDetector(
+                              onTap: () => Get.toNamed(AppRoute.login),
+                              child: Text(
+                                'Sign In',
+                                style: GoogleFonts.inter(
+                                  fontSize: 12.5.sp,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.4,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                      SizedBox(height: 10.h),
                     ],
                   ),
                 ),

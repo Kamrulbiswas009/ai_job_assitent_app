@@ -4,11 +4,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:studioequip_mobile_app/features/onboarding/presentation/screens/forgot_password_screen.dart';
 import 'package:studioequip_mobile_app/features/onboarding/presentation/screens/onboarding_login_screen.dart';
+import 'package:studioequip_mobile_app/features/onboarding/presentation/screens/membership_screen.dart';
 import 'package:studioequip_mobile_app/features/onboarding/presentation/screens/registration_screen.dart';
 import 'package:studioequip_mobile_app/features/onboarding/presentation/screens/reset_password_screen.dart';
 import 'package:studioequip_mobile_app/features/onboarding/presentation/screens/reset_password_verification_screen.dart';
 import 'package:studioequip_mobile_app/features/onboarding/presentation/screens/splash_get_started_screen.dart';
+import 'package:studioequip_mobile_app/features/onboarding/presentation/screens/uses_of_ai_screen.dart';
 import 'package:studioequip_mobile_app/features/onboarding/presentation/screens/verification_screen.dart';
+
+import 'package:studioequip_mobile_app/features/onboarding/controller/onboarding_controller.dart';
 
 Widget createScreen(Widget child) {
   return ScreenUtilInit(
@@ -22,17 +26,25 @@ Widget createScreen(Widget child) {
 }
 
 void main() {
+  setUp(() {
+    Get.testMode = true;
+    Get.put(OnboardingController());
+  });
+
+  tearDown(() {
+    Get.reset();
+  });
+
   testWidgets('Screen 0: Welcome / Get Started screen renders perfectly', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(createScreen(const SplashGetStartedScreen()));
     await tester.pumpAndSettle();
-    expect(find.text('welcome to'), findsOneWidget);
-    expect(find.text('Power through speech'), findsOneWidget);
-    expect(find.text('Influence through impact'), findsOneWidget);
-    expect(find.text('Authority through presence'), findsOneWidget);
-    expect(find.text('Create account →'), findsOneWidget);
-    expect(find.text('Already have an account? Sign in'), findsOneWidget);
+    expect(find.text('Welcome to'), findsOneWidget);
+    expect(find.text('Power Through Speech'), findsOneWidget);
+    expect(find.text('Influence Through Impact'), findsOneWidget);
+    expect(find.text('Authority Through Presence'), findsOneWidget);
+    expect(find.text('Create account'), findsOneWidget);
   });
 
   testWidgets('Screen 1: Registration screen renders perfectly', (
@@ -94,5 +106,30 @@ void main() {
     expect(find.text('Reset Password'), findsWidgets);
     expect(find.text('New Password'), findsOneWidget);
     expect(find.text('Confirm Password'), findsOneWidget);
+  });
+
+  testWidgets('Screen 7: Membership screen renders perfectly', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(createScreen(const MembershipScreen()));
+    await tester.pumpAndSettle();
+    expect(find.text('Your Membership'), findsOneWidget);
+    expect(find.text('Start training today.'), findsOneWidget);
+    expect(find.text('Full access to SpeechPro. Cancel anytime.'), findsOneWidget);
+    expect(find.text('SpeechPro training for every high-stakes conversation'), findsOneWidget);
+  });
+
+  testWidgets('Screen 8: Uses of AI screen renders perfectly', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(createScreen(const UsesOfAiScreen()));
+    await tester.pumpAndSettle();
+    expect(find.text('How SpeechPro uses AI'), findsOneWidget);
+    expect(find.text('Anthropic Claude'), findsOneWidget);
+    expect(find.text('Deepgram Nova-3'), findsOneWidget);
+    expect(find.text('OpenAI Whisper'), findsOneWidget);
+    expect(find.text('ElevenLabs'), findsOneWidget);
+    expect(find.text('I Understand,Continue'), findsOneWidget);
+    expect(find.text('Not Now'), findsOneWidget);
   });
 }

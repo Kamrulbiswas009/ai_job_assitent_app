@@ -15,11 +15,13 @@ class OnboardingHeader extends StatelessWidget {
     super.key,
     this.style = OnboardingHeaderStyle.logo,
     this.showBackButton = true,
+    this.showDivider = false,
     this.onBack,
   });
 
   final OnboardingHeaderStyle style;
   final bool showBackButton;
+  final bool showDivider;
   final VoidCallback? onBack;
 
   @override
@@ -38,8 +40,8 @@ class OnboardingHeader extends StatelessWidget {
                   onTap: onBack ?? Get.back,
                   behavior: HitTestBehavior.opaque,
                   child: Container(
-                    width: 32.w,
-                    height: 32.w,
+                    width: 36.w,
+                    height: 36.w,
                     decoration: const BoxDecoration(
                       color: Color(0xFFF2F2F7),
                       shape: BoxShape.circle,
@@ -57,7 +59,7 @@ class OnboardingHeader extends StatelessWidget {
               if (style == OnboardingHeaderStyle.logo)
                 Image.asset(
                   ImagePath.logoHeader,
-                  height: 40.h,
+                  height: 38.h,
                   fit: BoxFit.contain,
                 )
               else
@@ -73,8 +75,10 @@ class OnboardingHeader extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 6.h),
-        Divider(height: 1.h, thickness: 1, color: AppColors.divider),
+        if (showDivider) ...[
+          SizedBox(height: 6.h),
+          Divider(height: 1.h, thickness: 1, color: AppColors.divider),
+        ],
       ],
     );
   }
