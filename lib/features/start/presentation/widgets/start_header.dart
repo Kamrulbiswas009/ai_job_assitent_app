@@ -9,12 +9,14 @@ class StartHeader extends StatelessWidget {
   final int? currentStep; // 1 to 5
   final VoidCallback? onBack;
   final bool showLogo;
+  final bool showDivider;
 
   const StartHeader({
     super.key,
     this.currentStep,
     this.onBack,
     this.showLogo = true,
+    this.showDivider = false,
   });
 
   @override
@@ -35,8 +37,8 @@ class StartHeader extends StatelessWidget {
                   Container(
                     width: 36.r,
                     height: 36.r,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF7F7F7),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF7F7F7),
                       shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
@@ -61,29 +63,30 @@ class StartHeader extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 10.h),
-        const Divider(height: 1, thickness: 1, color: Color(0x14000000)),
+        if (showDivider) ...[
+          SizedBox(height: 10.h),
+          const Divider(height: 1, thickness: 1, color: Color(0x14000000)),
+        ],
         if (showLogo) ...[
-          SizedBox(height: 16.h),
+          SizedBox(height: 14.h),
           Center(
             child: Image.asset(
               ImagePath.logoHeader,
-              width: 333.w,
-              height: 96.h,
+              height: 44.h,
               fit: BoxFit.contain,
             ),
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 14.h),
         ],
         if (currentStep != null) ...[
-          SizedBox(height: 8.h),
+          SizedBox(height: 6.h),
           // 5-Segment Progress Bar
           Row(
             children: List.generate(5, (index) {
               final isPassed = index < currentStep!;
               return Expanded(
                 child: Container(
-                  height: 4.h,
+                  height: 3.5.h,
                   margin: EdgeInsets.only(right: index < 4 ? 6.w : 0),
                   decoration: BoxDecoration(
                     color: isPassed ? AppColors.primary : const Color(0xFFE5E5EA),
@@ -93,13 +96,13 @@ class StartHeader extends StatelessWidget {
               );
             }),
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 8.h),
           Text(
             'Step $currentStep of 5',
             style: GoogleFonts.inter(
-              fontSize: 14.sp,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w600,
-              height: 1.5,
+              height: 1.4,
               color: AppColors.primary,
             ),
           ),

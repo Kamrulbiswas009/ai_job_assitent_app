@@ -77,7 +77,14 @@ class StartStep2DetailsController extends GetxController {
     }
   }
 
+  final RxBool isProcessingBriefing = false.obs;
+
   void submitDetailsAndProceed() {
+    isProcessingBriefing.value = true;
+  }
+
+  void onProcessingComplete() {
+    isProcessingBriefing.value = false;
     Get.toNamed(AppRoute.startBriefing);
   }
 }

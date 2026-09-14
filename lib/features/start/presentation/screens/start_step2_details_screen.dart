@@ -7,6 +7,7 @@ import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../controller/start_step2_details_controller.dart';
+import '../widgets/briefing_processing_modal.dart';
 import '../widgets/start_header.dart';
 import '../widgets/voice_recorder_card.dart';
 
@@ -18,15 +19,19 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: Column(
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: const StartHeader(currentStep: 2),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
+            Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: const StartHeader(currentStep: 2, showDivider: true),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -36,30 +41,29 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                       children: [
                         Image.asset(
                           IconPath.icJobInterview,
-                          width: 24.w,
-                          height: 24.h,
+                          width: 22.w,
+                          height: 22.h,
                           fit: BoxFit.contain,
                         ),
                         SizedBox(width: 8.w),
                         Text(
                           'Job Interview',
                           style: GoogleFonts.inter(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.w700,
-                            height: 1.5,
-                            color: AppColors.black,
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.pureBlack,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 6.h),
+                    SizedBox(height: 8.h),
                     Text(
                       'Tell SpeechPro about your interview. Add a few keywords below about why you want to win this job.',
                       style: GoogleFonts.inter(
-                        fontSize: 14.sp,
+                        fontSize: 13.sp,
                         fontWeight: FontWeight.w400,
-                        height: 1.5,
-                        color: const Color(0xFF888888),
+                        height: 1.45,
+                        color: const Color(0xFF757575),
                       ),
                     ),
                     SizedBox(height: 16.h),
@@ -69,19 +73,23 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                       minLines: 3,
                       maxLines: 4,
                       borderRadius: 16.r,
+                      borderWidth: 1.2,
                       borderColor: AppColors.primary,
                       focusedBorderColor: AppColors.primary,
                       padding: EdgeInsets.all(16.w),
                       style: GoogleFonts.inter(
-                        fontSize: 14.sp,
+                        fontSize: 13.5.sp,
                         fontWeight: FontWeight.w400,
-                        height: 1.5,
-                        color: const Color(0xFF757575),
+                        height: 1.45,
+                        color: const Color(0xFF6B7280),
                       ),
-                      hintText: 'Add a few keywords...',
+                      hintText:
+                          'I have a job interview coming up and I want to walk in with complete authority and conviction.',
                       hintStyle: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        color: const Color(0xFF888888),
+                        fontSize: 13.5.sp,
+                        fontWeight: FontWeight.w400,
+                        height: 1.45,
+                        color: const Color(0xFF6B7280),
                       ),
                     ),
                     SizedBox(height: 24.h),
@@ -89,13 +97,12 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                     Text(
                       'What role are you applying for?',
                       style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        height: 1.5,
-                        color: AppColors.black,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.pureBlack,
                       ),
                     ),
-                    SizedBox(height: 14.h),
+                    SizedBox(height: 12.h),
                     CustomCardTextField(
                       controller: controller.roleApplyingController,
                       minLines: 3,
@@ -106,10 +113,15 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                       padding: EdgeInsets.all(16.w),
                       hintText: 'e.g. Head of Marketing at Unilever',
                       hintStyle: GoogleFonts.inter(
+                        fontSize: 13.5.sp,
+                        fontWeight: FontWeight.w400,
+                        height: 1.4,
+                        color: const Color(0xFFA0A0A8),
+                      ),
+                      style: GoogleFonts.inter(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
-                        height: 1.5,
-                        color: const Color(0xFF888888),
+                        color: AppColors.pureBlack,
                       ),
                     ),
                     SizedBox(height: 24.h),
@@ -117,23 +129,23 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                     Text(
                       'In your own words — why do you want this role and why are you the right person for it?',
                       style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        height: 1.4,
-                        color: AppColors.black,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700,
+                        height: 1.35,
+                        color: AppColors.pureBlack,
                       ),
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 6.h),
                     Text(
                       'Speak your answer — SpeechPro will transcribe it and use it to assess how you come across',
                       style: GoogleFonts.inter(
-                        fontSize: 14.sp,
+                        fontSize: 13.sp,
                         fontWeight: FontWeight.w400,
-                        height: 1.5,
-                        color: const Color(0xFF888888),
+                        height: 1.4,
+                        color: const Color(0xFF757575),
                       ),
                     ),
-                    SizedBox(height: 15.h),
+                    SizedBox(height: 14.h),
                     // Voice Recording Card
                     Obx(
                       () => VoiceRecorderCard(
@@ -154,12 +166,17 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                       focusedBorderColor: AppColors.primary,
                       padding: EdgeInsets.all(16.w),
                       hintText:
-                          'use the text below to add a few additional sentences why you feel you are the best person to win this',
+                          'use thr text below to add a few additional sentences why you feel you are the best person to win this',
                       hintStyle: GoogleFonts.inter(
-                        fontSize: 14.sp,
+                        fontSize: 13.5.sp,
                         fontWeight: FontWeight.w400,
                         height: 1.4,
-                        color: const Color(0xFF888888),
+                        color: const Color(0xFFA0A0A8),
+                      ),
+                      style: GoogleFonts.inter(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.pureBlack,
                       ),
                     ),
                     SizedBox(height: 20.h),
@@ -168,7 +185,7 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+              padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
               child: SpPrimaryButton(
                 label: 'Continue',
                 onPressed: controller.submitDetailsAndProceed,
@@ -176,7 +193,17 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
             ),
           ],
         ),
-      ),
-    );
-  }
+        // Black Briefing Processing Modal Transition (No score, 3 sequential AI briefing steps)
+        Obx(
+          () => controller.isProcessingBriefing.value
+              ? BriefingProcessingModal(
+                  onComplete: controller.onProcessingComplete,
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
+    ),
+  ),
+);
+}
 }

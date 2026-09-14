@@ -19,10 +19,11 @@ class StartStep5ScoreScreen extends GetView<StartScoreController> {
           children: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: const StartHeader(currentStep: 5),
+              child: const StartHeader(currentStep: 5, showDivider: true),
             ),
             Expanded(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: Column(
                   children: [
@@ -30,10 +31,10 @@ class StartStep5ScoreScreen extends GetView<StartScoreController> {
                     Text(
                       'Your Starting Influence Score',
                       style: GoogleFonts.inter(
-                        fontSize: 20.sp,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.w700,
-                        height: 1.5,
-                        color: AppColors.black,
+                        height: 1.3,
+                        color: AppColors.pureBlack,
                       ),
                     ),
                     SizedBox(height: 12.h),
@@ -47,10 +48,10 @@ class StartStep5ScoreScreen extends GetView<StartScoreController> {
                           () => Text(
                             '${controller.startingInfluenceScore.value}',
                             style: GoogleFonts.inter(
-                              fontSize: 64.sp,
+                              fontSize: 60.sp,
                               fontWeight: FontWeight.w900,
                               height: 1.0,
-                              color: AppColors.black,
+                              color: AppColors.pureBlack,
                             ),
                           ),
                         ),
@@ -58,53 +59,149 @@ class StartStep5ScoreScreen extends GetView<StartScoreController> {
                         Text(
                           '/100',
                           style: GoogleFonts.inter(
-                            fontSize: 24.sp,
+                            fontSize: 22.sp,
                             fontWeight: FontWeight.w500,
                             height: 1.5,
-                            color: const Color(0xFF888888),
+                            color: const Color(0xFF8E8E93),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 14.h),
+                    SizedBox(height: 4.h),
+                    Text(
+                      'Developing',
+                      style: GoogleFonts.inter(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
                     // Progress Bar Meter
                     Container(
-                      width: 328.w,
-                      height: 6.h,
+                      width: double.infinity,
+                      height: 5.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE5E5EA),
                         borderRadius: BorderRadius.circular(3.r),
                       ),
                       alignment: Alignment.centerLeft,
-                      child: Container(
-                        width: 84.w,
-                        height: 6.h,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(3.r),
+                      child: FractionallySizedBox(
+                        widthFactor: 0.59,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(3.r),
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 14.h),
-                    Text(
-                      "This is your personalized baseline.\nWe'll help you improve it.",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w400,
-                        height: 1.5,
-                        color: const Color(0xFF888888),
+                    SizedBox(height: 20.h),
+                    // Dimension Breakdown Card (Screen 3 in Figma)
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9F9FB),
+                        borderRadius: BorderRadius.circular(16.r),
+                        border: Border.all(color: const Color(0xFFEAEAEA)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Dimension Breakdown',
+                            style: GoogleFonts.inter(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF8E8E93),
+                            ),
+                          ),
+                          SizedBox(height: 14.h),
+                          _buildDimensionRow('Confidence', 52),
+                          SizedBox(height: 10.h),
+                          _buildDimensionRow('Presence', 61),
+                          SizedBox(height: 10.h),
+                          _buildDimensionRow('Authority', 48),
+                          SizedBox(height: 10.h),
+                          _buildDimensionRow('Leadership', 55),
+                          SizedBox(height: 10.h),
+                          _buildDimensionRow('Persuasion', 59),
+                          SizedBox(height: 10.h),
+                          _buildDimensionRow('Communication', 63),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 28.h),
+                    SizedBox(height: 20.h),
+                    // Instinct Callout Card with Left Red Border
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16.r),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFF9F9FB),
+                          border: Border(
+                            left: BorderSide(
+                              color: AppColors.primary,
+                              width: 4.0,
+                            ),
+                          ),
+                        ),
+                        padding: EdgeInsets.all(16.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'There is real instinct here.',
+                              style: GoogleFonts.inter(
+                                fontSize: 13.5.sp,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.pureBlack,
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            Text(
+                              'But instinct is not yet technique. You can feel what you want to say, but under pressure it is not landing with enough structure, authority or control. That gap is exactly what this system is built to close.',
+                              style: GoogleFonts.inter(
+                                fontSize: 12.5.sp,
+                                fontWeight: FontWeight.w400,
+                                height: 1.45,
+                                color: const Color(0xFF3A3A3C),
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            Text(
+                              'SpeechPro turns raw communication instinct into repeatable command.',
+                              style: GoogleFonts.inter(
+                                fontSize: 12.5.sp,
+                                fontWeight: FontWeight.w400,
+                                height: 1.45,
+                                color: const Color(0xFF3A3A3C),
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            Text(
+                              'Your first session starts now',
+                              style: GoogleFonts.inter(
+                                fontSize: 12.5.sp,
+                                fontWeight: FontWeight.w400,
+                                height: 1.45,
+                                color: const Color(0xFF3A3A3C),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
                     // Training Path Card Container
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFAFAFA),
+                        color: const Color(0xFFF9F9FB),
                         borderRadius: BorderRadius.circular(16.r),
-                        border: Border.all(color: const Color(0xFFECECEC), width: 1.0),
+                        border: Border.all(color: const Color(0xFFEAEAEA)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,60 +209,57 @@ class StartStep5ScoreScreen extends GetView<StartScoreController> {
                           Row(
                             children: [
                               Container(
-                                width: 32.r,
-                                height: 32.r,
+                                width: 26.r,
+                                height: 26.r,
                                 decoration: BoxDecoration(
                                   color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(8.r),
+                                  borderRadius: BorderRadius.circular(6.r),
                                 ),
                                 child: Icon(
-                                  Icons.star_rounded,
-                                  size: 18.sp,
+                                  Icons.bolt_rounded,
+                                  size: 16.sp,
                                   color: AppColors.white,
                                 ),
                               ),
-                              SizedBox(width: 10.w),
+                              SizedBox(width: 8.w),
                               Text(
                                 'YOUR TRAINING PATH',
                                 style: GoogleFonts.inter(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.5,
-                                  color: AppColors.primary,
+                                  fontSize: 12.5.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.pureBlack,
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: 10.h),
+                          SizedBox(height: 8.h),
                           Text(
                             "We've built your first training path around what you told us.",
                             style: GoogleFonts.inter(
-                              fontSize: 13.sp,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w400,
-                              height: 1.5,
-                              color: const Color(0xFF888888),
+                              color: const Color(0xFF8E8E93),
                             ),
                           ),
                           SizedBox(height: 14.h),
-                          _buildPathRow('PILLAR', 'Power Through Speech', isPrimary: true),
-                          const Divider(height: 1, thickness: 1, color: Color(0xFFEBEBEB)),
+                          _buildPathRow('PILLAR', 'Power Through Speech'),
+                          SizedBox(height: 10.h),
                           _buildPathRow('FOCUS 1', 'The Voice of Authority.'),
-                          const Divider(height: 1, thickness: 1, color: Color(0xFFEBEBEB)),
+                          SizedBox(height: 10.h),
                           _buildPathRow('FOCUS 2', 'Yi — The Power of Intent'),
                           SizedBox(height: 14.h),
                           Text(
                             "You'll discover why these matter as you train.",
                             style: GoogleFonts.inter(
-                              fontSize: 12.sp,
+                              fontSize: 11.5.sp,
                               fontWeight: FontWeight.w400,
-                              height: 1.5,
-                              color: const Color(0xFF888888),
+                              color: const Color(0xFF8E8E93),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: 20.h),
                   ],
                 ),
               ),
@@ -179,44 +273,44 @@ class StartStep5ScoreScreen extends GetView<StartScoreController> {
                     label: 'Start My First Session',
                     onPressed: controller.finishOnboarding,
                   ),
-                  SizedBox(height: 16.h),
+                  SizedBox(height: 14.h),
                   GestureDetector(
                     onTap: () {},
                     behavior: HitTestBehavior.opaque,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Hear why SpeechPro is different',
-                          style: GoogleFonts.inter(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w500,
-                            height: 1.5,
-                            color: AppColors.black,
-                          ),
-                        ),
-                        SizedBox(width: 6.w),
-                        Container(
-                          width: 22.r,
-                          height: 22.r,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFFF1F1),
-                            shape: BoxShape.circle,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            '▶',
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Hear why SpeechPro is different',
                             style: GoogleFonts.inter(
-                              fontSize: 9.sp,
+                              fontSize: 13.sp,
                               fontWeight: FontWeight.w500,
+                              color: AppColors.pureBlack,
+                            ),
+                          ),
+                          SizedBox(width: 6.w),
+                          Container(
+                            width: 22.r,
+                            height: 22.r,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFFF1F1),
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.play_arrow_rounded,
+                              size: 14.sp,
                               color: AppColors.primary,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(height: 8.h),
+                  SizedBox(height: 6.h),
                 ],
               ),
             ),
@@ -226,41 +320,86 @@ class StartStep5ScoreScreen extends GetView<StartScoreController> {
     );
   }
 
-  Widget _buildPathRow(String tag, String title, {bool isPrimary = false}) {
-    return Container(
-      height: 41.h,
-      alignment: Alignment.centerLeft,
-      child: Row(
-        children: [
-          Icon(
-            Icons.chevron_right_rounded,
-            size: 16.sp,
-            color: isPrimary ? AppColors.primary : const Color(0xFF888888),
-          ),
-          SizedBox(width: 4.w),
-          Text(
-            tag,
+  Widget _buildDimensionRow(String name, int score) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 105.w,
+          child: Text(
+            name,
             style: GoogleFonts.inter(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w600,
-              height: 1.5,
-              color: isPrimary ? AppColors.primary : const Color(0xFF888888),
+              fontSize: 12.5.sp,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF2C2C2E),
             ),
           ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Text(
-              title,
-              style: GoogleFonts.inter(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w700,
-                height: 1.5,
-                color: isPrimary ? AppColors.primary : AppColors.black,
+        ),
+        Expanded(
+          child: Container(
+            height: 6.h,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE5E5EA),
+              borderRadius: BorderRadius.circular(3.r),
+            ),
+            alignment: Alignment.centerLeft,
+            child: FractionallySizedBox(
+              widthFactor: (score / 100).clamp(0.0, 1.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF34C759),
+                  borderRadius: BorderRadius.circular(3.r),
+                ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+        SizedBox(width: 12.w),
+        SizedBox(
+          width: 24.w,
+          child: Text(
+            '$score',
+            textAlign: TextAlign.right,
+            style: GoogleFonts.inter(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF2C2C2E),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPathRow(String tag, String title) {
+    return Row(
+      children: [
+        Icon(
+          Icons.chevron_right_rounded,
+          size: 14.sp,
+          color: const Color(0xFF8E8E93),
+        ),
+        SizedBox(width: 4.w),
+        Text(
+          tag,
+          style: GoogleFonts.inter(
+            fontSize: 11.sp,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF8E8E93),
+          ),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Text(
+            title,
+            textAlign: TextAlign.right,
+            style: GoogleFonts.inter(
+              fontSize: 12.5.sp,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

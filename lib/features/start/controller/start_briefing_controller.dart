@@ -4,9 +4,12 @@ import '../../../../routes/app_routes.dart';
 import '../model/briefing_model.dart';
 
 class StartBriefingController extends GetxController {
-  final RxInt briefingLoadingStage = 0.obs; // 0, 1, 2, 3 (Done)
-  final RxBool isBriefingReady = false.obs;
+  final RxDouble progressPercent = 1.0.obs;
+  final RxInt briefingLoadingStage = 3.obs; // 0, 1, 2, 3 (Done)
+  final RxBool isBriefingReady = true.obs;
+  final RxBool showBlackPopup = false.obs;
   final RxBool isLoading = false.obs;
+  Timer? _progressTimer;
 
   // Briefing content (ready for API population)
   final Rx<PersonalBriefingModel> briefingData = const PersonalBriefingModel(
@@ -36,27 +39,42 @@ class StartBriefingController extends GetxController {
   ).obs;
 
   @override
-  void onInit() {
-    super.onInit();
-    startBriefingGeneration();
+  void onClose() {
+    _progressTimer?.cancel();
+    super.onClose();
   }
 
   void startBriefingGeneration() {
     isBriefingReady.value = false;
+    showBlackPopup.value = true;
     briefingLoadingStage.value = 0;
+    progressPercent.value = 0.0;
 
-    Future.delayed(const Duration(milliseconds: 900), () {
-      briefingLoadingStage.value = 1;
+    _progressTimer?.cancel();
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 35), (timer) {
+      if (progressPercent.value < 0.33) {
+        progressPercent.value += 0.015;
+        briefingLoadingStage.value = 0;
+      } else if (progressPercent.value < 0.66) {
+        progressPercent.value += 0.012;
+        briefingLoadingStage.value = 1;
+      } else if (progressPercent.value < 1.0) {
+        progressPercent.value += 0.012;
+        briefingLoadingStage.value = 2;
+      } else {
+        progressPercent.value = 1.0;
+        briefingLoadingStage.value = 3;
+        timer.cancel();
+        Future.delayed(const Duration(milliseconds: 700), () {
+          showBlackPopup.value = false;
+          isBriefingReady.value = true;
+        });
+      }
     });
+  }
 
-    Future.delayed(const Duration(milliseconds: 1800), () {
-      briefingLoadingStage.value = 2;
-    });
-
-    Future.delayed(const Duration(milliseconds: 2600), () {
-      briefingLoadingStage.value = 3;
-      isBriefingReady.value = true;
-    });
+  void dismissBlackPopup() {
+    showBlackPopup.value = false;
   }
 
   void proceedToAssessment() {
