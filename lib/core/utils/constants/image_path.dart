@@ -8,4 +8,5 @@ class ImagePath {
   static const String spMarkWhite = 'assets/images/sp_mark_white.png';
   static const String logoHeader = 'assets/images/logo_header.png';
   static const String confetti = 'assets/images/confetti.png';
+  static const String spCircleBadge = 'assets/images/sp_circle_badge.png';
 }

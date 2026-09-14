@@ -3,6 +3,7 @@ import '../../../../routes/app_routes.dart';
 import '../model/goal_model.dart';
 
 class StartGoalsController extends GetxController {
+  final RxString userName = 'Aycan Doganlar'.obs;
   final RxString selectedGoalId = '01'.obs;
   final RxString selectedGoalTitle = 'Job Interview'.obs;
   final RxBool isLoading = false.obs;
@@ -13,7 +14,7 @@ class StartGoalsController extends GetxController {
     const GoalCategoryModel(id: '03', number: '03', title: 'Promotion or Pay Rise'),
     const GoalCategoryModel(id: '04', number: '04', title: 'TED Talk or Presentation'),
     const GoalCategoryModel(id: '05', number: '05', title: 'Sales or Client Meeting'),
-    const GoalCategoryModel(id: '06', number: '06', title: 'Podcast or Convets'),
+    const GoalCategoryModel(id: '06', number: '06', title: 'Podcast or Camera'),
     const GoalCategoryModel(id: '07', number: '07', title: 'Social Confidence'),
     const GoalCategoryModel(id: '08', number: '08', title: 'English and Pronunciation'),
     const GoalCategoryModel(id: '09', number: '09', title: 'Difficult Conversation'),

@@ -24,40 +24,45 @@ class StartStep1GoalsScreen extends GetView<StartGoalsController> {
             ),
             Expanded(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 16.h),
-                    Text(
-                      'Hey Aycan, you\'re in the right place, this is where we make it happen.',
-                      style: GoogleFonts.inter(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.w700,
-                        height: 1.5,
-                        color: AppColors.black,
+                    Obx(
+                      () => Text(
+                        "Hey ${controller.userName.value},\nyou're in the right place,\nthis is where we make it happen.",
+                        style: GoogleFonts.inter(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.w800,
+                          height: 1.25,
+                          color: AppColors.pureBlack,
+                        ),
                       ),
                     ),
                     SizedBox(height: 16.h),
                     Text(
                       'What do you want to achieve?',
                       style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        height: 1.5,
-                        color: AppColors.black,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        height: 1.3,
+                        color: AppColors.pureBlack,
                       ),
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 6.h),
                     Text(
                       'Choose what matters most to you right now — or describe it in your own words below.',
                       style: GoogleFonts.inter(
-                        fontSize: 13.sp,
+                        fontSize: 12.5.sp,
                         fontWeight: FontWeight.w400,
-                        height: 1.5,
-                        color: const Color(0xFF888888),
+                        height: 1.45,
+                        color: const Color(0xFF8E8E93),
                       ),
                     ),
+                    SizedBox(height: 12.h),
+                    const _AccentDivider(),
                     SizedBox(height: 16.h),
                     // Goals List
                     Obx(
@@ -80,7 +85,7 @@ class StartStep1GoalsScreen extends GetView<StartGoalsController> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+              padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 16.h),
               child: SpPrimaryButton(
                 label: 'Continue',
                 onPressed: controller.submitGoalAndProceed,
@@ -91,4 +96,39 @@ class StartStep1GoalsScreen extends GetView<StartGoalsController> {
       ),
     );
   }
+}
+
+class _AccentDivider extends StatelessWidget {
+  const _AccentDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        CustomPaint(size: Size(8.w, 9.h), painter: _TrianglePainter()),
+        Expanded(
+          child: Container(height: 0.8.h, color: const Color(0xFFF0F0F2)),
+        ),
+      ],
+    );
+  }
+}
+
+class _TrianglePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFE5E7EB)
+      ..style = PaintingStyle.fill;
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, size.height / 2)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

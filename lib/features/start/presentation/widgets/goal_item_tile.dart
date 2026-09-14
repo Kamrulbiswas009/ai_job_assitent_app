@@ -23,22 +23,22 @@ class GoalItemTile extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        height: 48.h,
+        height: 50.h,
         margin: EdgeInsets.only(bottom: 8.h),
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        padding: EdgeInsets.symmetric(horizontal: 14.w),
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
             color: isSelected ? AppColors.primary : const Color(0xFFE5E5EA),
-            width: 1.0,
+            width: isSelected ? 1.2 : 1.0,
           ),
         ),
         child: Row(
           children: [
             // Number Box
             Container(
-              width: 24.w,
+              width: 26.w,
               height: 24.h,
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.primary : const Color(0xFFF2F2F7),
@@ -48,7 +48,7 @@ class GoalItemTile extends StatelessWidget {
               child: Text(
                 number,
                 style: GoogleFonts.inter(
-                  fontSize: 12.sp,
+                  fontSize: 11.sp,
                   fontWeight: FontWeight.w700,
                   color: isSelected ? AppColors.white : const Color(0xFF888888),
                 ),
@@ -60,10 +60,10 @@ class GoalItemTile extends StatelessWidget {
               child: Text(
                 title,
                 style: GoogleFonts.inter(
-                  fontSize: 14.sp,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  height: 1.5,
-                  color: AppColors.black,
+                  fontSize: 13.5.sp,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                  height: 1.3,
+                  color: AppColors.pureBlack,
                 ),
               ),
             ),
@@ -71,7 +71,7 @@ class GoalItemTile extends StatelessWidget {
               Icon(
                 Icons.check,
                 color: AppColors.primary,
-                size: 20.sp,
+                size: 18.sp,
               ),
           ],
         ),

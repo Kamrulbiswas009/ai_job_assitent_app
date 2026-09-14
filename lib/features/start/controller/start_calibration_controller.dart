@@ -62,7 +62,14 @@ class StartCalibrationController extends GetxController {
     }
   }
 
+  final RxBool isCalculating = false.obs;
+
   void proceedToStep5() {
+    isCalculating.value = true;
+  }
+
+  void onCalculationComplete() {
+    isCalculating.value = false;
     Get.toNamed(AppRoute.startStep5Score);
   }
 }

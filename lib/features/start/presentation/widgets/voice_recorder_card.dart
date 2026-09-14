@@ -42,16 +42,21 @@ class VoiceRecorderCard extends StatelessWidget {
     return _buildCenteredCalibrationLayout();
   }
 
-  // Step 2 exact Figma Layout (387x145 Container)
+  // Step 2 exact Figma Layout
   Widget _buildCompactHorizontalLayout() {
+    const compactWaveform = [
+      16.0, 26.0, 14.0, 8.0, 16.0, 28.0, 26.0, 24.0, 18.0, 8.0,
+      16.0, 28.0, 26.0, 24.0, 18.0, 8.0, 16.0, 26.0, 24.0, 18.0, 8.0, 14.0
+    ];
+
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF9F9),
-        borderRadius: BorderRadius.circular(12.r),
+        color: const Color(0xFFFFF7F7),
+        borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.25),
+          color: const Color(0xFFFCA5A5).withValues(alpha: 0.6),
           width: 1.0,
         ),
       ),
@@ -63,8 +68,8 @@ class VoiceRecorderCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 8.r,
-                height: 8.r,
+                width: 7.r,
+                height: 7.r,
                 decoration: const BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
@@ -74,25 +79,25 @@ class VoiceRecorderCard extends StatelessWidget {
               Text(
                 'Recording · ${_formatTime(durationSeconds)}',
                 style: GoogleFonts.inter(
-                  fontSize: 11.sp,
+                  fontSize: 11.5.sp,
                   fontWeight: FontWeight.w700,
-                  height: 1.5,
+                  height: 1.4,
                   color: AppColors.primary,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: 6.h),
           Text(
             isRecording ? 'Listening...' : label,
             style: GoogleFonts.inter(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w400,
-              height: 1.5,
-              color: const Color(0xFF0A0A0A),
+              fontSize: 12.5.sp,
+              fontWeight: FontWeight.w500,
+              height: 1.4,
+              color: const Color(0xFF374151),
             ),
           ),
-          SizedBox(height: 14.h),
+          SizedBox(height: 12.h),
           // Horizontal Row: 44x44 Mic Button + Waveform Bars
           Row(
             children: [
@@ -103,27 +108,20 @@ class VoiceRecorderCard extends StatelessWidget {
                   width: 44.r,
                   height: 44.r,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: isRecording ? 0.4 : 0.2),
-                        blurRadius: isRecording ? 12 : 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
                   child: isRecording
                       ? Icon(
                           Icons.stop_rounded,
                           color: AppColors.white,
-                          size: 22.sp,
+                          size: 24.sp,
                         )
                       : SvgPicture.asset(
                           IconPath.icMic,
                           width: 22.w,
-                          height: 22.w,
+                          height: 22.h,
                           colorFilter: const ColorFilter.mode(
                             AppColors.white,
                             BlendMode.srcIn,
@@ -131,24 +129,22 @@ class VoiceRecorderCard extends StatelessWidget {
                         ),
                 ),
               ),
-              SizedBox(width: 13.w),
+              SizedBox(width: 12.w),
               // Waveform bars
               Expanded(
                 child: SizedBox(
-                  height: 36.h,
+                  height: 32.h,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: waveformHeights.map((h) {
-                      final barH = isRecording ? (h * 1.1).h : (h * 0.45).h;
+                    children: compactWaveform.map((h) {
+                      final barH = isRecording ? (h * 1.15).h : (h * 0.95).h;
                       return Container(
-                        width: 3.5.w,
+                        width: 5.w,
                         height: barH,
                         decoration: BoxDecoration(
-                          color: isRecording
-                              ? AppColors.primary
-                              : AppColors.primary.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(2.r),
+                          color: const Color(0xFFDE6262),
+                          borderRadius: BorderRadius.circular(2.5.r),
                         ),
                       );
                     }).toList(),
