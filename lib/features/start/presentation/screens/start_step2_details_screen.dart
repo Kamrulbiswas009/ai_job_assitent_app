@@ -63,7 +63,7 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w400,
                         height: 1.45,
-                        color: const Color(0xFF757575),
+                        color: Color(0xFF757575),
                       ),
                     ),
                     SizedBox(height: 16.h),
