@@ -2,19 +2,26 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart' hide Response;
 import 'package:http/http.dart';
 
+import '../../routes/app_routes.dart';
 import '../models/response_data.dart';
+import 'storage_service.dart';
 
 class NetworkCaller {
   final int timeoutDuration = 20;
+  static bool _isHandlingUnauthorized = false;
 
   // GET method
   Future<ResponseData> getRequest(String url, {String? token}) async {
+    final effectiveToken = (token != null && token.isNotEmpty)
+        ? token
+        : StorageService.token;
     debugPrint('==================== [GET REQUEST] ====================');
     debugPrint('URL: $url');
-    if (token != null) debugPrint('Token: $token');
+    if (effectiveToken != null) debugPrint('Token: $effectiveToken');
     log('GET Request: $url');
 
     try {
@@ -23,14 +30,16 @@ class NetworkCaller {
         headers: {
           'Content-Type': 'application/json',
           'accept': '*/*',
-          if (token != null && token.isNotEmpty)
-            'Authorization': token.startsWith('Bearer ') ? token : 'Bearer $token',
+          if (effectiveToken != null && effectiveToken.isNotEmpty)
+            'Authorization': effectiveToken.startsWith('Bearer ')
+                ? effectiveToken
+                : 'Bearer $effectiveToken',
         },
       ).timeout(
         Duration(seconds: timeoutDuration),
       );
 
-      return _handleResponse(response);
+      return _handleResponse(response, requestUrl: url);
     } catch (e) {
       return _handleError(e);
     }
@@ -42,12 +51,15 @@ class NetworkCaller {
     dynamic body,
     String? token,
   }) async {
+    final effectiveToken = (token != null && token.isNotEmpty)
+        ? token
+        : StorageService.token;
     final bodyString = body != null ? jsonEncode(body) : '';
     final logBody = _formatSanitizedBody(body);
     debugPrint('==================== [POST REQUEST] ====================');
     debugPrint('URL: $url');
     debugPrint('Body: $logBody');
-    if (token != null) debugPrint('Token: $token');
+    if (effectiveToken != null) debugPrint('Token: $effectiveToken');
     log('POST Request: $url, Body: $logBody');
 
     try {
@@ -56,20 +68,125 @@ class NetworkCaller {
         headers: {
           'Content-Type': 'application/json',
           'accept': '*/*',
-          if (token != null && token.isNotEmpty)
-            'Authorization': token.startsWith('Bearer ') ? token : 'Bearer $token',
+          if (effectiveToken != null && effectiveToken.isNotEmpty)
+            'Authorization': effectiveToken.startsWith('Bearer ')
+                ? effectiveToken
+                : 'Bearer $effectiveToken',
         },
         body: bodyString.isNotEmpty ? bodyString : null,
       ).timeout(Duration(seconds: timeoutDuration));
 
-      return _handleResponse(response);
+      return _handleResponse(response, requestUrl: url);
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  // PUT method
+  Future<ResponseData> putRequest(
+    String url, {
+    dynamic body,
+    String? token,
+  }) async {
+    final effectiveToken = (token != null && token.isNotEmpty)
+        ? token
+        : StorageService.token;
+    final bodyString = body != null ? jsonEncode(body) : '';
+    final logBody = _formatSanitizedBody(body);
+    debugPrint('==================== [PUT REQUEST] ====================');
+    debugPrint('URL: $url');
+    debugPrint('Body: $logBody');
+    if (effectiveToken != null) debugPrint('Token: $effectiveToken');
+    log('PUT Request: $url, Body: $logBody');
+
+    try {
+      final Response response = await put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+          if (effectiveToken != null && effectiveToken.isNotEmpty)
+            'Authorization': effectiveToken.startsWith('Bearer ')
+                ? effectiveToken
+                : 'Bearer $effectiveToken',
+        },
+        body: bodyString.isNotEmpty ? bodyString : null,
+      ).timeout(Duration(seconds: timeoutDuration));
+
+      return _handleResponse(response, requestUrl: url);
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  // PATCH method
+  Future<ResponseData> patchRequest(
+    String url, {
+    dynamic body,
+    String? token,
+  }) async {
+    final effectiveToken = (token != null && token.isNotEmpty)
+        ? token
+        : StorageService.token;
+    final bodyString = body != null ? jsonEncode(body) : '';
+    final logBody = _formatSanitizedBody(body);
+    debugPrint('==================== [PATCH REQUEST] ====================');
+    debugPrint('URL: $url');
+    debugPrint('Body: $logBody');
+    if (effectiveToken != null) debugPrint('Token: $effectiveToken');
+    log('PATCH Request: $url, Body: $logBody');
+
+    try {
+      final Response response = await patch(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+          if (effectiveToken != null && effectiveToken.isNotEmpty)
+            'Authorization': effectiveToken.startsWith('Bearer ')
+                ? effectiveToken
+                : 'Bearer $effectiveToken',
+        },
+        body: bodyString.isNotEmpty ? bodyString : null,
+      ).timeout(Duration(seconds: timeoutDuration));
+
+      return _handleResponse(response, requestUrl: url);
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  // DELETE method
+  Future<ResponseData> deleteRequest(String url, {String? token}) async {
+    final effectiveToken = (token != null && token.isNotEmpty)
+        ? token
+        : StorageService.token;
+    debugPrint('==================== [DELETE REQUEST] ====================');
+    debugPrint('URL: $url');
+    if (effectiveToken != null) debugPrint('Token: $effectiveToken');
+    log('DELETE Request: $url');
+
+    try {
+      final Response response = await delete(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+          if (effectiveToken != null && effectiveToken.isNotEmpty)
+            'Authorization': effectiveToken.startsWith('Bearer ')
+                ? effectiveToken
+                : 'Bearer $effectiveToken',
+        },
+      ).timeout(Duration(seconds: timeoutDuration));
+
+      return _handleResponse(response, requestUrl: url);
     } catch (e) {
       return _handleError(e);
     }
   }
 
   // Handle response
-  ResponseData _handleResponse(Response response) {
+  ResponseData _handleResponse(Response response, {String? requestUrl}) {
     final logResponseBody = _formatSanitizedBody(response.body);
     debugPrint('==================== [API RESPONSE] ====================');
     debugPrint('Status Code: ${response.statusCode}');
@@ -110,6 +227,7 @@ class NetworkCaller {
       if (decodedResponse is Map && decodedResponse['message'] != null) {
         errorMessage = decodedResponse['message'].toString();
       }
+      _handleUnauthorized(requestUrl: requestUrl);
       return ResponseData(
         isSuccess: false,
         statusCode: response.statusCode,
@@ -128,6 +246,60 @@ class NetworkCaller {
         errorMessage: errorMessage,
       );
     }
+  }
+
+  // Handle 401 Unauthorized: clear session and redirect to login screen
+  static void _handleUnauthorized({String? requestUrl}) {
+    if (_isHandlingUnauthorized) return;
+
+    // Do not redirect if 401 occurred on auth screens/endpoints (e.g. invalid credentials on login)
+    if (requestUrl != null) {
+      final uri = Uri.tryParse(requestUrl);
+      final path = uri?.path ?? requestUrl;
+      if (path.contains('/auth/login') ||
+          path.contains('/auth/register') ||
+          path.contains('/auth/verify-email') ||
+          path.contains('/auth/forgot-password') ||
+          path.contains('/auth/reset-password')) {
+        return;
+      }
+    }
+
+    // Do not redirect if already on login screen
+    if (Get.currentRoute == AppRoute.login) {
+      return;
+    }
+
+    _isHandlingUnauthorized = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await StorageService.logoutUser();
+        if (Get.currentRoute != AppRoute.login) {
+          Get.offAllNamed(AppRoute.login);
+          Get.snackbar(
+            'Session Expired',
+            'Your session has expired. Please log in again.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red.shade600,
+            colorText: Colors.white,
+            margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 4),
+          );
+        }
+      } catch (e) {
+        debugPrint('Error handling unauthorized redirect: $e');
+      } finally {
+        Future.delayed(const Duration(seconds: 2), () {
+          _isHandlingUnauthorized = false;
+        });
+      }
+    });
+  }
+
+  // Public helper to trigger unauthorized/logout externally if needed
+  static void handleUnauthorized({String? requestUrl}) {
+    _handleUnauthorized(requestUrl: requestUrl);
   }
 
   // Extract error messages for status 400
