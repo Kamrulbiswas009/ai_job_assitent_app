@@ -218,10 +218,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_easyloading
-      sha256: ba21a3c883544e582f9cc455a4a0907556714e1e9cf0eababfcb600da191d17c
+      sha256: "764e83a3537c8bf00353750ec90cf42967949c47225d222277c218ca5f200ae8"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.5"
+    version: "4.0.2"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -292,10 +292,10 @@ packages:
     dependency: "direct main"
     description:
       name: google_fonts
-      sha256: ba03d03bcaa2f6cb7bd920e3b5027181db75ab524f8891c8bc3aa603885b8055
+      sha256: e3cb3ee6b47fd2472c23de6da5744796a4da195137759ddb3fbcc9467b7b3c7d
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.3"
+    version: "8.2.1"
   graphs:
     dependency: transitive
     description:
@@ -329,7 +329,7 @@ packages:
     source: hosted
     version: "3.2.2"
   http_parser:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http_parser
       sha256: "178d74305e7866013777bab2c3d8726205dc5a4dd935297175b19a23a2e66571"
@@ -356,10 +356,10 @@ packages:
     dependency: "direct main"
     description:
       name: intl
-      sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
+      sha256: "1ca20c894b1717686a2319b8548763d812bc0aabdac580420a44c5178c57a867"
       url: "https://pub.dev"
     source: hosted
-    version: "0.18.1"
+    version: "0.20.3"
   io:
     dependency: transitive
     description:

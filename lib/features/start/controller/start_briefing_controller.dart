@@ -9,39 +9,32 @@ class StartBriefingController extends GetxController {
   final RxBool isBriefingReady = true.obs;
   final RxBool showBlackPopup = false.obs;
   final RxBool isLoading = false.obs;
+  final RxString userFirstName = 'Aycan'.obs;
+  final RxString scenarioTitle = 'Job Interview'.obs;
   Timer? _progressTimer;
 
-  // Briefing content (ready for API population)
-  final Rx<PersonalBriefingModel> briefingData = const PersonalBriefingModel(
-    goalTitle: 'JOB INTERVIEW',
-    subGoal: 'Executive / Leadership Role',
-    summary:
-        'You\'re entering a high-stakes interview where authority, composure, and concise value articulation will decide the outcome.',
-    pillars: [
-      BriefingPillarModel(
-        title: 'GRAVITAS & EXECUTIVE PRESENCE',
-        body:
-            'Lower your vocal pitch by 5-10% at sentence ends. Speak with measured cadence — 130-140 words per minute is optimal for conveying high seniority.',
-      ),
-      BriefingPillarModel(
-        title: 'STRATEGIC PAUSING',
-        body:
-            'Replace filler words (um, uh, like) with 1-2 second intentional pauses. Senior leaders pause before answering difficult questions; it signals deep composure.',
-      ),
-      BriefingPillarModel(
-        title: 'THE "PYRAMID PRINCIPLE" STRUCTURE',
-        body:
-            'Always state your conclusion or key achievement first, followed by the supporting rationale. Cut back-story by 40% to keep interviewers lean and engaged.',
-      ),
-    ],
-    coachingNote:
-        'Your SpeechPro training plan will focus on eliminating upward inflections, mastering the 2-second pause, and structuring high-impact responses under pressure.',
-  ).obs;
+  // Briefing content (dynamically populated from API)
+  final Rx<PersonalBriefingModel> briefingData =
+      PersonalBriefingModel.fallback.obs;
 
   @override
   void onClose() {
     _progressTimer?.cancel();
     super.onClose();
+  }
+
+  void setBriefingData(
+    PersonalBriefingModel data, {
+    String? firstName,
+    String? scenario,
+  }) {
+    briefingData.value = data;
+    if (firstName != null && firstName.isNotEmpty) {
+      userFirstName.value = firstName;
+    }
+    if (scenario != null && scenario.isNotEmpty) {
+      scenarioTitle.value = scenario;
+    }
   }
 
   void startBriefingGeneration() {

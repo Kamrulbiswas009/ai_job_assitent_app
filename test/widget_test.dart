@@ -15,12 +15,14 @@ import 'package:studioequip_mobile_app/features/start/presentation/screens/start
 import 'package:studioequip_mobile_app/features/start/presentation/screens/start_step1_goals_screen.dart';
 import 'package:studioequip_mobile_app/features/start/presentation/screens/start_step2_details_screen.dart';
 import 'package:studioequip_mobile_app/features/start/presentation/screens/start_briefing_screen.dart';
+import 'package:studioequip_mobile_app/features/start/presentation/screens/start_step3_assessment_screen.dart';
 import 'package:studioequip_mobile_app/features/start/presentation/screens/start_step4_calibration_screen.dart';
 import 'package:studioequip_mobile_app/features/start/presentation/screens/start_step5_score_screen.dart';
 import 'package:studioequip_mobile_app/features/start/controller/start_membership_controller.dart';
 import 'package:studioequip_mobile_app/features/start/controller/start_goals_controller.dart';
 import 'package:studioequip_mobile_app/features/start/controller/start_step2_details_controller.dart';
 import 'package:studioequip_mobile_app/features/start/controller/start_briefing_controller.dart';
+import 'package:studioequip_mobile_app/features/start/controller/start_assessment_controller.dart';
 import 'package:studioequip_mobile_app/features/start/controller/start_calibration_controller.dart';
 import 'package:studioequip_mobile_app/features/start/controller/start_score_controller.dart';
 
@@ -207,6 +209,47 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  testWidgets('Screen 11b: Pick Investor Pitch in Step 1 updates Step 2 titles and starts with empty text fields', (
+    WidgetTester tester,
+  ) async {
+    final goalsController = Get.find<StartGoalsController>();
+    // Select Investor Pitch (id: '02')
+    final investorPitchGoal = goalsController.goalCategories.firstWhere((g) => g.id == '02');
+    goalsController.selectGoal(investorPitchGoal);
+
+    // Navigate to Step 2
+    Get.put(StartStep2DetailsController());
+    goalsController.submitGoalAndProceed();
+
+    await tester.pumpWidget(createScreen(const StartStep2DetailsScreen()));
+    await tester.pumpAndSettle();
+
+    // Verify dynamic Scenario Title
+    expect(find.text('Investor Pitch'), findsOneWidget);
+
+    // Verify dynamic field titles
+    expect(find.text('What is your role or venture?'), findsOneWidget);
+    expect(
+      find.text('In your own words — what is your pitch and why should investors back you?'),
+      findsOneWidget,
+    );
+
+    // Verify text fields are initially empty
+    final step2Controller = Get.find<StartStep2DetailsController>();
+    expect(step2Controller.interviewKeywordsController.text, isEmpty);
+    expect(step2Controller.roleApplyingController.text, isEmpty);
+    expect(step2Controller.voiceAnswerTextController.text, isEmpty);
+
+    // Verify user can enter text
+    step2Controller.interviewKeywordsController.text = 'AI startup raising seed round';
+    step2Controller.roleApplyingController.text = 'CEO & Founder';
+    await tester.pump();
+
+    expect(find.text('AI startup raising seed round'), findsOneWidget);
+    expect(find.text('CEO & Founder'), findsOneWidget);
+  });
+
+
   testWidgets('Screen 12: Start Briefing screen renders perfectly', (
     WidgetTester tester,
   ) async {
@@ -221,6 +264,40 @@ void main() {
     expect(find.text('Continue'), findsOneWidget);
   });
 
+  testWidgets('Screen 12b: Start Step 3 Assessment screen renders and updates choices', (
+    WidgetTester tester,
+  ) async {
+    final controller = Get.put(StartAssessmentController());
+    await tester.pumpWidget(createScreen(const StartStep3AssessmentScreen()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Step 3 of 5'), findsOneWidget);
+    expect(find.text('ONE LAST THING'), findsOneWidget);
+    expect(find.text('Before we begin — be honest.'), findsOneWidget);
+    expect(
+      find.text('Three quick questions. They set your starting benchmark.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('When speaking to a group or presenting, I feel confident'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('I communicate with authority — people listen when I speak'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('People respond positively to how I communicate in key situations'),
+      findsOneWidget,
+    );
+    expect(find.text('Continue'), findsOneWidget);
+
+    // Test updating an answer
+    controller.setBenchmarkAnswer(0, 3); // Usually
+    await tester.pumpAndSettle();
+    expect(controller.benchmarkQuestions[0].selectedIndex, equals(3));
+  });
+
   testWidgets('Screen 13: Start Step 4 Calibration and Score Calculation Modal', (
     WidgetTester tester,
   ) async {
@@ -230,6 +307,7 @@ void main() {
     expect(find.text('Step 4 of 5'), findsOneWidget);
     expect(find.text('VOICE CALIBRATION'), findsOneWidget);
     expect(find.textContaining('Now I want to'), findsOneWidget);
+    expect(find.text('Continue'), findsOneWidget);
     expect(find.text('Skip Voice calibration'), findsOneWidget);
 
     // Trigger score calculation modal

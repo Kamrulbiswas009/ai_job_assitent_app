@@ -6,6 +6,7 @@ class StorageService {
   static const String _idKey = 'userId';
   static const String _emailKey = 'userEmail';
   static const String _fullNameKey = 'userName';
+  static const String _assessmentIdKey = 'assessmentId';
 
   static SharedPreferences? _preferences;
 
@@ -49,6 +50,11 @@ class StorageService {
     await _preferences?.setString(_emailKey, email);
   }
 
+  // Save assessment ID (Step 3 -> 4, 5)
+  static Future<void> saveAssessmentId(String assessmentId) async {
+    await _preferences?.setString(_assessmentIdKey, assessmentId);
+  }
+
   // Getters
   static String? get token => _preferences?.getString(_accessTokenKey);
   static String? get accessToken => _preferences?.getString(_accessTokenKey);
@@ -56,6 +62,7 @@ class StorageService {
   static String? get userId => _preferences?.getString(_idKey);
   static String? get userEmail => _preferences?.getString(_emailKey);
   static String? get fullName => _preferences?.getString(_fullNameKey);
+  static String? get assessmentId => _preferences?.getString(_assessmentIdKey);
 
   // Logout / clear
   static Future<void> logoutUser() async {
@@ -64,5 +71,6 @@ class StorageService {
     await _preferences?.remove(_idKey);
     await _preferences?.remove(_emailKey);
     await _preferences?.remove(_fullNameKey);
+    await _preferences?.remove(_assessmentIdKey);
   }
 }

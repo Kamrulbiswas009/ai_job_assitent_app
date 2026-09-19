@@ -1,12 +1,24 @@
 import 'package:get/get.dart';
+import '../../../../core/services/storage_service.dart';
 import '../../../../routes/app_routes.dart';
 import '../model/goal_model.dart';
+
+import 'start_step2_details_controller.dart';
 
 class StartGoalsController extends GetxController {
   final RxString userName = 'Aycan Doganlar'.obs;
   final RxString selectedGoalId = '01'.obs;
   final RxString selectedGoalTitle = 'Job Interview'.obs;
   final RxBool isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    final storedName = StorageService.fullName;
+    if (storedName != null && storedName.trim().isNotEmpty) {
+      userName.value = storedName.trim();
+    }
+  }
 
   final List<GoalCategoryModel> goalCategories = [
     const GoalCategoryModel(id: '01', number: '01', title: 'Job Interview'),
@@ -35,6 +47,12 @@ class StartGoalsController extends GetxController {
   }
 
   void submitGoalAndProceed() {
+    if (Get.isRegistered<StartStep2DetailsController>()) {
+      Get.find<StartStep2DetailsController>().syncScenario(
+        id: selectedGoalId.value,
+        title: selectedGoalTitle.value,
+      );
+    }
     Get.toNamed(AppRoute.startStep2Details);
   }
 }
