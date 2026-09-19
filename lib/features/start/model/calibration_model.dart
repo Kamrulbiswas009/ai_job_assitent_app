@@ -25,3 +25,36 @@ class VoiceCalibrationModel {
     };
   }
 }
+
+/// Response payload for POST /api/v1/assessment/{assessment_id}/voice
+class CalibrationVoiceResponse {
+  final bool success;
+  final String assessmentId;
+  final String status;
+  final String message;
+
+  const CalibrationVoiceResponse({
+    required this.success,
+    required this.assessmentId,
+    required this.status,
+    required this.message,
+  });
+
+  factory CalibrationVoiceResponse.fromJson(Map<String, dynamic> json) {
+    return CalibrationVoiceResponse(
+      success: json['success'] as bool? ?? false,
+      assessmentId: json['assessment_id'] as String? ?? '',
+      status: json['status'] as String? ?? '',
+      message: json['message'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'assessment_id': assessmentId,
+      'status': status,
+      'message': message,
+    };
+  }
+}

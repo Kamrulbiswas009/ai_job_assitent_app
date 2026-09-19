@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../controller/start_calibration_controller.dart';
 import '../widgets/score_calculation_modal.dart';
@@ -91,25 +92,42 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                             label: 'Tap to speak your Answer',
                           ),
                         ),
-                        SizedBox(height: 28.h),
-                        // Skip Voice calibration
-                        Center(
-                          child: GestureDetector(
-                            onTap: controller.proceedToStep5,
-                            behavior: HitTestBehavior.opaque,
-                            child: Text(
-                              'Skip Voice calibration',
-                              style: GoogleFonts.inter(
-                                fontSize: 13.5.sp,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xFF8E8E93),
-                              ),
-                            ),
-                          ),
-                        ),
                         SizedBox(height: 24.h),
                       ],
                     ),
+                  ),
+                ),
+                // Bottom Continue & Skip Actions
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Obx(
+                        () => SpPrimaryButton(
+                          label: 'Continue',
+                          isLoading: controller.isLoading.value,
+                          onPressed: controller.isLoading.value
+                              ? null
+                              : controller.submitVoiceAndProceed,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      Center(
+                        child: GestureDetector(
+                          onTap: controller.skipCalibration,
+                          behavior: HitTestBehavior.opaque,
+                          child: Text(
+                            'Skip Voice calibration',
+                            style: GoogleFonts.inter(
+                              fontSize: 13.5.sp,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF8E8E93),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

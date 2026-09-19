@@ -12,4 +12,18 @@ class ApiConstants {
   // Subscription / Checkout Endpoints
   static const String createCheckoutSession =
       '$baseUrl/subscriptions/checkout-session';
+
+  // Coaching / Briefing Endpoints
+  static const String personalBriefing =
+      'https://rosendo-vitiable-sari.ngrok-free.dev/api/v1/coaching/personal-briefing';
+
+  // Assessment Endpoints
+  static const String selfAssessment =
+      'https://rosendo-vitiable-sari.ngrok-free.dev/api/v1/assessment/self-assessment';
+
+  static String assessmentVoice(String assessmentId) =>
+      'https://rosendo-vitiable-sari.ngrok-free.dev/api/v1/assessment/$assessmentId/voice';
+
+  static String assessmentResult(String assessmentId) =>
+      'https://rosendo-vitiable-sari.ngrok-free.dev/api/v1/assessment/$assessmentId/result';
 }

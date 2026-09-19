@@ -88,9 +88,14 @@ class StartStep3AssessmentScreen extends GetView<StartAssessmentController> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-              child: SpPrimaryButton(
-                label: 'Continue',
-                onPressed: controller.submitAssessmentAndProceed,
+              child: Obx(
+                () => SpPrimaryButton(
+                  label: 'Continue',
+                  isLoading: controller.isLoading.value,
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : controller.submitAssessmentAndProceed,
+                ),
               ),
             ),
           ],
