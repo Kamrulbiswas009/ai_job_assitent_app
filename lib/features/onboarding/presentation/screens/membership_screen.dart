@@ -49,7 +49,7 @@ class MembershipScreen extends StatelessWidget {
                       Text(
                         'Your Membership',
                         style: GoogleFonts.inter(
-                          fontSize: 13.5.sp,
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w400,
                           height: 1.4,
                           color: const Color(0xFF8E8E93),
@@ -111,7 +111,7 @@ class MembershipScreen extends StatelessWidget {
                             Text(
                               'Full access to SpeechPro. Cancel anytime.',
                               style: GoogleFonts.inter(
-                                fontSize: 13.sp,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w400,
                                 height: 1.4,
                                 color: const Color(0xFF8E8E93),
@@ -149,7 +149,7 @@ class MembershipScreen extends StatelessWidget {
                                       child: Text(
                                         feature,
                                         style: GoogleFonts.inter(
-                                          fontSize: 13.sp,
+                                          fontSize: 14.sp,
                                           fontWeight: FontWeight.w400,
                                           height: 1.4,
                                           color: AppColors.pureBlack,
@@ -177,7 +177,7 @@ class MembershipScreen extends StatelessWidget {
                 plan.billingText,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
-                  fontSize: 11.5.sp,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w400,
                   height: 1.4,
                   color: const Color(0xFF8E8E93),

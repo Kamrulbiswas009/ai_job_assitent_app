@@ -72,7 +72,7 @@ class StartHeader extends StatelessWidget {
           Center(
             child: Image.asset(
               ImagePath.logoHeader,
-              height: 44.h,
+              height: 70.h,
               fit: BoxFit.contain,
             ),
           ),
@@ -89,7 +89,9 @@ class StartHeader extends StatelessWidget {
                   height: 3.5.h,
                   margin: EdgeInsets.only(right: index < 4 ? 6.w : 0),
                   decoration: BoxDecoration(
-                    color: isPassed ? AppColors.primary : const Color(0xFFE5E5EA),
+                    color: isPassed
+                        ? AppColors.primary
+                        : const Color(0xFFE5E5EA),
                     borderRadius: BorderRadius.circular(2.r),
                   ),
                 ),

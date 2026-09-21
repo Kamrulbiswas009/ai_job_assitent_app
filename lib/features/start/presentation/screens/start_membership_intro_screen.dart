@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
+import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../controller/start_membership_controller.dart';
 
@@ -23,7 +24,7 @@ class StartMembershipIntroScreen extends GetView<StartMembershipController> {
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: IntrinsicHeight(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    padding: EdgeInsets.symmetric(horizontal: 22.w),
                     child: Column(
                       children: [
                         const Spacer(flex: 3),
@@ -31,84 +32,104 @@ class StartMembershipIntroScreen extends GetView<StartMembershipController> {
                         Center(
                           child: Image.asset(
                             ImagePath.confetti,
-                            width: 88.w,
-                            height: 88.w,
+                            width: 80.w,
+                            height: 80.w,
                             fit: BoxFit.contain,
                           ),
                         ),
-                        SizedBox(height: 32.h),
+                        SizedBox(height: 28.h),
                         // Main Heading
                         Obx(
-                          () => Text(
-                            'Great news, ${controller.userFirstName.value} !',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
-                              fontSize: 28.sp,
-                              fontWeight: FontWeight.w800,
-                              height: 1.2,
-                              color: AppColors.pureBlack,
-                            ),
-                          ),
+                          () {
+                            final rawName = controller.userFirstName.value.trim();
+                            final firstName = rawName.isNotEmpty
+                                ? '${rawName[0].toUpperCase()}${rawName.substring(1)}'
+                                : '';
+                            return Text(
+                              firstName.isNotEmpty
+                                  ? 'Great news, $firstName !'
+                                  : 'Great news !',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                fontSize: 28.sp,
+                                fontWeight: FontWeight.w800,
+                                height: 1.25,
+                                color: AppColors.pureBlack,
+                              ),
+                            );
+                          },
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          'Your SpechPro membership has started',
+                          'Your SpeechPro membership has started',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
-                            fontSize: 15.sp,
+                            fontSize: 15.5.sp,
                             fontWeight: FontWeight.w700,
                             height: 1.4,
                             color: AppColors.primary,
                           ),
                         ),
-                        SizedBox(height: 36.h),
+                        SizedBox(height: 32.h),
                         // Unified 3-Pillar Card
                         Container(
                           width: double.infinity,
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 4.h,
+                          ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFAF1EC),
+                            color: const Color(0xFFFBEFEA),
                             borderRadius: BorderRadius.circular(16.r),
                           ),
                           child: Column(
                             children: [
-                              _buildPillarRow('1', 'Power Through Speech'),
-                              const Divider(
-                                height: 1,
-                                thickness: 0.8,
-                                color: Color(0x14000000),
+                              _buildPillarRow(
+                                IconPath.icFire,
+                                'Power Through Speech',
                               ),
-                              _buildPillarRow('2', 'Influence Through Impact'),
                               const Divider(
                                 height: 1,
                                 thickness: 0.8,
                                 color: Color(0x14000000),
                               ),
                               _buildPillarRow(
-                                '3',
+                                IconPath.icBoltColor,
+                                'Influence Through Impact',
+                              ),
+                              const Divider(
+                                height: 1,
+                                thickness: 0.8,
+                                color: Color(0x14000000),
+                              ),
+                              _buildPillarRow(
+                                IconPath.icCrownColor,
                                 'Authority Through Presence',
                               ),
                             ],
                           ),
                         ),
-                        const Spacer(flex: 4),
-                        // Footer CTA
-                        Text(
-                          'Now let’s find out what you want to achieve.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            fontSize: 13.5.sp,
-                            fontWeight: FontWeight.w400,
-                            height: 1.4,
-                            color: const Color(0xFF71717A),
+                        SizedBox(height: 24.h),
+                        // Description text below card
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 6.w),
+                          child: Text(
+                            'You now have access to thirty years of real world experience, from a top growth and communication expert, built into a system you can train with anytime.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 14.5.sp,
+                              fontWeight: FontWeight.w400,
+                              height: 1.45,
+                              color: const Color(0xFF8E8E93),
+                            ),
                           ),
                         ),
-                        SizedBox(height: 16.h),
+                        const Spacer(flex: 4),
                         SpPrimaryButton(
                           label: 'What do you want to achieve',
                           onPressed: controller.goToStep1,
                         ),
-                        SizedBox(height: 36.h),
+                        SizedBox(height: 24.h),
                       ],
                     ),
                   ),
@@ -121,38 +142,22 @@ class StartMembershipIntroScreen extends GetView<StartMembershipController> {
     );
   }
 
-  Widget _buildPillarRow(String number, String title) {
+  Widget _buildPillarRow(String iconPath, String title) {
     return Container(
       height: 52.h,
       alignment: Alignment.center,
       child: Row(
         children: [
-          Container(
-            width: 20.w,
-            height: 20.w,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(3.r),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              number,
-              style: GoogleFonts.inter(
-                fontSize: 11.5.sp,
-                fontWeight: FontWeight.w800,
-                color: AppColors.white,
-                height: 1.1,
-              ),
-            ),
-          ),
+          SizedBox(width: 2.w),
+          Image.asset(iconPath, width: 22.w, height: 22.w, fit: BoxFit.contain),
           SizedBox(width: 14.w),
           Expanded(
             child: Text(
               title,
               style: GoogleFonts.inter(
-                fontSize: 14.sp,
+                fontSize: 14.5.sp,
                 fontWeight: FontWeight.w700,
-                height: 1.4,
+                height: 1.3,
                 color: AppColors.pureBlack,
               ),
             ),

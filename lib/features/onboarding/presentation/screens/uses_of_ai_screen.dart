@@ -111,7 +111,7 @@ class UsesOfAiScreen extends StatelessWidget {
                                 Text(
                                   service.title,
                                   style: GoogleFonts.inter(
-                                    fontSize: 14.sp,
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.w700,
                                     height: 1.3,
                                     color: AppColors.pureBlack,
@@ -121,7 +121,7 @@ class UsesOfAiScreen extends StatelessWidget {
                                 Text(
                                   'RECEIVES',
                                   style: GoogleFonts.inter(
-                                    fontSize: 10.sp,
+                                    fontSize: 14.sp,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 1.0,
                                     color: AppColors.primary,
@@ -131,7 +131,7 @@ class UsesOfAiScreen extends StatelessWidget {
                                 Text(
                                   service.receives,
                                   style: GoogleFonts.inter(
-                                    fontSize: 13.5.sp,
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.w400,
                                     height: 1.4,
                                     color: AppColors.pureBlack,
@@ -141,7 +141,7 @@ class UsesOfAiScreen extends StatelessWidget {
                                 Text(
                                   'USED FOR',
                                   style: GoogleFonts.inter(
-                                    fontSize: 10.sp,
+                                    fontSize: 14.sp,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 1.0,
                                     color: AppColors.primary,
@@ -151,7 +151,7 @@ class UsesOfAiScreen extends StatelessWidget {
                                 Text(
                                   service.usedFor,
                                   style: GoogleFonts.inter(
-                                    fontSize: 13.sp,
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.w400,
                                     height: 1.4,
                                     color: AppColors.pureBlack,

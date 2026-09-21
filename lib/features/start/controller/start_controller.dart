@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
@@ -249,10 +250,9 @@ class StartController extends GetxController {
   }
 
   void finishStartFlow() {
-    Get.snackbar(
-      'Welcome to SpeechPro',
-      'Your training session is starting!',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    try {
+      EasyLoading.showSuccess('Your training session is starting!')
+          .catchError((_) {});
+    } catch (_) {}
   }
 }

@@ -1,15 +1,21 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/services/network_caller.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../../core/utils/constants/api_constants.dart';
+import '../../start/controller/start_membership_controller.dart';
 import '../model/membership_plan_model.dart';
 
 class OnboardingController extends GetxController {
   final NetworkCaller _networkCaller = NetworkCaller();
+
+  // User auth & subscription state
+  final RxBool isUserSubscribed = false.obs;
+  final RxString userFullName = ''.obs;
 
   // Loading states
   final RxBool isRegisterLoading = false.obs;
@@ -99,39 +105,19 @@ class OnboardingController extends GetxController {
             ? response.responseData['message']
             : 'Registration successful. Please verify your email';
 
-        Get.snackbar(
-          'Success',
-          message,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 3),
-        );
+        EasyLoading.showSuccess(message);
         return true;
       } else {
-        Get.snackbar(
-          'Registration Failed',
+        EasyLoading.showError(
           response.errorMessage.isNotEmpty
               ? response.errorMessage
               : 'Something went wrong',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 4),
         );
         return false;
       }
     } catch (e) {
       debugPrint('Registration Exception: $e');
-      Get.snackbar(
-        'Error',
-        'An error occurred: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade600,
-        colorText: Colors.white,
-      );
+      EasyLoading.showError('An error occurred: $e');
       return false;
     } finally {
       isRegisterLoading.value = false;
@@ -162,39 +148,19 @@ class OnboardingController extends GetxController {
             ? response.responseData['message']
             : 'Email verified successfully';
 
-        Get.snackbar(
-          'Success',
-          message,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 3),
-        );
+        EasyLoading.showSuccess(message);
         return true;
       } else {
-        Get.snackbar(
-          'Verification Failed',
+        EasyLoading.showError(
           response.errorMessage.isNotEmpty
               ? response.errorMessage
               : 'Invalid verification code',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 4),
         );
         return false;
       }
     } catch (e) {
       debugPrint('Verify Email Exception: $e');
-      Get.snackbar(
-        'Error',
-        'An error occurred: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade600,
-        colorText: Colors.white,
-      );
+      EasyLoading.showError('An error occurred: $e');
       return false;
     } finally {
       isVerifyLoading.value = false;
@@ -230,7 +196,16 @@ class OnboardingController extends GetxController {
           final user = data['user'] is Map ? data['user'] as Map : null;
           final userId = user?['userId']?.toString();
           final userEmail = user?['email']?.toString() ?? email.trim();
-          final fullName = user?['fullName']?.toString();
+          final fullName = user?['fullName']?.toString() ?? '';
+          final rawIsSubscribed = user?['isSubscribed'];
+          final bool isSubscribed = rawIsSubscribed == true ||
+              rawIsSubscribed == 'true' ||
+              rawIsSubscribed == 1;
+
+          isUserSubscribed.value = isSubscribed;
+          if (fullName.isNotEmpty) {
+            userFullName.value = fullName;
+          }
 
           await StorageService.saveAuthData(
             accessToken: accessToken,
@@ -238,7 +213,14 @@ class OnboardingController extends GetxController {
             userId: userId,
             email: userEmail,
             fullName: fullName,
+            isSubscribed: isSubscribed,
           );
+
+          if (Get.isRegistered<StartMembershipController>()) {
+            if (fullName.isNotEmpty) {
+              Get.find<StartMembershipController>().setUserName(fullName);
+            }
+          }
         }
 
         final message = (response.responseData is Map &&
@@ -246,39 +228,19 @@ class OnboardingController extends GetxController {
             ? response.responseData['message']
             : 'Login successful';
 
-        Get.snackbar(
-          'Success',
-          message,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 3),
-        );
+        EasyLoading.showSuccess(message);
         return true;
       } else {
-        Get.snackbar(
-          'Login Failed',
+        EasyLoading.showError(
           response.errorMessage.isNotEmpty
               ? response.errorMessage
               : 'Invalid email or password',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 4),
         );
         return false;
       }
     } catch (e) {
       debugPrint('Login Exception: $e');
-      Get.snackbar(
-        'Error',
-        'An error occurred: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade600,
-        colorText: Colors.white,
-      );
+      EasyLoading.showError('An error occurred: $e');
       return false;
     } finally {
       isLoginLoading.value = false;
@@ -356,39 +318,19 @@ class OnboardingController extends GetxController {
             ? response.responseData['message']
             : 'If the email exists, a password reset OTP has been sent.';
 
-        Get.snackbar(
-          'Success',
-          message,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 3),
-        );
+        EasyLoading.showSuccess(message);
         return true;
       } else {
-        Get.snackbar(
-          'Request Failed',
+        EasyLoading.showError(
           response.errorMessage.isNotEmpty
               ? response.errorMessage
               : 'Failed to send password reset OTP',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 4),
         );
         return false;
       }
     } catch (e) {
       debugPrint('Forgot Password Exception: $e');
-      Get.snackbar(
-        'Error',
-        'An error occurred: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade600,
-        colorText: Colors.white,
-      );
+      EasyLoading.showError('An error occurred: $e');
       return false;
     } finally {
       isForgotPasswordLoading.value = false;
@@ -421,39 +363,19 @@ class OnboardingController extends GetxController {
             ? response.responseData['message']
             : 'Password reset successfully';
 
-        Get.snackbar(
-          'Success',
-          message,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 3),
-        );
+        EasyLoading.showSuccess(message);
         return true;
       } else {
-        Get.snackbar(
-          'Reset Failed',
+        EasyLoading.showError(
           response.errorMessage.isNotEmpty
               ? response.errorMessage
               : 'Failed to reset password',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 4),
         );
         return false;
       }
     } catch (e) {
       debugPrint('Reset Password Exception: $e');
-      Get.snackbar(
-        'Error',
-        'An error occurred: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade600,
-        colorText: Colors.white,
-      );
+      EasyLoading.showError('An error occurred: $e');
       return false;
     } finally {
       isResetPasswordLoading.value = false;
@@ -495,42 +417,22 @@ class OnboardingController extends GetxController {
         }
 
         if (checkoutUrl == null || checkoutUrl.isEmpty) {
-          Get.snackbar(
-            'Checkout Error',
-            'No checkout URL returned by server.',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red.shade600,
-            colorText: Colors.white,
-            margin: const EdgeInsets.all(16),
-          );
+          EasyLoading.showError('No checkout URL returned by server.');
           return null;
         }
 
         return checkoutUrl;
       } else {
-        Get.snackbar(
-          'Checkout Failed',
+        EasyLoading.showError(
           response.errorMessage.isNotEmpty
               ? response.errorMessage
               : 'Failed to create checkout session',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade600,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 4),
         );
         return null;
       }
     } catch (e) {
       debugPrint('Checkout Session Exception: $e');
-      Get.snackbar(
-        'Error',
-        'An error occurred: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade600,
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-      );
+      EasyLoading.showError('An error occurred: $e');
       return null;
     } finally {
       isCheckoutLoading.value = false;
@@ -547,14 +449,7 @@ class OnboardingController extends GetxController {
       }
     } catch (e) {
       debugPrint('Launch URL Exception: $e');
-      Get.snackbar(
-        'Error',
-        'Could not open checkout page: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade600,
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-      );
+      EasyLoading.showError('Could not open checkout page: $e');
       return false;
     }
   }

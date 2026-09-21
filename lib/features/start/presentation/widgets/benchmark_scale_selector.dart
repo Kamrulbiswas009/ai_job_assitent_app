@@ -31,7 +31,7 @@ class BenchmarkScaleSelector extends StatelessWidget {
         Text(
           question,
           style: GoogleFonts.inter(
-            fontSize: 14.sp,
+            fontSize: 15.sp,
             fontWeight: FontWeight.w600,
             height: 1.5,
             color: AppColors.black,
@@ -82,7 +82,7 @@ class BenchmarkScaleSelector extends StatelessWidget {
         child: Text(
           label,
           style: GoogleFonts.inter(
-            fontSize: 13.sp,
+            fontSize: 13.5.sp,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             height: 1.5,
             color: isSelected ? AppColors.white : AppColors.black,

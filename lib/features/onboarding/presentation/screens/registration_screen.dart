@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,57 +47,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final confirmPassword = _confirmPasswordController.text.trim();
 
     if (fullName.isEmpty) {
-      Get.snackbar(
-        'Required',
-        'Please enter your full name',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Please enter your full name');
       return;
     }
 
     if (email.isEmpty || !GetUtils.isEmail(email)) {
-      Get.snackbar(
-        'Required',
-        'Please enter a valid email address',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Please enter a valid email address');
       return;
     }
 
     if (password.isEmpty) {
-      Get.snackbar(
-        'Required',
-        'Please enter your password',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Please enter your password');
       return;
     }
 
     if (password != confirmPassword) {
-      Get.snackbar(
-        'Password Mismatch',
-        'Passwords do not match',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Passwords do not match');
       return;
     }
 
     if (!_agreed) {
-      Get.snackbar(
-        'Terms & Privacy',
-        'Please accept the Terms of Service to continue',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Please accept the Terms of Service to continue');
       return;
     }
 
@@ -122,151 +93,172 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             children: [
               const OnboardingHeader(),
               Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: EdgeInsets.only(top: 24.h, bottom: 20.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Create your account',
-                        style: GoogleFonts.inter(
-                          fontSize: 24.sp,
-                          fontWeight: FontWeight.w700,
-                          height: 1.25,
-                          color: AppColors.pureBlack,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
                         ),
-                      ),
-                      SizedBox(height: 6.h),
-                      Text(
-                        'Start your communication baseline today.',
-                        style: GoogleFonts.inter(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w400,
-                          height: 1.4,
-                          color: const Color(0xFF71717A),
-                        ),
-                      ),
-                      SizedBox(height: 28.h),
-                      SpUnderlineField(
-                        controller: _fullNameController,
-                        label: 'Full Name',
-                        hint: 'James Davidson',
-                      ),
-                      SizedBox(height: 20.h),
-                      SpUnderlineField(
-                        controller: _emailController,
-                        label: 'Email Address',
-                        hint: 'james@example.com',
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      SizedBox(height: 20.h),
-                      SpUnderlineField(
-                        controller: _passwordController,
-                        label: 'Password',
-                        hint: 'Enter your password',
-                        obscureText: true,
-                        showObscureToggle: true,
-                      ),
-                      SizedBox(height: 20.h),
-                      SpUnderlineField(
-                        controller: _confirmPasswordController,
-                        label: 'Confirm Password',
-                        hint: 'Re-enter your password',
-                        obscureText: true,
-                        showObscureToggle: true,
-                      ),
-                      SizedBox(height: 20.h),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () => setState(() => _agreed = !_agreed),
-                            behavior: HitTestBehavior.opaque,
-                            child: Container(
-                              width: 20.w,
-                              height: 20.w,
-                              margin: EdgeInsets.only(top: 1.5.h),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4.r),
-                                border: Border.all(
-                                  color: _agreed
-                                      ? AppColors.primary
-                                      : const Color(0xFFD1D5DB),
-                                  width: 1.5,
-                                ),
-                                color: _agreed
-                                    ? AppColors.primary
-                                    : AppColors.white,
-                              ),
-                              child: _agreed
-                                  ? Icon(
-                                      Icons.check,
-                                      size: 14.sp,
-                                      color: AppColors.white,
-                                    )
-                                  : null,
-                            ),
-                          ),
-                          SizedBox(width: 10.w),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () => setState(() => _agreed = !_agreed),
-                              behavior: HitTestBehavior.opaque,
-                              child: Text(
-                                "By continuing you agree to SpeechPro's Terms of Service and Privacy Policy. Your voice data is processed securely and never shared.",
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 24.h),
+                              Text(
+                                'Create your account',
                                 style: GoogleFonts.inter(
-                                  fontSize: 12.sp,
+                                  fontSize: 24.sp,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.25,
+                                  color: AppColors.pureBlack,
+                                ),
+                              ),
+                              SizedBox(height: 6.h),
+                              Text(
+                                'Start your communication baseline today.',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w400,
-                                  height: 1.45,
+                                  height: 1.4,
                                   color: const Color(0xFF71717A),
                                 ),
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 118.h),
-                      Obx(
-                        () => SpPrimaryButton(
-                          label: 'Create Account',
-                          isLoading: _controller.isRegisterLoading.value,
-                          onPressed: _handleRegister,
-                        ),
-                      ),
-                      SizedBox(height: 16.h),
-                      Center(
-                        child: Wrap(
-                          alignment: WrapAlignment.center,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Text(
-                              'Already have an account? ',
-                              style: GoogleFonts.inter(
-                                fontSize: 12.5.sp,
-                                fontWeight: FontWeight.w400,
-                                height: 1.4,
-                                color: const Color(0xFF71717A),
+                              SizedBox(height: 28.h),
+                              SpUnderlineField(
+                                controller: _fullNameController,
+                                label: 'Full Name',
+                                hint: 'James Davidson',
                               ),
-                            ),
-                            GestureDetector(
-                              onTap: () => Get.toNamed(AppRoute.login),
-                              child: Text(
-                                'Sign In',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12.5.sp,
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.4,
-                                  color: AppColors.primary,
+                              SizedBox(height: 20.h),
+                              SpUnderlineField(
+                                controller: _emailController,
+                                label: 'Email Address',
+                                hint: 'james@example.com',
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                              SizedBox(height: 20.h),
+                              SpUnderlineField(
+                                controller: _passwordController,
+                                label: 'Password',
+                                hint: 'Create a password',
+                                obscureText: true,
+                                showObscureToggle: true,
+                              ),
+                              SizedBox(height: 20.h),
+                              SpUnderlineField(
+                                controller: _confirmPasswordController,
+                                label: 'Confirm Password',
+                                hint: 'Confirm your password',
+                                obscureText: true,
+                                showObscureToggle: true,
+                              ),
+                              SizedBox(height: 16.h),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () =>
+                                        setState(() => _agreed = !_agreed),
+                                    child: Container(
+                                      width: 20.w,
+                                      height: 20.w,
+                                      margin: EdgeInsets.only(top: 2.h),
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(4.r),
+                                        border: Border.all(
+                                          color: _agreed
+                                              ? AppColors.primary
+                                              : const Color(0xFFD1D5DB),
+                                          width: 1.5,
+                                        ),
+                                        color: _agreed
+                                            ? AppColors.primary
+                                            : AppColors.white,
+                                      ),
+                                      child: _agreed
+                                          ? Icon(
+                                              Icons.check,
+                                              size: 14.sp,
+                                              color: AppColors.white,
+                                            )
+                                          : null,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () =>
+                                          setState(() => _agreed = !_agreed),
+                                      behavior: HitTestBehavior.opaque,
+                                      child: Text(
+                                        "By continuing you agree to SpeechPro's Terms of Service and Privacy Policy. Your voice data is processed securely and never shared.",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w400,
+                                          height: 1.45,
+                                          color: const Color(0xFF71717A),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              SizedBox(height: 24.h),
+                              Obx(
+                                () => SpPrimaryButton(
+                                  label: 'Create Account',
+                                  isLoading: _controller.isRegisterLoading.value,
+                                  onPressed: _handleRegister,
                                 ),
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 16.h),
+                              Center(
+                                child: Wrap(
+                                  alignment: WrapAlignment.center,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Already have an account? ',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12.5.sp,
+                                        fontWeight: FontWeight.w400,
+                                        height: 1.4,
+                                        color: const Color(0xFF71717A),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () => Get.toNamed(AppRoute.login),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 4.h,
+                                          horizontal: 2.w,
+                                        ),
+                                        child: Text(
+                                          'Sign In',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12.5.sp,
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.4,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 20.h),
+                            ],
+                          ),
                         ),
                       ),
-                      SizedBox(height: 10.h),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
             ],

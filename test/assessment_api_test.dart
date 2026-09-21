@@ -71,49 +71,52 @@ void main() {
   });
 
   group('AssessmentService Tests', () {
-    test('submitSelfAssessment sends correct JSON body and returns parsed response', () async {
-      final mockClient = MockClient((request) async {
-        expect(request.method, equals('POST'));
-        expect(
-          request.url.path,
-          contains('/api/v1/assessment/self-assessment'),
+    test(
+      'submitSelfAssessment sends correct JSON body and returns parsed response',
+      () async {
+        final mockClient = MockClient((request) async {
+          expect(request.method, equals('POST'));
+          expect(
+            request.url.path,
+            contains('/api/v1/assessment/self-assessment'),
+          );
+          expect(request.headers['Content-Type'], contains('application/json'));
+
+          final body = jsonDecode(request.body);
+          expect(body['confidence'], equals('sometimes'));
+          expect(body['authority'], equals('often'));
+          expect(body['communication'], equals('always'));
+
+          return http.Response(
+            jsonEncode({
+              'success': true,
+              'data': {
+                'assessment_id': 'test-uuid-1234',
+                'status': 'voice_pending',
+                'confidence': 'sometimes',
+                'authority': 'often',
+                'communication': 'always',
+              },
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        });
+
+        final service = AssessmentService(client: mockClient);
+        const req = SelfAssessmentRequest(
+          confidence: 'sometimes',
+          authority: 'often',
+          communication: 'always',
         );
-        expect(request.headers['Content-Type'], contains('application/json'));
 
-        final body = jsonDecode(request.body);
-        expect(body['confidence'], equals('sometimes'));
-        expect(body['authority'], equals('often'));
-        expect(body['communication'], equals('always'));
-
-        return http.Response(
-          jsonEncode({
-            'success': true,
-            'data': {
-              'assessment_id': 'test-uuid-1234',
-              'status': 'voice_pending',
-              'confidence': 'sometimes',
-              'authority': 'often',
-              'communication': 'always',
-            },
-          }),
-          200,
-          headers: {'content-type': 'application/json'},
-        );
-      });
-
-      final service = AssessmentService(client: mockClient);
-      const req = SelfAssessmentRequest(
-        confidence: 'sometimes',
-        authority: 'often',
-        communication: 'always',
-      );
-
-      final result = await service.submitSelfAssessment(req);
-      expect(result, isNotNull);
-      expect(result!.success, isTrue);
-      expect(result.data!.assessmentId, equals('test-uuid-1234'));
-      expect(result.data!.status, equals('voice_pending'));
-    });
+        final result = await service.submitSelfAssessment(req);
+        expect(result, isNotNull);
+        expect(result!.success, isTrue);
+        expect(result.data!.assessmentId, equals('test-uuid-1234'));
+        expect(result.data!.status, equals('voice_pending'));
+      },
+    );
 
     test('submitSelfAssessment returns null on server error', () async {
       final mockClient = MockClient((request) async {
@@ -150,7 +153,7 @@ void main() {
   group('StartAssessmentController Tests', () {
     test('setBenchmarkAnswer updates selectedIndex properly', () {
       final controller = StartAssessmentController();
-      expect(controller.benchmarkQuestions[0].selectedIndex, equals(1));
+      expect(controller.benchmarkQuestions[0].selectedIndex, isNull);
 
       controller.setBenchmarkAnswer(0, 4); // Always
       expect(controller.benchmarkQuestions[0].selectedIndex, equals(4));
@@ -159,47 +162,57 @@ void main() {
       expect(controller.benchmarkQuestions[1].selectedIndex, equals(2));
     });
 
-    test('submitAssessmentAndProceed saves assessment_id and handles success', () async {
-      final mockClient = MockClient((request) async {
-        final body = jsonDecode(request.body);
-        expect(body['confidence'], equals('sometimes'));
-        expect(body['authority'], equals('rarely'));
-        expect(body['communication'], equals('rarely'));
+    test(
+      'submitAssessmentAndProceed saves assessment_id and handles success',
+      () async {
+        final mockClient = MockClient((request) async {
+          final body = jsonDecode(request.body);
+          expect(body['confidence'], equals('sometimes'));
+          expect(body['authority'], equals('rarely'));
+          expect(body['communication'], equals('rarely'));
 
-        return http.Response(
-          jsonEncode({
-            'success': true,
-            'data': {
-              'assessment_id': '265b829d-22af-4cbf-941e-4be1ac53c57d',
-              'status': 'voice_pending',
-              'confidence': 'sometimes',
-              'authority': 'rarely',
-              'communication': 'rarely',
-            },
-          }),
-          200,
-          headers: {'content-type': 'application/json'},
+          return http.Response(
+            jsonEncode({
+              'success': true,
+              'data': {
+                'assessment_id': '265b829d-22af-4cbf-941e-4be1ac53c57d',
+                'status': 'voice_pending',
+                'confidence': 'sometimes',
+                'authority': 'rarely',
+                'communication': 'rarely',
+              },
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        });
+
+        final service = AssessmentService(client: mockClient);
+        final controller = StartAssessmentController(
+          assessmentService: service,
         );
-      });
 
-      final service = AssessmentService(client: mockClient);
-      final controller = StartAssessmentController(assessmentService: service);
+        // Select answers to enable submission
+        controller.setBenchmarkAnswer(0, 1); // sometimes
+        controller.setBenchmarkAnswer(1, 0); // rarely
+        controller.setBenchmarkAnswer(2, 0); // rarely
 
-      expect(controller.isLoading.value, isFalse);
-      expect(controller.assessmentId.value, isEmpty);
+        expect(controller.isLoading.value, isFalse);
+        expect(controller.assessmentId.value, isEmpty);
 
-      await controller.submitAssessmentAndProceed();
+        await controller.submitAssessmentAndProceed();
 
-      expect(controller.isLoading.value, isFalse);
-      expect(
-        controller.assessmentId.value,
-        equals('265b829d-22af-4cbf-941e-4be1ac53c57d'),
-      );
-      expect(
-        StorageService.assessmentId,
-        equals('265b829d-22af-4cbf-941e-4be1ac53c57d'),
-      );
-    });
+        expect(controller.isLoading.value, isFalse);
+        expect(
+          controller.assessmentId.value,
+          equals('265b829d-22af-4cbf-941e-4be1ac53c57d'),
+        );
+        expect(
+          StorageService.assessmentId,
+          equals('265b829d-22af-4cbf-941e-4be1ac53c57d'),
+        );
+      },
+    );
   });
 
   group('CalibrationVoiceResponse Model Tests', () {
@@ -215,15 +228,27 @@ void main() {
       final model = CalibrationVoiceResponse.fromJson(jsonMap);
 
       expect(model.success, isTrue);
-      expect(model.assessmentId, equals('265b829d-22af-4cbf-941e-4be1ac53c57d'));
+      expect(
+        model.assessmentId,
+        equals('265b829d-22af-4cbf-941e-4be1ac53c57d'),
+      );
       expect(model.status, equals('processing'));
-      expect(model.message, equals('Voice received. Calculating your score...'));
+      expect(
+        model.message,
+        equals('Voice received. Calculating your score...'),
+      );
 
       final jsonOut = model.toJson();
       expect(jsonOut['success'], isTrue);
-      expect(jsonOut['assessment_id'], equals('265b829d-22af-4cbf-941e-4be1ac53c57d'));
+      expect(
+        jsonOut['assessment_id'],
+        equals('265b829d-22af-4cbf-941e-4be1ac53c57d'),
+      );
       expect(jsonOut['status'], equals('processing'));
-      expect(jsonOut['message'], equals('Voice received. Calculating your score...'));
+      expect(
+        jsonOut['message'],
+        equals('Voice received. Calculating your score...'),
+      );
     });
   });
 
@@ -245,25 +270,28 @@ void main() {
       expect(controller.isCalculating.value, isFalse);
     });
 
-    test('submitVoiceAndProceed with existing file submits and activates isCalculating', () async {
-      final tempDir = await Directory.systemTemp.createTemp('voice_test');
-      final testFile = File('${tempDir.path}/test_voice.m4a');
-      await testFile.writeAsString('test voice data');
+    test(
+      'submitVoiceAndProceed with existing file submits and activates isCalculating',
+      () async {
+        final tempDir = await Directory.systemTemp.createTemp('voice_test');
+        final testFile = File('${tempDir.path}/test_voice.m4a');
+        await testFile.writeAsString('test voice data');
 
-      await StorageService.saveAssessmentId('test-calib-1234');
+        await StorageService.saveAssessmentId('test-calib-1234');
 
-      final controller = StartCalibrationController();
-      controller.recordedAudioPath.value = testFile.path;
+        final controller = StartCalibrationController();
+        controller.recordedAudioPath.value = testFile.path;
 
-      expect(controller.isCalculating.value, isFalse);
-      await controller.submitVoiceAndProceed();
+        expect(controller.isCalculating.value, isFalse);
+        await controller.submitVoiceAndProceed();
 
-      expect(controller.isCalculating.value, isTrue);
+        expect(controller.isCalculating.value, isTrue);
 
-      if (await tempDir.exists()) {
-        await tempDir.delete(recursive: true);
-      }
-    });
+        if (await tempDir.exists()) {
+          await tempDir.delete(recursive: true);
+        }
+      },
+    );
   });
 
   group('AssessmentResultResponse Model Tests', () {
@@ -294,7 +322,10 @@ void main() {
       final Map<String, dynamic> jsonMap = jsonDecode(jsonStr);
       final model = AssessmentResultResponse.fromJson(jsonMap);
 
-      expect(model.assessmentId, equals('265b829d-22af-4cbf-941e-4be1ac53c57d'));
+      expect(
+        model.assessmentId,
+        equals('265b829d-22af-4cbf-941e-4be1ac53c57d'),
+      );
       expect(model.influenceScore, equals(75));
       expect(model.dimensions.confidence, equals(70));
       expect(model.dimensions.presence, equals(80));
@@ -304,7 +335,10 @@ void main() {
       expect(model.dimensions.communication, equals(90));
       expect(model.interpretation.range, equals('70-89'));
       expect(model.interpretation.title, equals('Strong Command'));
-      expect(model.interpretation.description, equals('You command the room effectively.'));
+      expect(
+        model.interpretation.description,
+        equals('You command the room effectively.'),
+      );
       expect(model.trainingPath.pillar, equals('Executive Gravitas'));
       expect(model.trainingPath.focus1, equals('Decisive Framing'));
       expect(model.trainingPath.focus2, equals('Strategic Pauses'));
@@ -312,52 +346,55 @@ void main() {
   });
 
   group('StartScoreController Tests', () {
-    test('fetchResult loads data from AssessmentService and updates reactive state', () async {
-      final mockClient = MockClient((request) async {
-        expect(request.method, equals('GET'));
-        expect(
-          request.url.path,
-          contains('/api/v1/assessment/test-result-1234/result'),
-        );
+    test(
+      'fetchResult loads data from AssessmentService and updates reactive state',
+      () async {
+        final mockClient = MockClient((request) async {
+          expect(request.method, equals('GET'));
+          expect(
+            request.url.path,
+            contains('/api/v1/assessment/test-result-1234/result'),
+          );
 
-        return http.Response(
-          jsonEncode({
-            'assessment_id': 'test-result-1234',
-            'influence_score': 82,
-            'dimensions': {
-              'confidence': 85,
-              'presence': 80,
-              'authority': 78,
-              'leadership': 88,
-              'persuasion': 82,
-              'communication': 80,
-            },
-            'interpretation': {
-              'range': '80-100',
-              'title': 'High Authority',
-              'description': 'Exceptional natural command.',
-            },
-            'training_path': {
-              'pillar': 'Pacing Mastery',
-              'focus_1': 'Cadence Control',
-              'focus_2': 'Unshakable Frame',
-            },
-          }),
-          200,
-          headers: {'content-type': 'application/json'},
-        );
-      });
+          return http.Response(
+            jsonEncode({
+              'assessment_id': 'test-result-1234',
+              'influence_score': 82,
+              'dimensions': {
+                'confidence': 85,
+                'presence': 80,
+                'authority': 78,
+                'leadership': 88,
+                'persuasion': 82,
+                'communication': 80,
+              },
+              'interpretation': {
+                'range': '80-100',
+                'title': 'High Authority',
+                'description': 'Exceptional natural command.',
+              },
+              'training_path': {
+                'pillar': 'Pacing Mastery',
+                'focus_1': 'Cadence Control',
+                'focus_2': 'Unshakable Frame',
+              },
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        });
 
-      await StorageService.saveAssessmentId('test-result-1234');
-      final service = AssessmentService(client: mockClient);
-      final controller = StartScoreController(assessmentService: service);
-      await controller.fetchResult();
+        await StorageService.saveAssessmentId('test-result-1234');
+        final service = AssessmentService(client: mockClient);
+        final controller = StartScoreController(assessmentService: service);
+        await controller.fetchResult();
 
-      expect(controller.startingInfluenceScore, equals(82));
-      expect(controller.dimensions.confidence, equals(85));
-      expect(controller.dimensions.presence, equals(80));
-      expect(controller.interpretation.title, equals('High Authority'));
-      expect(controller.trainingPath.pillar, equals('Pacing Mastery'));
-    });
+        expect(controller.startingInfluenceScore, equals(82));
+        expect(controller.dimensions.confidence, equals(85));
+        expect(controller.dimensions.presence, equals(80));
+        expect(controller.interpretation.title, equals('High Authority'));
+        expect(controller.trainingPath.pillar, equals('Pacing Mastery'));
+      },
+    );
   });
 }

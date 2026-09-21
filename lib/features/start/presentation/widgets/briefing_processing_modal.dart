@@ -7,11 +7,15 @@ import '../../../../core/utils/constants/colors.dart';
 class BriefingProcessingModal extends StatefulWidget {
   final VoidCallback onComplete;
   final Duration totalDuration;
+  final bool? isCompleted;
+  final Future<dynamic>? asyncOperation;
 
   const BriefingProcessingModal({
     super.key,
     required this.onComplete,
     this.totalDuration = const Duration(milliseconds: 3200),
+    this.isCompleted,
+    this.asyncOperation,
   });
 
   @override
@@ -21,13 +25,68 @@ class BriefingProcessingModal extends StatefulWidget {
 class _BriefingProcessingModalState extends State<BriefingProcessingModal> {
   int _currentStep = 0; // 0 = step 1 active, 1 = step 2 active, 2 = step 3 active, 3 = all done
   double _progress = 0.0;
+  bool _hasApiResponded = false;
   Timer? _progressTimer;
   Timer? _timerDone;
 
   @override
   void initState() {
     super.initState();
+    if (widget.isCompleted != null) {
+      _hasApiResponded = widget.isCompleted!;
+    } else if (widget.asyncOperation != null) {
+      _hasApiResponded = false;
+      widget.asyncOperation!.whenComplete(() {
+        _onApiCompleted();
+      });
+    } else {
+      _hasApiResponded = true;
+    }
+
     _startProgress();
+  }
+
+  @override
+  void didUpdateWidget(covariant BriefingProcessingModal oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isCompleted == true && !_hasApiResponded) {
+      _onApiCompleted();
+    }
+  }
+
+  void _onApiCompleted() {
+    if (!mounted || _hasApiResponded) return;
+    setState(() {
+      _hasApiResponded = true;
+    });
+    if (_progressTimer == null || !_progressTimer!.isActive) {
+      _startFinishingProgress();
+    }
+  }
+
+  void _startFinishingProgress() {
+    _progressTimer?.cancel();
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 25), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        if (_progress < 1.0) {
+          _progress += 0.03;
+          if (_progress >= 1.0) {
+            _progress = 1.0;
+            _currentStep = 3;
+            timer.cancel();
+            _timerDone = Timer(const Duration(milliseconds: 600), () {
+              if (mounted) {
+                widget.onComplete();
+              }
+            });
+          }
+        }
+      });
+    });
   }
 
   void _startProgress() {
@@ -46,18 +105,30 @@ class _BriefingProcessingModalState extends State<BriefingProcessingModal> {
         } else if (_progress < 0.70) {
           _progress += 0.012;
           _currentStep = 1;
-        } else if (_progress < 1.0) {
-          _progress += 0.012;
+        } else if (_progress < 0.88) {
+          _progress += 0.010;
           _currentStep = 2;
+        } else if (!_hasApiResponded) {
+          // Waiting for AI response: hold at ~90% without reaching 100%
+          _currentStep = 2;
+          if (_progress < 0.90) {
+            _progress += 0.002;
+          }
         } else {
-          _progress = 1.0;
-          _currentStep = 3;
-          timer.cancel();
-          _timerDone = Timer(const Duration(milliseconds: 600), () {
-            if (mounted) {
-              widget.onComplete();
+          // AI response has arrived: smoothly complete to 100%
+          if (_progress < 1.0) {
+            _progress += 0.025;
+            if (_progress >= 1.0) {
+              _progress = 1.0;
+              _currentStep = 3;
+              timer.cancel();
+              _timerDone = Timer(const Duration(milliseconds: 600), () {
+                if (mounted) {
+                  widget.onComplete();
+                }
+              });
             }
-          });
+          }
         }
       });
     });

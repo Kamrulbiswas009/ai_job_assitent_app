@@ -29,8 +29,15 @@ class StartBriefingController extends GetxController {
     String? scenario,
   }) {
     briefingData.value = data;
-    if (firstName != null && firstName.isNotEmpty) {
-      userFirstName.value = firstName;
+    if (firstName != null && firstName.trim().isNotEmpty) {
+      final trimmed = firstName.trim();
+      final capitalized = trimmed
+          .split(RegExp(r'\s+'))
+          .map((w) => w.isNotEmpty
+              ? '${w[0].toUpperCase()}${w.substring(1)}'
+              : '')
+          .join(' ');
+      userFirstName.value = capitalized;
     }
     if (scenario != null && scenario.isNotEmpty) {
       scenarioTitle.value = scenario;

@@ -58,9 +58,10 @@ class CustomCardTextField extends StatelessWidget {
       keyboardType: keyboardType ?? TextInputType.multiline,
       focusNode: focusNode,
       onChanged: onChanged,
-      style: style ??
+      style:
+          style ??
           GoogleFonts.inter(
-            fontSize: 14.sp,
+            fontSize: 14.5.sp,
             fontWeight: FontWeight.w400,
             height: 1.5,
             color: AppColors.black,
@@ -70,7 +71,8 @@ class CustomCardTextField extends StatelessWidget {
         fillColor: backgroundColor ?? AppColors.white,
         contentPadding: padding ?? EdgeInsets.all(16.w),
         hintText: hintText,
-        hintStyle: hintStyle ??
+        hintStyle:
+            hintStyle ??
             GoogleFonts.inter(
               fontSize: 14.sp,
               fontWeight: FontWeight.w400,

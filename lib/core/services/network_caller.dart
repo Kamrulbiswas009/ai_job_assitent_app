@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:http/http.dart';
 
@@ -277,14 +278,8 @@ class NetworkCaller {
         await StorageService.logoutUser();
         if (Get.currentRoute != AppRoute.login) {
           Get.offAllNamed(AppRoute.login);
-          Get.snackbar(
-            'Session Expired',
+          EasyLoading.showError(
             'Your session has expired. Please log in again.',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red.shade600,
-            colorText: Colors.white,
-            margin: const EdgeInsets.all(16),
-            duration: const Duration(seconds: 4),
           );
         }
       } catch (e) {

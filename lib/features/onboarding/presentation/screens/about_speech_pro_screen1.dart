@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -47,7 +48,7 @@ class AboutSpeechProScreen1 extends StatelessWidget {
                     Text(
                       'We have spent thirty years coaching at the highest level. Our consultants charge up to £500 an hour and we make no apology for that. That is what thirty years of mastery in communication, influence and presence is worth.',
                       style: GoogleFonts.inter(
-                        fontSize: 13.5.sp,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                         height: 1.5,
                         color: AppColors.pureBlack,
@@ -57,7 +58,7 @@ class AboutSpeechProScreen1 extends StatelessWidget {
                     Text(
                       'But those thirty years also taught us something that goes beyond communication.',
                       style: GoogleFonts.inter(
-                        fontSize: 13.5.sp,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                         height: 1.5,
                         color: AppColors.pureBlack,
@@ -226,13 +227,7 @@ class AboutSpeechProScreen1 extends StatelessWidget {
                     Center(
                       child: GestureDetector(
                         onTap: () {
-                          Get.snackbar(
-                            'Restore Purchase',
-                            'Checking for existing subscriptions...',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: AppColors.pureBlack,
-                            colorText: AppColors.white,
-                          );
+                          EasyLoading.showInfo('Checking for existing subscriptions...');
                         },
                         child: Text(
                           'Already subscribed? Restore purchase',
@@ -323,7 +318,7 @@ class _DiamondBullet extends StatelessWidget {
             child: Text(
               text,
               style: GoogleFonts.inter(
-                fontSize: 13.5.sp,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
                 height: 1.48,
                 color: AppColors.pureBlack,

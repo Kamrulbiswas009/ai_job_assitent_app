@@ -32,7 +32,7 @@ class StartStep3AssessmentScreen extends GetView<StartAssessmentController> {
                     Text(
                       'ONE LAST THING',
                       style: GoogleFonts.inter(
-                        fontSize: 12.sp,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
                         letterSpacing: 0.5,
@@ -42,7 +42,7 @@ class StartStep3AssessmentScreen extends GetView<StartAssessmentController> {
                     Text(
                       'Before we begin — be honest.',
                       style: GoogleFonts.inter(
-                        fontSize: 20.sp,
+                        fontSize: 24.sp,
                         fontWeight: FontWeight.w800,
                         height: 1.5,
                         color: AppColors.black,
@@ -52,7 +52,7 @@ class StartStep3AssessmentScreen extends GetView<StartAssessmentController> {
                     Text(
                       'Three quick questions. They set your starting benchmark.',
                       style: GoogleFonts.inter(
-                        fontSize: 13.sp,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                         height: 1.5,
                         color: const Color(0xFF888888),
@@ -66,20 +66,23 @@ class StartStep3AssessmentScreen extends GetView<StartAssessmentController> {
                             .asMap()
                             .entries
                             .map((entry) {
-                          final index = entry.key;
-                          final q = entry.value;
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 24.h),
-                            child: BenchmarkScaleSelector(
-                              question: q.title,
-                              selectedIndex: q.selectedIndex,
-                              onSelected: (optionIndex) {
-                                controller.setBenchmarkAnswer(
-                                    index, optionIndex);
-                              },
-                            ),
-                          );
-                        }).toList(),
+                              final index = entry.key;
+                              final q = entry.value;
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 24.h),
+                                child: BenchmarkScaleSelector(
+                                  question: q.title,
+                                  selectedIndex: q.selectedIndex,
+                                  onSelected: (optionIndex) {
+                                    controller.setBenchmarkAnswer(
+                                      index,
+                                      optionIndex,
+                                    );
+                                  },
+                                ),
+                              );
+                            })
+                            .toList(),
                       ),
                     ),
                   ],
@@ -88,15 +91,17 @@ class StartStep3AssessmentScreen extends GetView<StartAssessmentController> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-              child: Obx(
-                () => SpPrimaryButton(
+              child: Obx(() {
+                final isEnabled =
+                    controller.isAllAnswered && !controller.isLoading.value;
+                return SpPrimaryButton(
                   label: 'Continue',
                   isLoading: controller.isLoading.value,
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : controller.submitAssessmentAndProceed,
-                ),
-              ),
+                  onPressed: isEnabled
+                      ? controller.submitAssessmentAndProceed
+                      : null,
+                );
+              }),
             ),
           ],
         ),
