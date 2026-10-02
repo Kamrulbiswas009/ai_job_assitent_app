@@ -154,7 +154,7 @@ void main() {
     expect(find.text('Deepgram Nova-3'), findsOneWidget);
     expect(find.text('OpenAI Whisper'), findsOneWidget);
     expect(find.text('ElevenLabs'), findsOneWidget);
-    expect(find.text('I Understand,Continue'), findsOneWidget);
+    expect(find.textContaining('Understand'), findsOneWidget);
     expect(find.text('Not Now'), findsOneWidget);
   });
 

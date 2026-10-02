@@ -9,6 +9,10 @@ class ApiConstants {
   static const String forgotPassword = '$baseUrl/auth/forgot-password';
   static const String resetPassword = '$baseUrl/auth/reset-password';
 
+  // Stripe
+  static const String stripePublishableKey =
+      'pk_test_51UE3RGP6NOcdSbkq0Cz8omsVHWnYrSHDLJJeekU1yZouNkAVk7Rpyku8AzzalgA2wEAHTpq5WHfeNVjRDBJwpkVJ00oNP2E6k7';
+
   // Subscription / Checkout Endpoints
   static const String createCheckoutSession =
       '$baseUrl/subscriptions/checkout-session';
