@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../controller/onboarding_controller.dart';
 import '../../model/membership_plan_model.dart';
-import 'payment_success_sheet.dart';
 import 'sp_primary_button.dart';
 
 class CheckoutConfirmationSheet extends StatelessWidget {
@@ -27,13 +26,6 @@ class CheckoutConfirmationSheet extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
       builder: (_) => CheckoutConfirmationSheet(plan: plan),
-    );
-  }
-
-  void _handlePaymentDone() {
-    Get.back(); // close confirmation sheet
-    PaymentSuccessSheet.show(
-      planArgs: plan.toMap(),
     );
   }
 
@@ -65,9 +57,7 @@ class CheckoutConfirmationSheet extends StatelessWidget {
             ),
             SizedBox(height: 20.h),
             Text(
-              controller.isPaymentLaunched.value
-                  ? 'Complete Payment in Stripe'
-                  : 'Confirm Your Training Plan',
+              'Confirm Your Training Plan',
               style: GoogleFonts.inter(
                 fontSize: 22.sp,
                 fontWeight: FontWeight.w800,
@@ -76,9 +66,7 @@ class CheckoutConfirmationSheet extends StatelessWidget {
             ),
             SizedBox(height: 8.h),
             Text(
-              controller.isPaymentLaunched.value
-                  ? 'Stripe checkout has opened in your browser. After finishing your payment, tap the button below.'
-                  : 'You are about to start your SpeechPro membership with the following details:',
+              'You are about to start your SpeechPro membership with the following details:',
               style: GoogleFonts.inter(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
@@ -179,20 +167,14 @@ class CheckoutConfirmationSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
-                    controller.isPaymentLaunched.value
-                        ? Icons.check_circle_outline_rounded
-                        : Icons.lock_outline_rounded,
+                    Icons.lock_outline_rounded,
                     size: 18.sp,
-                    color: controller.isPaymentLaunched.value
-                        ? AppColors.primary
-                        : AppColors.gray,
+                    color: AppColors.primary,
                   ),
                   SizedBox(width: 10.w),
                   Expanded(
                     child: Text(
-                      controller.isPaymentLaunched.value
-                          ? 'Once you complete your payment on Stripe, tap "Payment Completed" to activate your plan.'
-                          : 'You will be redirected to the secure Stripe checkout page to complete your payment.',
+                      'Payment is processed securely with 256-bit encryption via Stripe.',
                       style: GoogleFonts.inter(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w400,
@@ -205,80 +187,34 @@ class CheckoutConfirmationSheet extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24.h),
-            if (!controller.isPaymentLaunched.value) ...[
-              SpPrimaryButton(
-                label: 'Proceed to Payment',
-                isLoading: controller.isCheckoutLoading.value,
-                onPressed: controller.isCheckoutLoading.value
-                    ? null
-                    : () => controller.handleProceedToPayment(plan.planId),
-              ),
-              SizedBox(height: 12.h),
-              SizedBox(
-                width: double.infinity,
-                height: 48.h,
-                child: TextButton(
-                  onPressed: () => Get.back(),
-                  style: TextButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
+            SpPrimaryButton(
+              label: 'Proceed to Payment',
+              isLoading: controller.isCheckoutLoading.value,
+              onPressed: controller.isCheckoutLoading.value
+                  ? null
+                  : () => controller.startStripePayment(context, plan: plan),
+            ),
+            SizedBox(height: 12.h),
+            SizedBox(
+              width: double.infinity,
+              height: 48.h,
+              child: TextButton(
+                onPressed: () => Get.back(),
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
-                  child: Text(
-                    'Cancel',
-                    style: GoogleFonts.inter(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.gray,
-                    ),
+                ),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.inter(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.gray,
                   ),
                 ),
               ),
-            ] else ...[
-              SpPrimaryButton(
-                label: 'Payment Completed',
-                onPressed: _handlePaymentDone,
-              ),
-              SizedBox(height: 10.h),
-              if (controller.checkoutUrl.value.isNotEmpty) ...[
-                SizedBox(
-                  width: double.infinity,
-                  height: 44.h,
-                  child: TextButton.icon(
-                    icon: Icon(
-                      Icons.open_in_new_rounded,
-                      size: 16.sp,
-                      color: AppColors.primary,
-                    ),
-                    label: Text(
-                      'Reopen Stripe Checkout',
-                      style: GoogleFonts.inter(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    onPressed: () => controller
-                        .launchCheckoutUrl(controller.checkoutUrl.value),
-                  ),
-                ),
-              ],
-              SizedBox(
-                width: double.infinity,
-                height: 44.h,
-                child: TextButton(
-                  onPressed: () => Get.back(),
-                  child: Text(
-                    'Cancel',
-                    style: GoogleFonts.inter(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.gray,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ],
         ),
       ),

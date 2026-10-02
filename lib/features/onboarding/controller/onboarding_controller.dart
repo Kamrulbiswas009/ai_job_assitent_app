@@ -9,6 +9,7 @@ import '../../../../core/services/storage_service.dart';
 import '../../../../core/utils/constants/api_constants.dart';
 import '../../start/controller/start_membership_controller.dart';
 import '../model/membership_plan_model.dart';
+import '../presentation/widgets/stripe_checkout_modal_sheet.dart';
 
 class OnboardingController extends GetxController {
   final NetworkCaller _networkCaller = NetworkCaller();
@@ -490,14 +491,29 @@ class OnboardingController extends GetxController {
     checkoutUrl.value = '';
   }
 
+  Future<void> startStripePayment(
+    BuildContext context, {
+    required MembershipPlanModel plan,
+  }) async {
+    final url = await createCheckoutSession(planId: plan.planId);
+    if (url != null && url.isNotEmpty) {
+      checkoutUrl.value = url;
+      if (context.mounted) {
+        Get.back(); // close confirmation sheet
+        StripeCheckoutModalSheet.show(
+          context,
+          checkoutUrl: url,
+          plan: plan,
+        );
+      }
+    }
+  }
+
   Future<void> handleProceedToPayment(String planId) async {
     final url = await createCheckoutSession(planId: planId);
     if (url != null && url.isNotEmpty) {
       checkoutUrl.value = url;
-      final launched = await launchCheckoutUrl(url);
-      if (launched) {
-        isPaymentLaunched.value = true;
-      }
+      isPaymentLaunched.value = true;
     }
   }
 
