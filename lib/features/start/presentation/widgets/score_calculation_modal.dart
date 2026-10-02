@@ -34,29 +34,31 @@ class _ScoreCalculationModalState extends State<ScoreCalculationModal> {
     _progress = 0.0;
     _currentStep = 0;
 
-    _progressTimer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
+    // 12 seconds total duration across 4 steps (~3 seconds per step)
+    // 3000ms / 40ms = 75 ticks per step -> 0.25 / 75 ≈ 0.00333
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 40), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
       }
       setState(() {
         if (_progress < 0.25) {
-          _progress += 0.015;
+          _progress += 0.00333;
           _currentStep = 0;
         } else if (_progress < 0.50) {
-          _progress += 0.012;
+          _progress += 0.00333;
           _currentStep = 1;
         } else if (_progress < 0.75) {
-          _progress += 0.012;
+          _progress += 0.00333;
           _currentStep = 2;
         } else if (_progress < 1.0) {
-          _progress += 0.012;
+          _progress += 0.00333;
           _currentStep = 3;
         } else {
           _progress = 1.0;
           _currentStep = 4;
           timer.cancel();
-          _timerDone = Timer(const Duration(milliseconds: 600), () {
+          _timerDone = Timer(const Duration(milliseconds: 800), () {
             if (mounted) {
               widget.onComplete();
             }

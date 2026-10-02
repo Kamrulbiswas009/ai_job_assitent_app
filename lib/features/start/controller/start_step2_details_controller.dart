@@ -42,12 +42,26 @@ class StartStep2DetailsController extends GetxController {
   final RxInt recordDuration = 0.obs;
   final RxString recordedAudioPath = ''.obs;
   final RxBool isLoading = false.obs;
+  final RxDouble currentVolume = 0.0.obs; // 0.0 to 1.0 real-time microphone volume
+  final RxBool isVoiceDetected = false.obs;
   Timer? _timer;
+  Timer? _amplitudeTimer;
 
   // Briefing processing modal & API state
   final RxBool isProcessingBriefing = false.obs;
+  final RxBool isAiResponseReceived = false.obs;
   Future<PersonalBriefingModel?>? _apiFuture;
+  Future<PersonalBriefingModel?>? get apiFuture => _apiFuture;
   PersonalBriefingModel? _cachedBriefing;
+
+  // Form validation state (enabled when user fills the required data)
+  final RxBool isFormValid = false.obs;
+
+  void _checkFormValidation() {
+    final hasGoal = interviewKeywordsController.text.trim().isNotEmpty;
+    final hasRole = roleApplyingController.text.trim().isNotEmpty;
+    isFormValid.value = hasGoal && hasRole;
+  }
 
   @override
   void onInit() {
@@ -57,7 +71,13 @@ class StartStep2DetailsController extends GetxController {
     roleApplyingController = TextEditingController();
     voiceAnswerTextController = TextEditingController();
 
+    interviewKeywordsController.addListener(_checkFormValidation);
+    roleApplyingController.addListener(_checkFormValidation);
+    voiceAnswerTextController.addListener(_checkFormValidation);
+    ever(recordedAudioPath, (_) => _checkFormValidation());
+
     syncScenario();
+    _checkFormValidation();
   }
 
   /// Synchronize dynamic titles, hints and slugs based on selected scenario from Step 1
@@ -86,18 +106,52 @@ class StartStep2DetailsController extends GetxController {
 
   @override
   void onClose() {
+    interviewKeywordsController.removeListener(_checkFormValidation);
+    roleApplyingController.removeListener(_checkFormValidation);
+    voiceAnswerTextController.removeListener(_checkFormValidation);
     interviewKeywordsController.dispose();
     roleApplyingController.dispose();
     voiceAnswerTextController.dispose();
     _timer?.cancel();
+    _amplitudeTimer?.cancel();
     _audioRecorder?.dispose().catchError((_) {});
     super.onClose();
+  }
+
+  // Real-time microphone amplitude listener
+  void _startAmplitudeListening() {
+    _amplitudeTimer?.cancel();
+    _amplitudeTimer = Timer.periodic(const Duration(milliseconds: 65), (_) async {
+      if (!isRecording.value) {
+        _amplitudeTimer?.cancel();
+        currentVolume.value = 0.0;
+        isVoiceDetected.value = false;
+        return;
+      }
+      try {
+        final amp = await audioRecorder.getAmplitude();
+        final currentDb = amp.current; // dBFS: typically -160 dB to 0 dB
+        // Human voice typically ranges between -45 dB and -10 dB
+        double vol = 0.0;
+        if (currentDb > -45.0) {
+          vol = ((currentDb + 45.0) / 35.0).clamp(0.0, 1.0);
+        }
+        // Smooth transitions with exponential moving average
+        final smoothed = (currentVolume.value * 0.35) + (vol * 0.65);
+        currentVolume.value = smoothed.clamp(0.0, 1.0);
+        isVoiceDetected.value = currentVolume.value > 0.12;
+      } catch (_) {
+        // Fallback for simulators or restricted platforms
+      }
+    });
   }
 
   // Start audio recording
   Future<void> startRecording() async {
     isRecording.value = true;
     recordDuration.value = 0;
+    currentVolume.value = 0.0;
+    isVoiceDetected.value = false;
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       recordDuration.value++;
@@ -113,9 +167,12 @@ class StartStep2DetailsController extends GetxController {
           const RecordConfig(encoder: AudioEncoder.aacLc),
           path: filePath,
         );
+        _startAmplitudeListening();
         AppLoggerHelper.info('Started voice recording to: $filePath');
       } else {
-        AppLoggerHelper.warning('Microphone permission not granted for voice recording');
+        AppLoggerHelper.warning(
+          'Microphone permission not granted for voice recording',
+        );
       }
     } catch (e) {
       AppLoggerHelper.error('Error starting audio recording: $e', e);
@@ -125,10 +182,15 @@ class StartStep2DetailsController extends GetxController {
   // Stop audio recording and return path
   Future<String?> stopRecording() async {
     if (!isRecording.value) {
-      return recordedAudioPath.value.isNotEmpty ? recordedAudioPath.value : null;
+      return recordedAudioPath.value.isNotEmpty
+          ? recordedAudioPath.value
+          : null;
     }
     isRecording.value = false;
     _timer?.cancel();
+    _amplitudeTimer?.cancel();
+    currentVolume.value = 0.0;
+    isVoiceDetected.value = false;
     try {
       final path = await audioRecorder.stop();
       if (path != null && path.isNotEmpty) {
@@ -200,10 +262,26 @@ class StartStep2DetailsController extends GetxController {
       voiceFilePath: voicePath,
     );
 
-    // Start background API call
-    _apiFuture = _briefingService.getPersonalBriefing(request);
+    isAiResponseReceived.value = false;
+    isProcessingBriefing.value = true;
+
+    // Start background API call with a 30-second safety timeout
+    _apiFuture = _briefingService
+        .getPersonalBriefing(request)
+        .timeout(
+          const Duration(seconds: 30),
+          onTimeout: () {
+            AppLoggerHelper.warning('Personal Briefing API timed out after 30s');
+            return null;
+          },
+        );
+
     _apiFuture!.then((result) {
       _cachedBriefing = result;
+      isAiResponseReceived.value = true;
+    }).catchError((err) {
+      AppLoggerHelper.error('Personal Briefing API error: $err', err);
+      isAiResponseReceived.value = true;
     });
 
     // Show preparation modal
@@ -211,7 +289,6 @@ class StartStep2DetailsController extends GetxController {
       'Starting Personal Briefing preparation for scenario: ${selectedGoalTitle.value} (${selectedScenarioSlug.value})\n'
       'Voice File Path: ${voicePath ?? "None"}',
     );
-    isProcessingBriefing.value = true;
   }
 
   Future<void> onProcessingComplete() async {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../../core/utils/logging/logger.dart';
@@ -81,12 +82,9 @@ class StartScoreController extends GetxController {
   }
 
   void finishOnboarding() {
-    if (Get.context != null) {
-      Get.snackbar(
-        'Welcome to SpeechPro',
-        'Your training session is starting!',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
+    try {
+      EasyLoading.showSuccess('Your training session is starting!')
+          .catchError((_) {});
+    } catch (_) {}
   }
 }

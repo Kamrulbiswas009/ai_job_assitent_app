@@ -3,6 +3,7 @@ import '../../../../core/services/storage_service.dart';
 import '../../../../routes/app_routes.dart';
 import '../model/goal_model.dart';
 
+import 'start_membership_controller.dart';
 import 'start_step2_details_controller.dart';
 
 class StartGoalsController extends GetxController {
@@ -17,6 +18,10 @@ class StartGoalsController extends GetxController {
     final storedName = StorageService.fullName;
     if (storedName != null && storedName.trim().isNotEmpty) {
       userName.value = storedName.trim();
+    } else if (Get.isRegistered<StartMembershipController>() &&
+        Get.find<StartMembershipController>().userName.value.trim().isNotEmpty) {
+      userName.value =
+          Get.find<StartMembershipController>().userName.value.trim();
     }
   }
 

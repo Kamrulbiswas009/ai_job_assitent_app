@@ -146,13 +146,17 @@ class SplashGetStartedScreen extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14.r),
                               ),
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
                             ),
-                            child: Text(
-                              'Create account',
-                              style: GoogleFonts.inter(
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.white,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Create account',
+                                style: GoogleFonts.inter(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -189,7 +193,7 @@ class SplashGetStartedScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 60.h),
+                        SizedBox(height: 24.h),
                       ],
                     ),
                   ),

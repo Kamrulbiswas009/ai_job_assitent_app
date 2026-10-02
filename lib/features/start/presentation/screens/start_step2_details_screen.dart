@@ -69,7 +69,7 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                           () => Text(
                             controller.scenarioSubtitle.value,
                             style: GoogleFonts.inter(
-                              fontSize: 13.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w400,
                               height: 1.45,
                               color: const Color(0xFF757575),
@@ -109,7 +109,7 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                           () => Text(
                             controller.roleFieldTitle.value,
                             style: GoogleFonts.inter(
-                              fontSize: 15.sp,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.w700,
                               color: AppColors.pureBlack,
                             ),
@@ -146,7 +146,7 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                           () => Text(
                             controller.voiceQuestionTitle.value,
                             style: GoogleFonts.inter(
-                              fontSize: 15.sp,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.w700,
                               height: 1.35,
                               color: AppColors.pureBlack,
@@ -157,7 +157,7 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                         Text(
                           'Speak your answer — SpeechPro will transcribe it and use it to assess how you come across',
                           style: GoogleFonts.inter(
-                            fontSize: 13.sp,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w400,
                             height: 1.4,
                             color: const Color(0xFF757575),
@@ -170,6 +170,8 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                             isRecording: controller.isRecording.value,
                             durationSeconds: controller.recordDuration.value,
                             onToggleRecord: controller.toggleRecording,
+                            volumeLevel: controller.currentVolume.value,
+                            isVoiceDetected: controller.isVoiceDetected.value,
                             isCompactHorizontal: true,
                           ),
                         ),
@@ -205,9 +207,13 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
-                  child: SpPrimaryButton(
-                    label: 'Continue',
-                    onPressed: controller.submitDetailsAndProceed,
+                  child: Obx(
+                    () => SpPrimaryButton(
+                      label: 'Continue',
+                      onPressed: controller.isFormValid.value
+                          ? controller.submitDetailsAndProceed
+                          : null,
+                    ),
                   ),
                 ),
               ],
@@ -216,6 +222,8 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
             Obx(
               () => controller.isProcessingBriefing.value
                   ? BriefingProcessingModal(
+                      isCompleted: controller.isAiResponseReceived.value,
+                      asyncOperation: controller.apiFuture,
                       onComplete: controller.onProcessingComplete,
                     )
                   : const SizedBox.shrink(),

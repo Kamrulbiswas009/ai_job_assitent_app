@@ -33,14 +33,15 @@ class SpPrimaryButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? AppColors.primary,
           disabledBackgroundColor:
-              (backgroundColor ?? AppColors.primary).withValues(alpha: 0.7),
+              (backgroundColor ?? AppColors.primary).withValues(alpha: 0.5),
+          disabledForegroundColor: AppColors.white.withValues(alpha: 0.7),
           foregroundColor: AppColors.white,
           elevation: 0,
           shadowColor: AppColors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius ?? 16.r),
           ),
-          padding: EdgeInsets.symmetric(vertical: 14.h),
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
         ),
         child: isLoading
             ? SizedBox(
@@ -51,17 +52,20 @@ class SpPrimaryButton extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
                 ),
               )
-            : Text(
-                label,
-                textAlign: TextAlign.center,
-                style: textStyle ??
-                    GoogleFonts.inter(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w700,
-                      height: 1.5,
-                      letterSpacing: 0.6,
-                      color: AppColors.white,
-                    ),
+            : FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: textStyle ??
+                      GoogleFonts.inter(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700,
+                        height: 1.5,
+                        letterSpacing: 0.6,
+                        color: AppColors.white,
+                      ),
+                ),
               ),
       ),
     );

@@ -48,7 +48,7 @@ class GoalItemTile extends StatelessWidget {
               child: Text(
                 number,
                 style: GoogleFonts.inter(
-                  fontSize: 11.sp,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w700,
                   color: isSelected ? AppColors.white : const Color(0xFF888888),
                 ),
@@ -60,7 +60,7 @@ class GoalItemTile extends StatelessWidget {
               child: Text(
                 title,
                 style: GoogleFonts.inter(
-                  fontSize: 13.5.sp,
+                  fontSize: 14.sp,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                   height: 1.3,
                   color: AppColors.pureBlack,
@@ -68,11 +68,7 @@ class GoalItemTile extends StatelessWidget {
               ),
             ),
             if (isSelected)
-              Icon(
-                Icons.check,
-                color: AppColors.primary,
-                size: 18.sp,
-              ),
+              Icon(Icons.check, color: AppColors.primary, size: 20.sp),
           ],
         ),
       ),

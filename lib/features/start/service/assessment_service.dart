@@ -54,11 +54,7 @@ class AssessmentService {
       };
 
       final response = await _client
-          .post(
-            Uri.parse(url),
-            headers: headers,
-            body: requestBody,
-          )
+          .post(Uri.parse(url), headers: headers, body: requestBody)
           .timeout(Duration(seconds: timeoutDuration));
 
       AppLoggerHelper.info(
@@ -150,10 +146,12 @@ class AssessmentService {
         ),
       );
 
-      final http.StreamedResponse streamedResponse =
-          await multipartRequest.send().timeout(Duration(seconds: timeoutDuration));
-      final http.Response response =
-          await http.Response.fromStream(streamedResponse);
+      final http.StreamedResponse streamedResponse = await multipartRequest
+          .send()
+          .timeout(Duration(seconds: timeoutDuration));
+      final http.Response response = await http.Response.fromStream(
+        streamedResponse,
+      );
 
       AppLoggerHelper.info(
         '==================== [CALIBRATION VOICE SUBMISSION RESPONSE] ====================\n'
@@ -220,16 +218,18 @@ class AssessmentService {
     );
 
     try {
-      final response = await _client.get(
-        Uri.parse(url),
-        headers: {
-          'accept': 'application/json',
-          if (effectiveToken != null && effectiveToken.isNotEmpty)
-            'Authorization': effectiveToken.startsWith('Bearer ')
-                ? effectiveToken
-                : 'Bearer $effectiveToken',
-        },
-      ).timeout(Duration(seconds: timeoutDuration));
+      final response = await _client
+          .get(
+            Uri.parse(url),
+            headers: {
+              'accept': 'application/json',
+              if (effectiveToken != null && effectiveToken.isNotEmpty)
+                'Authorization': effectiveToken.startsWith('Bearer ')
+                    ? effectiveToken
+                    : 'Bearer $effectiveToken',
+            },
+          )
+          .timeout(Duration(seconds: timeoutDuration));
 
       AppLoggerHelper.info(
         '==================== [FETCH ASSESSMENT RESULT RESPONSE] ====================\n'

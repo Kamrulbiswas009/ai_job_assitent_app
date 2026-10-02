@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/services/storage_service.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../routes/app_routes.dart';
 import '../../controller/onboarding_controller.dart';
@@ -48,31 +50,31 @@ class _OnboardingLoginScreenState extends State<OnboardingLoginScreen> {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || !GetUtils.isEmail(email)) {
-      Get.snackbar(
-        'Required',
-        'Please enter a valid email address',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Please enter a valid email address');
       return;
     }
 
     if (password.isEmpty) {
-      Get.snackbar(
-        'Required',
-        'Please enter your password',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Please enter your password');
       return;
     }
 
     final isSuccess = await _controller.login(email: email, password: password);
 
     if (isSuccess) {
-      Get.offAllNamed(AppRoute.about1);
+      final isSubscribed =
+          _controller.isUserSubscribed.value || StorageService.isSubscribed;
+      if (isSubscribed) {
+        final fullName = _controller.userFullName.value.isNotEmpty
+            ? _controller.userFullName.value
+            : (StorageService.fullName ?? '');
+        Get.offAllNamed(
+          AppRoute.startMembershipIntro,
+          arguments: {'fullName': fullName},
+        );
+      } else {
+        Get.offAllNamed(AppRoute.about1);
+      }
     }
   }
 
@@ -156,38 +158,49 @@ class _OnboardingLoginScreenState extends State<OnboardingLoginScreen> {
                                   onPressed: _handleLogin,
                                 ),
                               ),
-                              SizedBox(height: 12.h),
+                              SizedBox(height: 16.h),
                               Center(
-                                child: Wrap(
-                                  alignment: WrapAlignment.center,
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Don't have an account? ",
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w400,
-                                        height: 1.5,
-                                        color: AppColors.gray,
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () =>
-                                          Get.toNamed(AppRoute.registration),
-                                      child: Text(
-                                        'Create one',
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Don't have an account? ",
                                         style: GoogleFonts.inter(
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12.5.sp,
+                                          fontWeight: FontWeight.w400,
                                           height: 1.5,
-                                          color: AppColors.primary,
+                                          color: AppColors.gray,
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () =>
+                                            Get.toNamed(AppRoute.registration),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 6.h,
+                                            horizontal: 4.w,
+                                          ),
+                                          child: Text(
+                                            'Create one',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 12.5.sp,
+                                              fontWeight: FontWeight.w700,
+                                              height: 1.5,
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              SizedBox(height: 90.h),
+                              SizedBox(height: 20.h),
                             ],
                           ),
                         ),

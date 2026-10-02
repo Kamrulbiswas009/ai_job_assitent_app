@@ -1,14 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class AppHelperFunctions{
- AppHelperFunctions._();
- static void showSnackBar(String message) {
-  ScaffoldMessenger.of(Get.context!).showSnackBar(
-   SnackBar(content: Text(message)),
-  );
- }
+class AppHelperFunctions {
+  AppHelperFunctions._();
+
+  static void showSnackBar(String message) {
+    showToast(message);
+  }
+
+  static void showSuccess(String message) {
+    try {
+      EasyLoading.showSuccess(message).catchError((_) {});
+    } catch (_) {}
+  }
+
+  static void showError(String message) {
+    try {
+      EasyLoading.showError(message).catchError((_) {});
+    } catch (_) {}
+  }
+
+  static void showInfo(String message) {
+    try {
+      EasyLoading.showInfo(message).catchError((_) {});
+    } catch (_) {}
+  }
+
+  static void showToast(String message) {
+    try {
+      EasyLoading.showToast(message).catchError((_) {});
+    } catch (_) {}
+  }
+
+  static void showLoading([String? status]) {
+    try {
+      EasyLoading.show(status: status ?? 'Loading...').catchError((_) {});
+    } catch (_) {}
+  }
+
+  static void hideLoading() {
+    try {
+      EasyLoading.dismiss().catchError((_) {});
+    } catch (_) {}
+  }
 
  static void showAlert(String title, String message) {
   showDialog(

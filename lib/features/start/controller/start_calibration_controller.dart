@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import '../../../../core/services/storage_service.dart';
-import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/logging/logger.dart';
 import '../../../../routes/app_routes.dart';
 import '../service/assessment_service.dart';
@@ -14,7 +13,7 @@ class StartCalibrationController extends GetxController {
   final AssessmentService _assessmentService;
 
   StartCalibrationController({AssessmentService? assessmentService})
-      : _assessmentService = assessmentService ?? AssessmentService();
+    : _assessmentService = assessmentService ?? AssessmentService();
 
   // Real Audio Recorder
   AudioRecorder? _audioRecorder;
@@ -25,11 +24,15 @@ class StartCalibrationController extends GetxController {
   final RxString recordedAudioPath = ''.obs;
   final RxBool isLoading = false.obs;
   final RxBool isCalculating = false.obs;
+  final RxDouble currentVolume = 0.0.obs; // 0.0 to 1.0 real-time microphone volume
+  final RxBool isVoiceDetected = false.obs;
   Timer? _timer;
+  Timer? _amplitudeTimer;
 
   @override
   void onClose() {
     _timer?.cancel();
+    _amplitudeTimer?.cancel();
     _audioRecorder?.dispose();
     super.onClose();
   }
@@ -43,9 +46,39 @@ class StartCalibrationController extends GetxController {
     }
   }
 
+  // Real-time microphone amplitude listener
+  void _startAmplitudeListening() {
+    _amplitudeTimer?.cancel();
+    _amplitudeTimer = Timer.periodic(const Duration(milliseconds: 65), (_) async {
+      if (!isRecording.value) {
+        _amplitudeTimer?.cancel();
+        currentVolume.value = 0.0;
+        isVoiceDetected.value = false;
+        return;
+      }
+      try {
+        final amp = await audioRecorder.getAmplitude();
+        final currentDb = amp.current; // dBFS: typically -160 dB to 0 dB
+        // Human voice typically ranges between -45 dB and -10 dB
+        double vol = 0.0;
+        if (currentDb > -45.0) {
+          vol = ((currentDb + 45.0) / 35.0).clamp(0.0, 1.0);
+        }
+        // Smooth transitions with exponential moving average
+        final smoothed = (currentVolume.value * 0.35) + (vol * 0.65);
+        currentVolume.value = smoothed.clamp(0.0, 1.0);
+        isVoiceDetected.value = currentVolume.value > 0.12;
+      } catch (_) {
+        // Fallback for simulators or restricted platforms
+      }
+    });
+  }
+
   Future<void> startRecording() async {
     isRecording.value = true;
     durationSeconds.value = 0;
+    currentVolume.value = 0.0;
+    isVoiceDetected.value = false;
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (durationSeconds.value >= 60) {
@@ -65,26 +98,41 @@ class StartCalibrationController extends GetxController {
           const RecordConfig(encoder: AudioEncoder.aacLc),
           path: filePath,
         );
-        AppLoggerHelper.info('Started calibration voice recording to: $filePath');
+        _startAmplitudeListening();
+        AppLoggerHelper.info(
+          'Started calibration voice recording to: $filePath',
+        );
       } else {
-        AppLoggerHelper.warning('Microphone permission not granted for voice calibration');
+        AppLoggerHelper.warning(
+          'Microphone permission not granted for voice calibration',
+        );
       }
     } catch (e) {
-      AppLoggerHelper.error('Error starting voice calibration recording: $e', e);
+      AppLoggerHelper.error(
+        'Error starting voice calibration recording: $e',
+        e,
+      );
     }
   }
 
   Future<String?> stopRecording() async {
     if (!isRecording.value) {
-      return recordedAudioPath.value.isNotEmpty ? recordedAudioPath.value : null;
+      return recordedAudioPath.value.isNotEmpty
+          ? recordedAudioPath.value
+          : null;
     }
     isRecording.value = false;
     _timer?.cancel();
+    _amplitudeTimer?.cancel();
+    currentVolume.value = 0.0;
+    isVoiceDetected.value = false;
     try {
       final path = await audioRecorder.stop();
       if (path != null && path.isNotEmpty) {
         recordedAudioPath.value = path;
-        AppLoggerHelper.info('Stopped calibration voice recording. Saved at: $path');
+        AppLoggerHelper.info(
+          'Stopped calibration voice recording. Saved at: $path',
+        );
         return path;
       }
     } catch (e) {
@@ -97,22 +145,19 @@ class StartCalibrationController extends GetxController {
   /// and opens the ScoreCalculationModal
   Future<void> submitVoiceAndProceed() async {
     if (isRecording.value) {
-      AppLoggerHelper.info('Continue pressed while recording. Automatically stopping recording...');
+      AppLoggerHelper.info(
+        'Continue pressed while recording. Automatically stopping recording...',
+      );
       await stopRecording();
     }
 
     final path = recordedAudioPath.value;
     if (path.isEmpty || !File(path).existsSync()) {
-      if (Get.context != null) {
-        Get.snackbar(
-          'Voice Recording Needed',
+      try {
+        EasyLoading.showInfo(
           'Please tap to speak your answer before continuing, or tap "Skip Voice calibration".',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: AppColors.black.withValues(alpha: 0.85),
-          colorText: AppColors.white,
-          margin: const EdgeInsets.all(16),
-        );
-      }
+        ).catchError((_) {});
+      } catch (_) {}
       return;
     }
 
@@ -121,16 +166,22 @@ class StartCalibrationController extends GetxController {
     try {
       final assessmentId = StorageService.assessmentId ?? '';
       if (assessmentId.isNotEmpty) {
-        AppLoggerHelper.info('Submitting calibration voice for assessment_id: $assessmentId');
+        AppLoggerHelper.info(
+          'Submitting calibration voice for assessment_id: $assessmentId',
+        );
         final response = await _assessmentService.submitVoiceFile(
           assessmentId: assessmentId,
           filePath: path,
         );
 
         if (response != null && response.success) {
-          AppLoggerHelper.info('Calibration voice successfully processed: ${response.message}');
+          AppLoggerHelper.info(
+            'Calibration voice successfully processed: ${response.message}',
+          );
         } else {
-          AppLoggerHelper.warning('Calibration voice submission returned non-success or null');
+          AppLoggerHelper.warning(
+            'Calibration voice submission returned non-success or null',
+          );
         }
       } else {
         AppLoggerHelper.warning(
@@ -138,7 +189,10 @@ class StartCalibrationController extends GetxController {
         );
       }
     } catch (e) {
-      AppLoggerHelper.error('Unexpected error while submitting calibration voice: $e', e);
+      AppLoggerHelper.error(
+        'Unexpected error while submitting calibration voice: $e',
+        e,
+      );
     } finally {
       isLoading.value = false;
       // Navigate to Score Calculation Modal

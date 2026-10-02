@@ -32,7 +32,7 @@ class SpPrimaryButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
           ),
-          padding: EdgeInsets.symmetric(vertical: 16.h),
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
         ),
         child: isLoading
             ? SizedBox(
@@ -43,14 +43,17 @@ class SpPrimaryButton extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : Text(
-                label,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  height: 1.5,
-                  color: AppColors.white,
+            : FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    height: 1.5,
+                    color: AppColors.white,
+                  ),
                 ),
               ),
       ),

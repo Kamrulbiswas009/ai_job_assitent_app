@@ -34,7 +34,7 @@ class StartStep1GoalsScreen extends GetView<StartGoalsController> {
                       () => Text(
                         "Hey ${controller.userName.value},\nyou're in the right place,\nthis is where we make it happen.",
                         style: GoogleFonts.inter(
-                          fontSize: 24.sp,
+                          fontSize: 26.sp,
                           fontWeight: FontWeight.w800,
                           height: 1.25,
                           color: AppColors.pureBlack,
@@ -45,7 +45,7 @@ class StartStep1GoalsScreen extends GetView<StartGoalsController> {
                     Text(
                       'What do you want to achieve?',
                       style: GoogleFonts.inter(
-                        fontSize: 16.sp,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.w700,
                         height: 1.3,
                         color: AppColors.pureBlack,
@@ -55,10 +55,10 @@ class StartStep1GoalsScreen extends GetView<StartGoalsController> {
                     Text(
                       'Choose what matters most to you right now — or describe it in your own words below.',
                       style: GoogleFonts.inter(
-                        fontSize: 12.5.sp,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                         height: 1.45,
-                        color: const Color(0xFF8E8E93),
+                        color: const Color.fromARGB(255, 21, 21, 21),
                       ),
                     ),
                     SizedBox(height: 12.h),

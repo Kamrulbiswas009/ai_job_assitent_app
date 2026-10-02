@@ -26,9 +26,7 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: const StartHeader(showLogo: false, showDivider: true),
                 ),
-                Expanded(
-                  child: _buildBriefingContent(),
-                ),
+                Expanded(child: _buildBriefingContent()),
                 Obx(
                   () => controller.isBriefingReady.value
                       ? Padding(
@@ -44,7 +42,8 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
             ),
             // Black Box Pop-up from Client Figma Comment
             Obx(
-              () => (controller.showBlackPopup.value ||
+              () =>
+                  (controller.showBlackPopup.value ||
                       !controller.isBriefingReady.value)
                   ? BriefingProcessingModal(
                       onComplete: () {
@@ -63,7 +62,15 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
   Widget _buildBriefingContent() {
     return Obx(() {
       final briefing = controller.briefingData.value;
-      final firstName = controller.userFirstName.value;
+      final rawFirstName = controller.userFirstName.value.trim();
+      final firstName = rawFirstName.isNotEmpty
+          ? rawFirstName
+              .split(RegExp(r'\s+'))
+              .map((w) => w.isNotEmpty
+                  ? '${w[0].toUpperCase()}${w.substring(1)}'
+                  : '')
+              .join(' ')
+          : '';
       final scenario = controller.scenarioTitle.value;
 
       return SingleChildScrollView(
@@ -100,7 +107,7 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
             Text(
               briefing.whatWeHeard,
               style: GoogleFonts.inter(
-                fontSize: 14.5.sp,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w400,
                 height: 1.5,
                 color: const Color(0xFF2C2C2E),
@@ -108,14 +115,14 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
             ),
             SizedBox(height: 14.h),
             // AI-generated note
-            Text(
-              '✦ AI-generated',
-              style: GoogleFonts.inter(
-                fontSize: 11.5.sp,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF8E8E93),
-              ),
-            ),
+            // Text(
+            //   '✦ AI-generated',
+            //   style: GoogleFonts.inter(
+            //     fontSize: 11.5.sp,
+            //     fontWeight: FontWeight.w500,
+            //     color: const Color(0xFF8E8E93),
+            //   ),
+            // ),
             SizedBox(height: 24.h),
             // Section 2: YOUR PROGRAMME
             _buildSectionHeader('YOUR PROGRAMME'),
@@ -123,7 +130,7 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
             Text(
               briefing.yourProgram,
               style: GoogleFonts.inter(
-                fontSize: 14.5.sp,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w400,
                 height: 1.5,
                 color: const Color(0xFF2C2C2E),
@@ -146,7 +153,7 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
             Text(
               briefing.trainingPillar.description,
               style: GoogleFonts.inter(
-                fontSize: 14.5.sp,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w400,
                 height: 1.5,
                 color: const Color(0xFF2C2C2E),
@@ -161,10 +168,7 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
                 decoration: const BoxDecoration(
                   color: Color(0xFFFBF0F0),
                   border: Border(
-                    left: BorderSide(
-                      color: AppColors.primary,
-                      width: 4.5,
-                    ),
+                    left: BorderSide(color: AppColors.primary, width: 4.5),
                   ),
                 ),
                 padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
@@ -192,7 +196,7 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
                     Text(
                       briefing.firstPrinciple.description,
                       style: GoogleFonts.inter(
-                        fontSize: 13.5.sp,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.w400,
                         height: 1.45,
                         color: const Color(0xFF2C2C2E),
@@ -209,7 +213,7 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
             Text(
               briefing.putItIntoPractice.title,
               style: GoogleFonts.inter(
-                fontSize: 17.sp,
+                fontSize: 18.sp,
                 fontWeight: FontWeight.w800,
                 height: 1.3,
                 color: AppColors.pureBlack,
@@ -219,7 +223,7 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
             Text(
               briefing.putItIntoPractice.instruction,
               style: GoogleFonts.inter(
-                fontSize: 14.5.sp,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w400,
                 height: 1.5,
                 color: const Color(0xFF2C2C2E),
@@ -232,7 +236,7 @@ class StartBriefingScreen extends GetView<StartBriefingController> {
     });
   }
 
-  Widget _buildSectionHeader(String title, {double fontSize = 14}) {
+  Widget _buildSectionHeader(String title, {double fontSize = 16}) {
     return Text(
       title,
       style: GoogleFonts.inter(

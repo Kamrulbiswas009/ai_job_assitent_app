@@ -147,9 +147,16 @@ void main() {
         equals('In your own words — what is your core message and why must this audience hear it?'),
       );
 
-      // Verify user can enter text
+      // Verify initial form validation is false (Continue disabled)
+      expect(controller.isFormValid.value, isFalse);
+
+      // Verify user can enter text and form becomes valid (Continue enabled)
       controller.interviewKeywordsController.text = 'Keynote on Generative AI';
+      expect(controller.isFormValid.value, isFalse); // Still missing role
+
       controller.roleApplyingController.text = 'Featured Speaker';
+      expect(controller.isFormValid.value, isTrue); // Both filled -> enabled!
+
       expect(controller.interviewKeywordsController.text, equals('Keynote on Generative AI'));
       expect(controller.roleApplyingController.text, equals('Featured Speaker'));
 

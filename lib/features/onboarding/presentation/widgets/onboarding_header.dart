@@ -16,22 +16,29 @@ class OnboardingHeader extends StatelessWidget {
     this.style = OnboardingHeaderStyle.logo,
     this.showBackButton = true,
     this.showDivider = false,
+    this.logoHeight,
     this.onBack,
   });
 
   final OnboardingHeaderStyle style;
   final bool showBackButton;
   final bool showDivider;
+  final double? logoHeight;
   final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
+    final double effectiveLogoHeight = logoHeight ?? 75.h;
+    final double headerHeight = style == OnboardingHeaderStyle.logo
+        ? (effectiveLogoHeight > 44.h ? effectiveLogoHeight : 44.h)
+        : 44.h;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 10.h),
         SizedBox(
-          height: 44.h,
+          height: headerHeight,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -59,7 +66,7 @@ class OnboardingHeader extends StatelessWidget {
               if (style == OnboardingHeaderStyle.logo)
                 Image.asset(
                   ImagePath.logoHeader,
-                  height: 38.h,
+                  height: effectiveLogoHeight,
                   fit: BoxFit.contain,
                 )
               else

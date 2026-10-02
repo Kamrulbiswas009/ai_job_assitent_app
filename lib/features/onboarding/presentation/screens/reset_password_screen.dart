@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -57,46 +58,22 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final confirmPassword = _confirmPasswordController.text.trim();
 
     if (newPassword.isEmpty) {
-      Get.snackbar(
-        'Validation Error',
-        'Please enter your new password',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Please enter your new password');
       return;
     }
 
     if (newPassword.length < 6) {
-      Get.snackbar(
-        'Validation Error',
-        'Password must be at least 6 characters',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Password must be at least 6 characters');
       return;
     }
 
     if (confirmPassword.isEmpty) {
-      Get.snackbar(
-        'Validation Error',
-        'Please confirm your password',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Please confirm your password');
       return;
     }
 
     if (newPassword != confirmPassword) {
-      Get.snackbar(
-        'Validation Error',
-        'Passwords do not match',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-      );
+      EasyLoading.showInfo('Passwords do not match');
       return;
     }
 

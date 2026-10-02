@@ -37,7 +37,7 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                         Text(
                           'VOICE CALIBRATION',
                           style: GoogleFonts.inter(
-                            fontSize: 12.sp,
+                            fontSize: 15.sp,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                             letterSpacing: 0.5,
@@ -47,7 +47,7 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                         Text(
                           'Now I want to\nhear your voice.',
                           style: GoogleFonts.inter(
-                            fontSize: 26.sp,
+                            fontSize: 28.sp,
                             fontWeight: FontWeight.w800,
                             height: 1.2,
                             color: AppColors.pureBlack,
@@ -57,7 +57,7 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                         Text(
                           'Tell me about yourself — who you are, what you do, and what you are hoping to achieve with SpeechPro. Speak naturally and confidently. You have sixty seconds.',
                           style: GoogleFonts.inter(
-                            fontSize: 13.5.sp,
+                            fontSize: 15.sp,
                             fontWeight: FontWeight.w400,
                             height: 1.45,
                             color: const Color(0xFF757575),
@@ -65,22 +65,37 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                         ),
                         SizedBox(height: 18.h),
                         // Audio Timeline Track from Figma Screen 1
-                        Container(
-                          width: double.infinity,
-                          height: 3.h,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEBEBEF),
-                            borderRadius: BorderRadius.circular(2.r),
-                          ),
-                          alignment: Alignment.centerLeft,
-                          child: Container(
-                            width: 12.w,
-                            height: 3.h,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFC7C7CC),
-                              borderRadius: BorderRadius.circular(2.r),
-                            ),
-                          ),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            return Obx(() {
+                              final totalWidth = constraints.maxWidth;
+                              final progress =
+                                  (controller.durationSeconds.value / 60.0)
+                                      .clamp(0.0, 1.0);
+                              final trackWidth =
+                                  (12.w + (totalWidth - 12.w) * progress)
+                                      .clamp(12.w, totalWidth);
+                              return Container(
+                                width: double.infinity,
+                                height: 3.h,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEBEBEF),
+                                  borderRadius: BorderRadius.circular(2.r),
+                                ),
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  width: trackWidth,
+                                  height: 3.h,
+                                  decoration: BoxDecoration(
+                                    color: controller.isRecording.value
+                                        ? AppColors.primary
+                                        : const Color(0xFFC7C7CC),
+                                    borderRadius: BorderRadius.circular(2.r),
+                                  ),
+                                ),
+                              );
+                            });
+                          },
                         ),
                         SizedBox(height: 24.h),
                         // Voice Recorder Card with Waveform
@@ -89,6 +104,8 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                             isRecording: controller.isRecording.value,
                             durationSeconds: controller.durationSeconds.value,
                             onToggleRecord: controller.toggleRecording,
+                            volumeLevel: controller.currentVolume.value,
+                            isVoiceDetected: controller.isVoiceDetected.value,
                             label: 'Tap to speak your Answer',
                           ),
                         ),
@@ -99,7 +116,10 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                 ),
                 // Bottom Continue & Skip Actions
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 12.h,
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -113,20 +133,20 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                         ),
                       ),
                       SizedBox(height: 12.h),
-                      Center(
-                        child: GestureDetector(
-                          onTap: controller.skipCalibration,
-                          behavior: HitTestBehavior.opaque,
-                          child: Text(
-                            'Skip Voice calibration',
-                            style: GoogleFonts.inter(
-                              fontSize: 13.5.sp,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF8E8E93),
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Center(
+                      //   child: GestureDetector(
+                      //     onTap: controller.skipCalibration,
+                      //     behavior: HitTestBehavior.opaque,
+                      //     child: Text(
+                      //       'Skip Voice calibration',
+                      //       style: GoogleFonts.inter(
+                      //         fontSize: 13.5.sp,
+                      //         fontWeight: FontWeight.w500,
+                      //         color: const Color(0xFF8E8E93),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
