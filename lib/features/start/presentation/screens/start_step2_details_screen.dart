@@ -207,9 +207,13 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
-                  child: SpPrimaryButton(
-                    label: 'Continue',
-                    onPressed: controller.submitDetailsAndProceed,
+                  child: Obx(
+                    () => SpPrimaryButton(
+                      label: 'Continue',
+                      onPressed: controller.isFormValid.value
+                          ? controller.submitDetailsAndProceed
+                          : null,
+                    ),
                   ),
                 ),
               ],

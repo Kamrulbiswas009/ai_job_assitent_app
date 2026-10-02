@@ -66,19 +66,19 @@ class _BriefingProcessingModalState extends State<BriefingProcessingModal> {
 
   void _startFinishingProgress() {
     _progressTimer?.cancel();
-    _progressTimer = Timer.periodic(const Duration(milliseconds: 25), (timer) {
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 40), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
       }
       setState(() {
         if (_progress < 1.0) {
-          _progress += 0.03;
+          _progress += 0.012;
           if (_progress >= 1.0) {
             _progress = 1.0;
             _currentStep = 3;
             timer.cancel();
-            _timerDone = Timer(const Duration(milliseconds: 600), () {
+            _timerDone = Timer(const Duration(milliseconds: 700), () {
               if (mounted) {
                 widget.onComplete();
               }
@@ -93,36 +93,37 @@ class _BriefingProcessingModalState extends State<BriefingProcessingModal> {
     _progress = 0.0;
     _currentStep = 0;
 
-    _progressTimer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
+    // Precisely calibrated 8-second total AI briefing preparation sequence
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 40), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
       }
       setState(() {
         if (_progress < 0.35) {
-          _progress += 0.015;
+          _progress += 0.0054; // ~2.6s for Step 1
           _currentStep = 0;
         } else if (_progress < 0.70) {
-          _progress += 0.012;
+          _progress += 0.0054; // ~2.6s for Step 2
           _currentStep = 1;
         } else if (_progress < 0.88) {
-          _progress += 0.010;
+          _progress += 0.0044; // ~1.8s for Step 3
           _currentStep = 2;
         } else if (!_hasApiResponded) {
-          // Waiting for AI response: hold at ~90% without reaching 100%
+          // Waiting for AI response: hold gently around ~90% without reaching 100%
           _currentStep = 2;
           if (_progress < 0.90) {
-            _progress += 0.002;
+            _progress += 0.0003;
           }
         } else {
-          // AI response has arrived: smoothly complete to 100%
+          // AI response has arrived: smoothly complete to 100% (~1.0s)
           if (_progress < 1.0) {
-            _progress += 0.025;
+            _progress += 0.012;
             if (_progress >= 1.0) {
               _progress = 1.0;
               _currentStep = 3;
               timer.cancel();
-              _timerDone = Timer(const Duration(milliseconds: 600), () {
+              _timerDone = Timer(const Duration(milliseconds: 700), () {
                 if (mounted) {
                   widget.onComplete();
                 }

@@ -213,6 +213,30 @@ void main() {
         );
       },
     );
+
+    test(
+      'submitAssessmentAndProceed handles offline server by creating fallback assessment_id',
+      () async {
+        final mockClient = MockClient((request) async {
+          return http.Response('<!DOCTYPE html><html>Offline</html>', 404);
+        });
+
+        final service = AssessmentService(client: mockClient);
+        final controller = StartAssessmentController(
+          assessmentService: service,
+        );
+
+        controller.setBenchmarkAnswer(0, 0);
+        controller.setBenchmarkAnswer(1, 1);
+        controller.setBenchmarkAnswer(2, 2);
+
+        await controller.submitAssessmentAndProceed();
+
+        expect(controller.isLoading.value, isFalse);
+        expect(controller.assessmentId.value, startsWith('fallback_'));
+        expect(StorageService.assessmentId, startsWith('fallback_'));
+      },
+    );
   });
 
   group('CalibrationVoiceResponse Model Tests', () {

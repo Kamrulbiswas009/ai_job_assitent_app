@@ -3,9 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/services/storage_service.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../../../routes/app_routes.dart';
+import '../../controller/onboarding_controller.dart';
 import '../widgets/onboarding_header.dart';
 import '../widgets/sp_primary_button.dart';
 
@@ -164,9 +166,23 @@ class UsesOfAiScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 16.h),
                       SpPrimaryButton(
-                        label: 'I Understand,Continue',
+                        label: 'I Understand-Continue',
                         onPressed: () {
-                          Get.toNamed(AppRoute.startMembershipIntro);
+                          final fullName = Get.isRegistered<OnboardingController>() &&
+                                  Get.find<OnboardingController>()
+                                      .userFullName
+                                      .value
+                                      .trim()
+                                      .isNotEmpty
+                              ? Get.find<OnboardingController>()
+                                  .userFullName
+                                  .value
+                                  .trim()
+                              : (StorageService.fullName ?? '');
+                          Get.toNamed(
+                            AppRoute.startMembershipIntro,
+                            arguments: {'fullName': fullName},
+                          );
                         },
                       ),
                       SizedBox(height: 14.h),

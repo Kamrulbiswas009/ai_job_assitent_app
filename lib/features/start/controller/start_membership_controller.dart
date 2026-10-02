@@ -29,14 +29,29 @@ class StartMembershipController extends GetxController {
         args['fullName'] != null &&
         args['fullName'].toString().trim().isNotEmpty) {
       name = args['fullName'].toString().trim();
+    } else if (args is Map &&
+        args['name'] != null &&
+        args['name'].toString().trim().isNotEmpty) {
+      name = args['name'].toString().trim();
+    } else if (args is Map &&
+        args['userName'] != null &&
+        args['userName'].toString().trim().isNotEmpty) {
+      name = args['userName'].toString().trim();
     } else if (args is String && args.trim().isNotEmpty) {
       name = args.trim();
     } else if (StorageService.fullName != null &&
         StorageService.fullName!.trim().isNotEmpty) {
       name = StorageService.fullName!.trim();
+    } else if (StorageService.userEmail != null &&
+        StorageService.userEmail!.trim().isNotEmpty) {
+      final emailPrefix = StorageService.userEmail!.trim().split('@').first;
+      final raw = emailPrefix.split(RegExp(r'[._-]')).first;
+      if (raw.isNotEmpty) {
+        name = '${raw[0].toUpperCase()}${raw.substring(1)}';
+      }
     }
 
-    if (name != null && name.isNotEmpty) {
+    if (name != null && name.trim().isNotEmpty) {
       setUserName(name);
     }
   }

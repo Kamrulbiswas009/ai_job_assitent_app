@@ -54,6 +54,15 @@ class StartStep2DetailsController extends GetxController {
   Future<PersonalBriefingModel?>? get apiFuture => _apiFuture;
   PersonalBriefingModel? _cachedBriefing;
 
+  // Form validation state (enabled when user fills the required data)
+  final RxBool isFormValid = false.obs;
+
+  void _checkFormValidation() {
+    final hasGoal = interviewKeywordsController.text.trim().isNotEmpty;
+    final hasRole = roleApplyingController.text.trim().isNotEmpty;
+    isFormValid.value = hasGoal && hasRole;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -62,7 +71,13 @@ class StartStep2DetailsController extends GetxController {
     roleApplyingController = TextEditingController();
     voiceAnswerTextController = TextEditingController();
 
+    interviewKeywordsController.addListener(_checkFormValidation);
+    roleApplyingController.addListener(_checkFormValidation);
+    voiceAnswerTextController.addListener(_checkFormValidation);
+    ever(recordedAudioPath, (_) => _checkFormValidation());
+
     syncScenario();
+    _checkFormValidation();
   }
 
   /// Synchronize dynamic titles, hints and slugs based on selected scenario from Step 1
@@ -91,6 +106,9 @@ class StartStep2DetailsController extends GetxController {
 
   @override
   void onClose() {
+    interviewKeywordsController.removeListener(_checkFormValidation);
+    roleApplyingController.removeListener(_checkFormValidation);
+    voiceAnswerTextController.removeListener(_checkFormValidation);
     interviewKeywordsController.dispose();
     roleApplyingController.dispose();
     voiceAnswerTextController.dispose();

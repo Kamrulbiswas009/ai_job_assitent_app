@@ -98,7 +98,14 @@ class OnboardingController extends GetxController {
 
       if (response.isSuccess) {
         registeredEmail.value = email.trim();
+        userFullName.value = fullName.trim();
         await StorageService.saveEmail(email.trim());
+        await StorageService.saveAuthData(
+          accessToken: StorageService.accessToken ?? '',
+          refreshToken: StorageService.refreshToken ?? '',
+          email: email.trim(),
+          fullName: fullName.trim(),
+        );
 
         final message = (response.responseData is Map &&
                 response.responseData['message'] != null)
@@ -194,10 +201,34 @@ class OnboardingController extends GetxController {
           final accessToken = data['accessToken']?.toString() ?? '';
           final refreshToken = data['refreshToken']?.toString() ?? '';
           final user = data['user'] is Map ? data['user'] as Map : null;
-          final userId = user?['userId']?.toString();
-          final userEmail = user?['email']?.toString() ?? email.trim();
-          final fullName = user?['fullName']?.toString() ?? '';
-          final rawIsSubscribed = user?['isSubscribed'];
+          final userId = user?['userId']?.toString() ??
+              user?['id']?.toString() ??
+              data['userId']?.toString() ??
+              data['id']?.toString();
+          final userEmail = user?['email']?.toString() ??
+              data['email']?.toString() ??
+              email.trim();
+          String fullName = user?['fullName']?.toString() ??
+              user?['name']?.toString() ??
+              user?['userName']?.toString() ??
+              user?['firstName']?.toString() ??
+              data['fullName']?.toString() ??
+              data['name']?.toString() ??
+              data['userName']?.toString() ??
+              data['firstName']?.toString() ??
+              '';
+
+          // Fallback: If backend returned no name, generate readable name from email
+          if (fullName.trim().isEmpty && userEmail.isNotEmpty) {
+            final emailPrefix = userEmail.split('@').first;
+            final clean = emailPrefix.split(RegExp(r'[._0-9-]')).first;
+            if (clean.isNotEmpty) {
+              fullName = '${clean[0].toUpperCase()}${clean.substring(1)}';
+            }
+          }
+
+          final rawIsSubscribed =
+              user?['isSubscribed'] ?? data['isSubscribed'];
           final bool isSubscribed = rawIsSubscribed == true ||
               rawIsSubscribed == 'true' ||
               rawIsSubscribed == 1;

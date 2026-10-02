@@ -13,6 +13,8 @@ class StartMembershipIntroScreen extends GetView<StartMembershipController> {
 
   @override
   Widget build(BuildContext context) {
+    controller.loadUserData();
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -44,7 +46,9 @@ class StartMembershipIntroScreen extends GetView<StartMembershipController> {
                             final rawName = controller.userFirstName.value.trim();
                             final firstName = rawName.isNotEmpty
                                 ? '${rawName[0].toUpperCase()}${rawName.substring(1)}'
-                                : '';
+                                : (controller.userName.value.trim().isNotEmpty
+                                    ? controller.userName.value.trim().split(' ').first
+                                    : '');
                             return Text(
                               firstName.isNotEmpty
                                   ? 'Great news, $firstName !'

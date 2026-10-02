@@ -298,12 +298,12 @@ void main() {
     rxCompleted.value = true;
     await tester.pump();
 
-    // Pump forward for progress to smoothly finish to 100%
-    await tester.pump(const Duration(milliseconds: 400));
+    // Pump forward for progress to smoothly finish to 100% in the 8s sequence
+    await tester.pump(const Duration(seconds: 6));
     expect(find.text('100%'), findsOneWidget);
 
-    // Pump past the 600ms completion delay
-    await tester.pump(const Duration(milliseconds: 700));
+    // Pump past the completion delay
+    await tester.pump(const Duration(milliseconds: 900));
     expect(isDone, isTrue);
   });
 
@@ -338,11 +338,15 @@ void main() {
     expect(step2Controller.roleApplyingController.text, isEmpty);
     expect(step2Controller.voiceAnswerTextController.text, isEmpty);
 
-    // Verify user can enter text
+    // Verify Continue button is initially disabled
+    expect(step2Controller.isFormValid.value, isFalse);
+
+    // Verify user can enter text and Continue button becomes enabled
     step2Controller.interviewKeywordsController.text = 'AI startup raising seed round';
     step2Controller.roleApplyingController.text = 'CEO & Founder';
     await tester.pump();
 
+    expect(step2Controller.isFormValid.value, isTrue);
     expect(find.text('AI startup raising seed round'), findsOneWidget);
     expect(find.text('CEO & Founder'), findsOneWidget);
   });
