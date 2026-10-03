@@ -9,4 +9,6 @@ class ImagePath {
   static const String logoHeader = 'assets/images/logo_header.png';
   static const String confetti = 'assets/images/confetti.png';
   static const String spCircleBadge = 'assets/images/sp_circle_badge.png';
+  static const String introWoman = 'assets/images/intro_woman.jpg';
+  static const String introSpeaker = 'assets/images/intro_speaker.jpg';
 }

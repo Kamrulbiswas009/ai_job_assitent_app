@@ -22,6 +22,8 @@ class AppColors {
   // Feature Colors
   static const Color purple = Color(0xFF8200E2);
   static const Color purpleSoft = Color(0xFFFAF5FF);
+  static const Color primarySoft = Color(0xFFFDF1F0); // Light pink card surface
+  static const Color primaryTint = Color(0xFFFBE3E1); // Pink icon/badge background
 
   // Gradient Colors
   static const Gradient linearGradient = LinearGradient(
