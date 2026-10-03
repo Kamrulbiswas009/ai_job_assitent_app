@@ -175,8 +175,18 @@ class StartStep2DetailsScreen extends GetView<StartStep2DetailsController> {
                             isCompactHorizontal: true,
                           ),
                         ),
-                        SizedBox(height: 16.h),
+                        SizedBox(height: 20.h),
                         // Field 4: Additional Sentences / Notes TextField (starts empty)
+                        Text(
+                          'Additional notes ',
+                          style: GoogleFonts.inter(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
+                            height: 1.35,
+                            color: AppColors.pureBlack,
+                          ),
+                        ),
+                        SizedBox(height: 10.h),
                         Obx(
                           () => CustomCardTextField(
                             controller: controller.voiceAnswerTextController,
