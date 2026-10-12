@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../../core/utils/logging/logger.dart';
@@ -146,60 +150,161 @@ class StartStep2DetailsController extends GetxController {
     });
   }
 
-  // Start audio recording
+  // Request microphone permission explicitly and return true if granted
+  Future<bool> _requestMicrophonePermission() async {
+    // First check current status
+    PermissionStatus status = await Permission.microphone.status;
+
+    if (status.isGranted) return true;
+
+    if (status.isPermanentlyDenied) {
+      // User has permanently denied — direct to settings
+      Get.snackbar(
+        'Microphone Access Required',
+        'Please enable microphone access in your device settings to record voice.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 4),
+        mainButton: TextButton(
+          onPressed: () => openAppSettings(),
+          child: const Text('Open Settings', style: TextStyle(color: Colors.white)),
+        ),
+      );
+      AppLoggerHelper.warning('Microphone permission permanently denied. Directing user to settings.');
+      return false;
+    }
+
+    // Request permission
+    status = await Permission.microphone.request();
+    if (status.isGranted) return true;
+
+    Get.snackbar(
+      'Microphone Access Denied',
+      'Voice recording requires microphone access. Please allow it to continue.',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 3),
+    );
+    AppLoggerHelper.warning('Microphone permission denied by user.');
+    return false;
+  }
+
+  // Start audio recording — records as AAC-LC inside an MP4 container (.mp4)
+  // Backend receives audio/mp4 which is widely supported
   Future<void> startRecording() async {
+    // Guard: don't start a new recording if already recording
+    if (isRecording.value) return;
+
+    // Request permission explicitly before trying to record
+    final granted = await _requestMicrophonePermission();
+    if (!granted) {
+      AppLoggerHelper.warning('Recording skipped — microphone permission not granted.');
+      return;
+    }
+
     isRecording.value = true;
     recordDuration.value = 0;
     currentVolume.value = 0.0;
     isVoiceDetected.value = false;
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       recordDuration.value++;
     });
 
     try {
-      if (await audioRecorder.hasPermission()) {
-        final dir = await getApplicationDocumentsDirectory();
-        final filePath =
-            '${dir.path}/step2_voice_answer_${DateTime.now().millisecondsSinceEpoch}.m4a';
+      final dir = await getApplicationDocumentsDirectory();
+      // Record as AAC-LC in .m4a — universally supported, will be converted to MP3
+      final filePath =
+          '${dir.path}/step2_voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
 
-        await audioRecorder.start(
-          const RecordConfig(encoder: AudioEncoder.aacLc),
-          path: filePath,
-        );
-        _startAmplitudeListening();
-        AppLoggerHelper.info('Started voice recording to: $filePath');
-      } else {
-        AppLoggerHelper.warning(
-          'Microphone permission not granted for voice recording',
-        );
-      }
+      await audioRecorder.start(
+        const RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,   // 128 kbps — good quality for speech
+          sampleRate: 44100, // 44.1 kHz standard sample rate
+          numChannels: 1,    // Mono — sufficient for voice, smaller file size
+        ),
+        path: filePath,
+      );
+      _startAmplitudeListening();
+      AppLoggerHelper.info('Started AAC voice recording to: $filePath (will convert to MP3)');
     } catch (e) {
+      isRecording.value = false;
+      _timer?.cancel();
       AppLoggerHelper.error('Error starting audio recording: $e', e);
     }
   }
 
-  // Stop audio recording and return path
+  // Stop audio recording, then convert AAC/M4A → MP3 for the backend
+  // Enforces a 500ms minimum to prevent zero-byte files on fast taps
   Future<String?> stopRecording() async {
     if (!isRecording.value) {
       return recordedAudioPath.value.isNotEmpty
           ? recordedAudioPath.value
           : null;
     }
+
+    // Minimum 500ms guard — prevents empty/corrupt file on instant tap-stop
+    if (recordDuration.value == 0) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
     isRecording.value = false;
     _timer?.cancel();
     _amplitudeTimer?.cancel();
     currentVolume.value = 0.0;
     isVoiceDetected.value = false;
+
     try {
-      final path = await audioRecorder.stop();
-      if (path != null && path.isNotEmpty) {
-        recordedAudioPath.value = path;
-        AppLoggerHelper.info('Stopped voice recording. Saved at: $path');
-        return path;
+      final aacPath = await audioRecorder.stop();
+      if (aacPath == null || aacPath.isEmpty) {
+        return recordedAudioPath.value.isNotEmpty ? recordedAudioPath.value : null;
       }
+
+      // Immediately store the recorded audio path as the baseline.
+      // This ensures the recording is NEVER lost if FFmpeg is unavailable or fails.
+      recordedAudioPath.value = aacPath;
+      AppLoggerHelper.info('Stopped AAC recording at: $aacPath');
+
+      // Attempt FFmpeg conversion to MP3
+      try {
+        final mp3Path = aacPath.replaceAll(RegExp(r'\.(m4a|mp4|aac)$'), '.mp3');
+        AppLoggerHelper.info('Attempting MP3 conversion: $mp3Path');
+
+        // FFmpeg: transcode AAC → MP3 (128 kbps, mono, 44100 Hz)
+        // -y         : overwrite output if it exists
+        // -i         : input file
+        // -vn        : no video stream
+        // -ar 44100  : sample rate
+        // -ac 1      : mono channel
+        // -b:a 128k  : 128 kbps audio bitrate
+        final session = await FFmpegKit.execute(
+          '-y -i "$aacPath" -vn -ar 44100 -ac 1 -b:a 128k "$mp3Path"',
+        );
+        final returnCode = await session.getReturnCode();
+
+        if (ReturnCode.isSuccess(returnCode)) {
+          final mp3File = File(mp3Path);
+          if (await mp3File.exists() && await mp3File.length() > 0) {
+            // Delete the intermediate AAC file to save storage
+            try { await File(aacPath).delete(); } catch (_) {}
+            recordedAudioPath.value = mp3Path;
+            AppLoggerHelper.info('MP3 conversion successful: $mp3Path');
+            return mp3Path;
+          }
+        }
+
+        final logs = await session.getLogsAsString();
+        AppLoggerHelper.warning(
+          'MP3 conversion failed (rc=$returnCode). Falling back to recorded audio: $aacPath\nFFmpeg logs: $logs',
+        );
+      } catch (ffmpegErr) {
+        AppLoggerHelper.warning(
+          'FFmpeg conversion unavailable ($ffmpegErr). Falling back to recorded audio: $aacPath (Requires full app rebuild to link FFmpeg native binary).',
+        );
+      }
+
+      return recordedAudioPath.value;
     } catch (e) {
-      AppLoggerHelper.error('Error stopping audio recording: $e', e);
+      AppLoggerHelper.error('Error during stop recording: $e', e);
     }
     return recordedAudioPath.value.isNotEmpty ? recordedAudioPath.value : null;
   }
@@ -265,13 +370,13 @@ class StartStep2DetailsController extends GetxController {
     isAiResponseReceived.value = false;
     isProcessingBriefing.value = true;
 
-    // Start background API call with a 30-second safety timeout
+    // Start background API call with a 60-second safety timeout (voice uploads need extra time)
     _apiFuture = _briefingService
         .getPersonalBriefing(request)
         .timeout(
-          const Duration(seconds: 30),
+          const Duration(seconds: 60),
           onTimeout: () {
-            AppLoggerHelper.warning('Personal Briefing API timed out after 30s');
+            AppLoggerHelper.warning('Personal Briefing API timed out after 60s');
             return null;
           },
         );

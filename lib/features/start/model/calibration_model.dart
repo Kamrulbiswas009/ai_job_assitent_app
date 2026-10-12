@@ -32,12 +32,18 @@ class CalibrationVoiceResponse {
   final String assessmentId;
   final String status;
   final String message;
+  final String? error;
+  final String? hint;
+  final bool retryAllowed;
 
   const CalibrationVoiceResponse({
     required this.success,
     required this.assessmentId,
     required this.status,
     required this.message,
+    this.error,
+    this.hint,
+    this.retryAllowed = true,
   });
 
   factory CalibrationVoiceResponse.fromJson(Map<String, dynamic> json) {
@@ -46,6 +52,26 @@ class CalibrationVoiceResponse {
       assessmentId: json['assessment_id'] as String? ?? '',
       status: json['status'] as String? ?? '',
       message: json['message'] as String? ?? '',
+      error: json['error'] as String?,
+      hint: json['hint'] as String?,
+      retryAllowed: json['retry_allowed'] as bool? ?? true,
+    );
+  }
+
+  factory CalibrationVoiceResponse.fromError({
+    required String message,
+    String? error,
+    String? hint,
+    bool retryAllowed = true,
+  }) {
+    return CalibrationVoiceResponse(
+      success: false,
+      assessmentId: '',
+      status: 'error',
+      message: message,
+      error: error,
+      hint: hint,
+      retryAllowed: retryAllowed,
     );
   }
 
@@ -55,6 +81,9 @@ class CalibrationVoiceResponse {
       'assessment_id': assessmentId,
       'status': status,
       'message': message,
+      if (error != null) 'error': error,
+      if (hint != null) 'hint': hint,
+      'retry_allowed': retryAllowed,
     };
   }
 }

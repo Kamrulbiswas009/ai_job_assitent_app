@@ -11,20 +11,26 @@ import '../model/calibration_model.dart';
 import '../model/influence_score_model.dart';
 
 class AssessmentService {
-  final int timeoutDuration = 30;
+  /// 60s timeout — voice uploads need extra time on slower connections
+  final int timeoutDuration = 60;
   final http.Client _client;
 
   AssessmentService({http.Client? client}) : _client = client ?? http.Client();
 
+  /// Returns correct MIME type for the audio file.
+  /// Backend accepts: wav, mp3, webm, ogg, m4a — we send mp3.
   MediaType _getAudioMediaType(String path) {
     final lower = path.toLowerCase();
+    // Primary: backend receives MP3
     if (lower.endsWith('.mp3')) return MediaType('audio', 'mpeg');
+    // Fallback containers (should not occur with current recorder config)
     if (lower.endsWith('.mp4')) return MediaType('audio', 'mp4');
-    if (lower.endsWith('.m4a')) return MediaType('audio', 'm4a');
+    if (lower.endsWith('.m4a')) return MediaType('audio', 'mp4');
     if (lower.endsWith('.wav')) return MediaType('audio', 'wav');
     if (lower.endsWith('.webm')) return MediaType('audio', 'webm');
     if (lower.endsWith('.ogg')) return MediaType('audio', 'ogg');
-    return MediaType('audio', 'm4a');
+    // Default: match recorder output
+    return MediaType('audio', 'mpeg');
   }
 
   /// Submits the 3 benchmark self-assessment answers to backend
@@ -169,26 +175,47 @@ class AssessmentService {
           );
         }
       } else {
-        String errorDetail = response.body;
+        String errorMessage = 'No speech detected or audio processing failed.';
+        String? errorHint;
+        String? errorKey;
+        bool retryAllowed = true;
+
         try {
           final decodedError = jsonDecode(response.body);
           if (decodedError is Map) {
-            if (decodedError['detail'] != null) {
-              if (decodedError['detail'] is Map &&
-                  decodedError['detail']['message'] != null) {
-                errorDetail = decodedError['detail']['message'].toString();
-              } else {
-                errorDetail = decodedError['detail'].toString();
+            final detail = decodedError['detail'];
+            if (detail is Map) {
+              if (detail['message'] != null) {
+                errorMessage = detail['message'].toString();
               }
+              if (detail['hint'] != null) {
+                errorHint = detail['hint'].toString();
+              }
+              if (detail['error'] != null) {
+                errorKey = detail['error'].toString();
+              }
+              if (detail['retry_allowed'] is bool) {
+                retryAllowed = detail['retry_allowed'] as bool;
+              }
+            } else if (detail != null) {
+              errorMessage = detail.toString();
             } else if (decodedError['message'] != null) {
-              errorDetail = decodedError['message'].toString();
+              errorMessage = decodedError['message'].toString();
             }
           }
         } catch (_) {}
 
         AppLoggerHelper.error(
-          'Calibration Voice API Error [${response.statusCode}]: $errorDetail\n'
+          'Calibration Voice API Error [${response.statusCode}]: $errorMessage\n'
+          'Hint: $errorHint\n'
           'Full Response: ${response.body}',
+        );
+
+        return CalibrationVoiceResponse.fromError(
+          message: errorMessage,
+          error: errorKey,
+          hint: errorHint,
+          retryAllowed: retryAllowed,
         );
       }
 
@@ -198,7 +225,10 @@ class AssessmentService {
         'Exception while submitting calibration voice: $e',
         e,
       );
-      return null;
+      return CalibrationVoiceResponse.fromError(
+        message: 'Network error while uploading voice recording: $e',
+        retryAllowed: true,
+      );
     }
   }
 

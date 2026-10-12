@@ -9,17 +9,24 @@ import '../../../core/utils/logging/logger.dart';
 import '../model/briefing_model.dart';
 
 class BriefingService {
-  final int timeoutDuration = 30;
+  /// Timeout in seconds — 60s to handle voice file uploads on slower connections
+  final int timeoutDuration = 60;
 
+  /// Returns the correct MIME subtype for the audio file being uploaded.
+  /// The backend requires MP3 (audio/mpeg).
+  /// Recorder is configured to produce .mp3 directly via AudioEncoder.mp3.
   MediaType _getAudioMediaType(String path) {
     final lower = path.toLowerCase();
+    // Primary: backend requires MP3
     if (lower.endsWith('.mp3')) return MediaType('audio', 'mpeg');
+    // Fallback containers (should not occur with current recorder config)
     if (lower.endsWith('.mp4')) return MediaType('audio', 'mp4');
-    if (lower.endsWith('.m4a')) return MediaType('audio', 'm4a');
+    if (lower.endsWith('.m4a')) return MediaType('audio', 'mp4');
     if (lower.endsWith('.wav')) return MediaType('audio', 'wav');
     if (lower.endsWith('.webm')) return MediaType('audio', 'webm');
     if (lower.endsWith('.ogg')) return MediaType('audio', 'ogg');
-    return MediaType('audio', 'm4a');
+    // Default: match what recorder produces
+    return MediaType('audio', 'mpeg');
   }
 
   Future<PersonalBriefingModel?> getPersonalBriefing(

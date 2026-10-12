@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/return_code.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../../core/utils/logging/logger.dart';
@@ -74,40 +78,87 @@ class StartCalibrationController extends GetxController {
     });
   }
 
+  // Request microphone permission explicitly and return true if granted
+  Future<bool> _requestMicrophonePermission() async {
+    PermissionStatus status = await Permission.microphone.status;
+    if (status.isGranted) return true;
+
+    if (status.isPermanentlyDenied) {
+      Get.snackbar(
+        'Microphone Access Required',
+        'Please enable microphone access in your device settings to record voice.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 4),
+        mainButton: TextButton(
+          onPressed: () => openAppSettings(),
+          child: const Text('Open Settings', style: TextStyle(color: Colors.white)),
+        ),
+      );
+      AppLoggerHelper.warning('Microphone permission permanently denied. Directing user to settings.');
+      return false;
+    }
+
+    status = await Permission.microphone.request();
+    if (status.isGranted) return true;
+
+    Get.snackbar(
+      'Microphone Access Denied',
+      'Voice recording requires microphone access. Please allow it to continue.',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 3),
+    );
+    AppLoggerHelper.warning('Microphone permission denied by user.');
+    return false;
+  }
+
+  // Starts a new recording session (AAC-LC into .m4a, converted to .mp3 on stop)
+  // Auto-stops at 60 seconds
   Future<void> startRecording() async {
+    // Guard: don't start a new recording if already active
+    if (isRecording.value) return;
+
+    // Request permission explicitly
+    final granted = await _requestMicrophonePermission();
+    if (!granted) {
+      AppLoggerHelper.warning('Calibration recording skipped — microphone permission not granted.');
+      return;
+    }
+
     isRecording.value = true;
     durationSeconds.value = 0;
     currentVolume.value = 0.0;
     isVoiceDetected.value = false;
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) async {
       if (durationSeconds.value >= 60) {
-        await stopRecording();
+        await stopRecording(); // auto-stop at 60s (includes MP3 conversion)
       } else {
         durationSeconds.value++;
       }
     });
 
     try {
-      if (await audioRecorder.hasPermission()) {
-        final dir = await getApplicationDocumentsDirectory();
-        final filePath =
-            '${dir.path}/calibration_voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+      final dir = await getApplicationDocumentsDirectory();
+      // Record as AAC-LC in .m4a — universally supported, converted to MP3 after stop
+      final filePath =
+          '${dir.path}/calibration_voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
 
-        await audioRecorder.start(
-          const RecordConfig(encoder: AudioEncoder.aacLc),
-          path: filePath,
-        );
-        _startAmplitudeListening();
-        AppLoggerHelper.info(
-          'Started calibration voice recording to: $filePath',
-        );
-      } else {
-        AppLoggerHelper.warning(
-          'Microphone permission not granted for voice calibration',
-        );
-      }
+      await audioRecorder.start(
+        const RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,   // 128 kbps — good quality for speech
+          sampleRate: 44100, // 44.1 kHz standard
+          numChannels: 1,    // Mono — sufficient for voice
+        ),
+        path: filePath,
+      );
+      _startAmplitudeListening();
+      AppLoggerHelper.info(
+        'Started calibration voice recording to: $filePath (will convert to MP3)',
+      );
     } catch (e) {
+      isRecording.value = false;
+      _timer?.cancel();
       AppLoggerHelper.error(
         'Error starting voice calibration recording: $e',
         e,
@@ -115,28 +166,72 @@ class StartCalibrationController extends GetxController {
     }
   }
 
+  // Stop recording and convert AAC/M4A → MP3 for the backend
+  // Backend endpoint: POST /api/v1/assessment/{id}/voice accepts mp3
   Future<String?> stopRecording() async {
     if (!isRecording.value) {
       return recordedAudioPath.value.isNotEmpty
           ? recordedAudioPath.value
           : null;
     }
+
+    // Minimum 500ms guard — prevents zero-byte file on instant tap-stop
+    if (durationSeconds.value == 0) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
     isRecording.value = false;
     _timer?.cancel();
     _amplitudeTimer?.cancel();
     currentVolume.value = 0.0;
     isVoiceDetected.value = false;
+
     try {
-      final path = await audioRecorder.stop();
-      if (path != null && path.isNotEmpty) {
-        recordedAudioPath.value = path;
-        AppLoggerHelper.info(
-          'Stopped calibration voice recording. Saved at: $path',
-        );
-        return path;
+      final aacPath = await audioRecorder.stop();
+      if (aacPath == null || aacPath.isEmpty) {
+        return recordedAudioPath.value.isNotEmpty ? recordedAudioPath.value : null;
       }
+
+      // Immediately store the recorded audio path as the baseline.
+      // This ensures the recording is NEVER lost if FFmpeg is unavailable or fails.
+      recordedAudioPath.value = aacPath;
+      AppLoggerHelper.info('Stopped calibration recording at: $aacPath');
+
+      // Attempt FFmpeg conversion to MP3
+      try {
+        final mp3Path = aacPath.replaceAll(RegExp(r'\.(m4a|mp4|aac)$'), '.mp3');
+        AppLoggerHelper.info('Attempting MP3 conversion: $mp3Path');
+
+        // FFmpeg: transcode AAC → MP3 (128 kbps, mono, 44100 Hz)
+        final session = await FFmpegKit.execute(
+          '-y -i "$aacPath" -vn -ar 44100 -ac 1 -b:a 128k "$mp3Path"',
+        );
+        final returnCode = await session.getReturnCode();
+
+        if (ReturnCode.isSuccess(returnCode)) {
+          final mp3File = File(mp3Path);
+          if (await mp3File.exists() && await mp3File.length() > 0) {
+            // Delete intermediate AAC file to save storage
+            try { await File(aacPath).delete(); } catch (_) {}
+            recordedAudioPath.value = mp3Path;
+            AppLoggerHelper.info('Calibration MP3 conversion successful: $mp3Path');
+            return mp3Path;
+          }
+        }
+
+        final logs = await session.getLogsAsString();
+        AppLoggerHelper.warning(
+          'MP3 conversion failed (rc=$returnCode). Falling back to recorded audio: $aacPath\nFFmpeg logs: $logs',
+        );
+      } catch (ffmpegErr) {
+        AppLoggerHelper.warning(
+          'FFmpeg conversion unavailable ($ffmpegErr). Falling back to recorded audio: $aacPath (Requires full app rebuild to link FFmpeg native binary).',
+        );
+      }
+
+      return recordedAudioPath.value;
     } catch (e) {
-      AppLoggerHelper.error('Error stopping calibration recording: $e', e);
+      AppLoggerHelper.error('Error during calibration stop: $e', e);
     }
     return recordedAudioPath.value.isNotEmpty ? recordedAudioPath.value : null;
   }
@@ -178,25 +273,48 @@ class StartCalibrationController extends GetxController {
           AppLoggerHelper.info(
             'Calibration voice successfully processed: ${response.message}',
           );
+          // Navigate to Score Calculation Modal only on successful voice analysis
+          isCalculating.value = true;
         } else {
-          AppLoggerHelper.warning(
-            'Calibration voice submission returned non-success or null',
+          final message = response?.message ??
+              'No speech was detected in your recording. Please check your microphone and try again.';
+          final hint = response?.hint;
+          final displayText = hint != null && hint.isNotEmpty
+              ? '$message\n\n$hint'
+              : message;
+
+          Get.snackbar(
+            'Speech Not Detected',
+            displayText,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: const Color(0xFF2C2C2E),
+            colorText: Colors.white,
+            duration: const Duration(seconds: 5),
+            margin: const EdgeInsets.all(16),
+            icon: const Icon(Icons.mic_off, color: Colors.orangeAccent),
           );
+
+          // Clear audio path so user can tap to re-record
+          recordedAudioPath.value = '';
         }
       } else {
         AppLoggerHelper.warning(
           'No assessmentId found in storage. Proceeding with calibration score calculation directly.',
         );
+        isCalculating.value = true;
       }
     } catch (e) {
       AppLoggerHelper.error(
         'Unexpected error while submitting calibration voice: $e',
         e,
       );
+      Get.snackbar(
+        'Submission Error',
+        'Failed to process audio recording: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       isLoading.value = false;
-      // Navigate to Score Calculation Modal
-      isCalculating.value = true;
     }
   }
 

@@ -3,7 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>SpeechPro needs microphone access to calibrate and analyze your voice.</string>
+	<string>SpeechPro needs microphone access to record your voice and analyse how you come across.</string>
+	<!-- Required so iOS continues audio recording if the screen locks or app briefly backgrounds -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

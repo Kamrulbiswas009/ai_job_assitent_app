@@ -133,20 +133,20 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                         ),
                       ),
                       SizedBox(height: 12.h),
-                      // Center(
-                      //   child: GestureDetector(
-                      //     onTap: controller.skipCalibration,
-                      //     behavior: HitTestBehavior.opaque,
-                      //     child: Text(
-                      //       'Skip Voice calibration',
-                      //       style: GoogleFonts.inter(
-                      //         fontSize: 13.5.sp,
-                      //         fontWeight: FontWeight.w500,
-                      //         color: const Color(0xFF8E8E93),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
+                      Center(
+                        child: GestureDetector(
+                          onTap: controller.skipCalibration,
+                          behavior: HitTestBehavior.opaque,
+                          child: Text(
+                            'Skip Voice calibration',
+                            style: GoogleFonts.inter(
+                              fontSize: 13.5.sp,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF8E8E93),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
