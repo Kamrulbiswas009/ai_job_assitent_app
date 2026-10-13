@@ -7,7 +7,7 @@ import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../controller/practice_coaching_brief_controller.dart';
-import '../widgets/practice_app_bar.dart';
+import '../widgets/practice_scaffold.dart';
 
 class PracticeCoachingBriefScreen
     extends GetView<PracticeCoachingBriefController> {
@@ -17,9 +17,8 @@ class PracticeCoachingBriefScreen
   Widget build(BuildContext context) {
     final data = controller.briefData.value;
 
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: const PracticeAppBar(isRoot: false),
+    return PracticeScaffold(
+      isRoot: false,
       body: SafeArea(
         top: false,
         child: Column(

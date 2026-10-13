@@ -7,7 +7,7 @@ import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../controller/practice_question_controller.dart';
-import '../widgets/practice_app_bar.dart';
+import '../widgets/practice_scaffold.dart';
 import '../widgets/practice_meta_chips.dart';
 
 class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
@@ -17,9 +17,8 @@ class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
   Widget build(BuildContext context) {
     final data = controller.questionData.value;
 
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: const PracticeAppBar(isRoot: false),
+    return PracticeScaffold(
+      isRoot: false,
       body: SafeArea(
         top: false,
         child: Column(

@@ -7,7 +7,7 @@ import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../controller/practice_warmup_controller.dart';
-import '../widgets/practice_app_bar.dart';
+import '../widgets/practice_scaffold.dart';
 
 class PracticeWarmupScreen extends GetView<PracticeWarmupController> {
   const PracticeWarmupScreen({super.key});
@@ -16,9 +16,8 @@ class PracticeWarmupScreen extends GetView<PracticeWarmupController> {
   Widget build(BuildContext context) {
     final data = controller.warmupData.value;
 
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: const PracticeAppBar(isRoot: false),
+    return PracticeScaffold(
+      isRoot: false,
       body: SafeArea(
         top: false,
         child: Column(

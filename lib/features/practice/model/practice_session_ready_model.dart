@@ -5,12 +5,16 @@ class RoleplayOptionModel {
   final String name;
   final String subtitle;
   final String imageAsset;
+  final String? avatarUrl;
+  final bool isRecommended;
 
   const RoleplayOptionModel({
     required this.id,
     required this.name,
     required this.subtitle,
     required this.imageAsset,
+    this.avatarUrl,
+    this.isRecommended = false,
   });
 
   factory RoleplayOptionModel.fromJson(Map<String, dynamic> json) {
@@ -18,7 +22,22 @@ class RoleplayOptionModel {
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
       subtitle: json['subtitle'] as String? ?? '',
-      imageAsset: json['imageAsset'] as String? ?? ImagePath.introWoman,
+      imageAsset: json['imageAsset'] as String? ?? ImagePath.spRoleplayWoman,
+      avatarUrl: json['avatarUrl'] as String?,
+      isRecommended: json['isRecommended'] as bool? ?? false,
+    );
+  }
+
+  factory RoleplayOptionModel.fromPanelJson(Map<String, dynamic> json) {
+    return RoleplayOptionModel(
+      id: json['panelId'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      subtitle: json['description'] as String? ??
+          json['roleTitle'] as String? ??
+          '',
+      imageAsset: ImagePath.spRoleplayWoman,
+      avatarUrl: json['avatarUrl'] as String?,
+      isRecommended: json['isRecommended'] as bool? ?? false,
     );
   }
 
@@ -27,6 +46,8 @@ class RoleplayOptionModel {
         'name': name,
         'subtitle': subtitle,
         'imageAsset': imageAsset,
+        'avatarUrl': avatarUrl,
+        'isRecommended': isRecommended,
       };
 }
 
@@ -36,6 +57,7 @@ class ChallengeModeOptionModel {
   final String description;
   final bool isXpBonus;
   final String xpBonusText;
+  final double xpBonusMultiplier;
 
   const ChallengeModeOptionModel({
     required this.id,
@@ -43,6 +65,7 @@ class ChallengeModeOptionModel {
     required this.description,
     this.isXpBonus = false,
     this.xpBonusText = '',
+    this.xpBonusMultiplier = 1,
   });
 
   factory ChallengeModeOptionModel.fromJson(Map<String, dynamic> json) {
@@ -52,6 +75,24 @@ class ChallengeModeOptionModel {
       description: json['description'] as String? ?? '',
       isXpBonus: json['isXpBonus'] as bool? ?? false,
       xpBonusText: json['xpBonusText'] as String? ?? '',
+      xpBonusMultiplier:
+          (json['xpBonusMultiplier'] as num?)?.toDouble() ?? 1,
+    );
+  }
+
+  factory ChallengeModeOptionModel.fromModeJson(Map<String, dynamic> json) {
+    final mode = (json['mode'] as String? ?? '').toLowerCase();
+    final multiplier = (json['xpBonusMultiplier'] as num?)?.toDouble() ?? 1;
+    final bonusPercent =
+        multiplier > 1 ? ((multiplier - 1) * 100).round() : 0;
+
+    return ChallengeModeOptionModel(
+      id: mode.isNotEmpty ? mode : 'standard',
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      isXpBonus: multiplier > 1,
+      xpBonusText: bonusPercent > 0 ? '+$bonusPercent% XP' : '',
+      xpBonusMultiplier: multiplier,
     );
   }
 
@@ -61,6 +102,7 @@ class ChallengeModeOptionModel {
         'description': description,
         'isXpBonus': isXpBonus,
         'xpBonusText': xpBonusText,
+        'xpBonusMultiplier': xpBonusMultiplier,
       };
 }
 
@@ -68,10 +110,14 @@ class PracticeSessionReadyModel {
   final String userName;
   final String heading;
   final String description;
+  final String founderInsightTag;
   final String founderInsightDuration;
   final String founderInsightTitle;
+  final String? founderInsightThumbnailUrl;
+  final String? founderInsightVideoUrl;
   final String missionTarget;
   final String missionTargetQuote;
+  final String? sessionTarget;
   final List<RoleplayOptionModel> roleplays;
   final List<ChallengeModeOptionModel> challengeModes;
 
@@ -79,20 +125,67 @@ class PracticeSessionReadyModel {
     required this.userName,
     required this.heading,
     required this.description,
+    required this.founderInsightTag,
     required this.founderInsightDuration,
     required this.founderInsightTitle,
+    this.founderInsightThumbnailUrl,
+    this.founderInsightVideoUrl,
     required this.missionTarget,
     required this.missionTargetQuote,
+    this.sessionTarget,
     required this.roleplays,
     required this.challengeModes,
   });
 
+  factory PracticeSessionReadyModel.fromPrepareApi(
+    Map<String, dynamic> json, {
+    required String userName,
+  }) {
+    final scenario =
+        (json['scenario'] as Map?)?.cast<String, dynamic>() ?? {};
+    final founderVideo =
+        (scenario['founderVideo'] as Map?)?.cast<String, dynamic>();
+    final panels = json['panels'] as List? ?? [];
+    final modes = json['availableModes'] as List? ?? [];
+
+    final durationSeconds = founderVideo?['durationSeconds'] as int?;
+
+    return PracticeSessionReadyModel(
+      userName: userName,
+      heading: 'YOUR FIRST\nPRACTISE SESSION IS READY',
+      description:
+          'Choose who SpeechPro will roleplay and how challenging you want this first session to be.',
+      founderInsightTag: founderVideo?['tag'] as String? ??
+          'FOUNDER INSIGHT - ${_formatDurationLabel(durationSeconds)}',
+      founderInsightDuration: _formatDurationLabel(durationSeconds),
+      founderInsightTitle: founderVideo?['title'] as String? ?? '',
+      founderInsightThumbnailUrl: founderVideo?['thumbnailUrl'] as String?,
+      founderInsightVideoUrl: founderVideo?['videoUrl'] as String?,
+      missionTarget: scenario['name'] as String? ?? '',
+      missionTargetQuote: scenario['missionTarget'] as String? ?? '',
+      sessionTarget: scenario['sessionTarget'] as String?,
+      roleplays: panels
+          .whereType<Map>()
+          .map((panel) => RoleplayOptionModel.fromPanelJson(
+                Map<String, dynamic>.from(panel),
+              ))
+          .toList(),
+      challengeModes: modes
+          .whereType<Map>()
+          .map((mode) => ChallengeModeOptionModel.fromModeJson(
+                Map<String, dynamic>.from(mode),
+              ))
+          .toList(),
+    );
+  }
+
   factory PracticeSessionReadyModel.initial() {
     return const PracticeSessionReadyModel(
       userName: 'NICK',
-      heading: 'YOUR FIRST PRACTISE SESSION IS READY',
+      heading: 'YOUR FIRST\nPRACTISE SESSION IS READY',
       description:
           'Choose who SpeechPro will roleplay and how challenging you want this first session to be.',
+      founderInsightTag: 'FOUNDER INSIGHT - 08s',
       founderInsightDuration: '08s',
       founderInsightTitle: 'The first moments of an interview',
       missionTarget: 'Job Interview',
@@ -104,6 +197,7 @@ class PracticeSessionReadyModel {
           name: 'Warm HR Partner',
           subtitle: 'Friendly, conversational, still probing for substance.',
           imageAsset: ImagePath.spRoleplayWoman,
+          isRecommended: true,
         ),
         RoleplayOptionModel(
           id: 'skeptical_manager',
@@ -134,8 +228,14 @@ class PracticeSessionReadyModel {
               'A more demanding, realistic experience. SpeechPro may interrupt, challenge assumptions, and hold deliberate silences.',
           isXpBonus: true,
           xpBonusText: '+20% XP',
+          xpBonusMultiplier: 1.2,
         ),
       ],
     );
+  }
+
+  static String _formatDurationLabel(int? seconds) {
+    if (seconds == null || seconds <= 0) return '60s';
+    return '${seconds}s';
   }
 }

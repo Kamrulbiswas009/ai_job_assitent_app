@@ -7,7 +7,8 @@ import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../controller/practice_session_ready_controller.dart';
-import '../widgets/practice_app_bar.dart';
+import '../../model/practice_session_ready_model.dart';
+import '../widgets/practice_scaffold.dart';
 
 class PracticeSessionReadyScreen
     extends GetView<PracticeSessionReadyController> {
@@ -15,60 +16,28 @@ class PracticeSessionReadyScreen
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: const PracticeAppBar(isRoot: true),
+    return PracticeScaffold(
+      isRoot: true,
       body: SafeArea(
         top: false,
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Main Title: Exact Figma Size 28, LineHeight 36.4, Inter 800
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'NICK, ',
-                            style: GoogleFonts.inter(
-                              fontSize: 28.sp,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFFE60008),
-                              height: 1.3,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          TextSpan(
-                            text: 'YOUR FIRST\nPRACTISE SESSION IS READY',
-                            style: GoogleFonts.inter(
-                              fontSize: 28.sp,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF0A0A0A),
-                              height: 1.3,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                    // Subtitle: Exact Figma Size 16, LineHeight 22.4, Color #666666, LetterSpacing -0.5
-                    Text(
-                      'Choose who SpeechPro will roleplay and how challenging you want this first session to be.',
-                      style: GoogleFonts.inter(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFF666666),
-                        height: 1.4,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeaderSection(),
+                      SizedBox(height: 8.h),
+                      _buildDescriptionSection(),
                     SizedBox(height: 24.h),
 
                     // Founder Insight Video Card (Figma Radius 12)
@@ -110,74 +79,152 @@ class PracticeSessionReadyScreen
                     _buildInfoNotice(
                       'XP means experience points you earn through practice.',
                     ),
-                    SizedBox(height: 24.h),
-                  ],
-                ),
-              ),
-            ),
-
-            // Bottom Sticky Button Bar (Figma Pad L16 R16 T16 B16, Radius 16, Bg #CC0000)
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              decoration: const BoxDecoration(
-                color: AppColors.white,
-                border: Border(
-                  top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
-                ),
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56.h,
-                child: ElevatedButton(
-                  onPressed: controller.onEnterSessionBrief,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFCC0000),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.r),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Enter Session Brief',
-                        style: GoogleFonts.inter(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(width: 10.w),
-                      SvgPicture.asset(
-                        IconPath.spArrowRight,
-                        width: 18.r,
-                        height: 18.r,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
+                      SizedBox(height: 24.h),
                     ],
                   ),
                 ),
               ),
+              _buildBottomBar(),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildHeaderSection() {
+    final data = controller.sessionData.value;
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: '${data.userName}, ',
+            style: GoogleFonts.inter(
+              fontSize: 28.sp,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFFE60008),
+              height: 1.3,
+              letterSpacing: -0.5,
             ),
-          ],
+          ),
+          TextSpan(
+            text: data.heading,
+            style: GoogleFonts.inter(
+              fontSize: 28.sp,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF0A0A0A),
+              height: 1.3,
+              letterSpacing: -0.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDescriptionSection() {
+    return Text(
+      controller.sessionData.value.description,
+      style: GoogleFonts.inter(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w400,
+        color: const Color(0xFF666666),
+        height: 1.4,
+        letterSpacing: -0.5,
+      ),
+    );
+  }
+
+  Widget _buildBottomBar() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: const BoxDecoration(
+        color: AppColors.white,
+        border: Border(
+          top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
+        ),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: 56.h,
+        child: ElevatedButton(
+          onPressed: controller.isLoading.value
+              ? null
+              : controller.onEnterSessionBrief,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFCC0000),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Enter Session Brief',
+                style: GoogleFonts.inter(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(width: 10.w),
+              SvgPicture.asset(
+                IconPath.spArrowRight,
+                width: 18.r,
+                height: 18.r,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  Widget _buildRoleplayAvatar(RoleplayOptionModel roleplay, double size) {
+    final url = roleplay.avatarUrl;
+    if (url != null && url.isNotEmpty) {
+      return Image.network(
+        url,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Image.asset(
+          roleplay.imageAsset,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+
+    return Image.asset(
+      roleplay.imageAsset,
+      width: size,
+      height: size,
+      fit: BoxFit.cover,
+    );
+  }
+
   Widget _buildVideoInsightCard() {
+    final data = controller.sessionData.value;
+    final thumbnailUrl = data.founderInsightThumbnailUrl;
+
     return Container(
       width: double.infinity,
       height: 230.h,
       decoration: BoxDecoration(
         color: const Color(0xFF1C1C1E),
         borderRadius: BorderRadius.circular(12.r),
-        image: const DecorationImage(
-          image: AssetImage(ImagePath.spVideoThumb),
+        image: DecorationImage(
+          image: thumbnailUrl != null && thumbnailUrl.isNotEmpty
+              ? NetworkImage(thumbnailUrl)
+              : const AssetImage(ImagePath.spVideoThumb),
           fit: BoxFit.cover,
         ),
       ),
@@ -228,7 +275,7 @@ class PracticeSessionReadyScreen
                     ),
                     SizedBox(width: 6.w),
                     Text(
-                      'FOUNDER INSIGHT - 08s',
+                      data.founderInsightTag,
                       style: GoogleFonts.inter(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
@@ -239,7 +286,7 @@ class PracticeSessionReadyScreen
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  'The first moments of an interview',
+                  data.founderInsightTitle,
                   style: GoogleFonts.inter(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w700,
@@ -255,6 +302,7 @@ class PracticeSessionReadyScreen
   }
 
   Widget _buildMissionTargetCard() {
+    final data = controller.sessionData.value;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16.r),
@@ -287,7 +335,7 @@ class PracticeSessionReadyScreen
           ),
           SizedBox(height: 8.h),
           Text(
-            'Job Interview',
+            data.missionTarget,
             style: GoogleFonts.inter(
               fontSize: 24.sp,
               fontWeight: FontWeight.w800,
@@ -296,7 +344,7 @@ class PracticeSessionReadyScreen
           ),
           SizedBox(height: 4.h),
           Text(
-            '"I have a job interview coming up and I want to walk in with complete authority and conviction."',
+            '"${data.missionTargetQuote}"',
             style: GoogleFonts.inter(
               fontSize: 16.sp,
               fontWeight: FontWeight.w400,
@@ -341,12 +389,7 @@ class PracticeSessionReadyScreen
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8.r),
-                    child: Image.asset(
-                      roleplay.imageAsset,
-                      width: 50.r,
-                      height: 50.r,
-                      fit: BoxFit.cover,
-                    ),
+                    child: _buildRoleplayAvatar(roleplay, 50.r),
                   ),
                   SizedBox(width: 12.w),
                   Expanded(
@@ -413,12 +456,7 @@ class PracticeSessionReadyScreen
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: Image.asset(
-                roleplay.imageAsset,
-                width: 46.r,
-                height: 46.r,
-                fit: BoxFit.cover,
-              ),
+              child: _buildRoleplayAvatar(roleplay, 46.r),
             ),
             SizedBox(width: 12.w),
             Expanded(
