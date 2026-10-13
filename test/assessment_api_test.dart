@@ -316,6 +316,103 @@ void main() {
         }
       },
     );
+
+    test('submitVoiceAndProceed with mock successful response sets isCalculating to true', () async {
+      final tempDir = await Directory.systemTemp.createTemp('voice_test_success');
+      final testFile = File('${tempDir.path}/test_voice.mp3');
+      await testFile.writeAsString('audio content');
+      await StorageService.saveAssessmentId('real-assessment-uuid-1234');
+
+      final mockClient = MockClient((request) async {
+        return http.Response(
+          jsonEncode({
+            'success': true,
+            'assessment_id': 'real-assessment-uuid-1234',
+            'status': 'processing',
+            'message': 'Voice received. Calculating your score...',
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final service = AssessmentService(client: mockClient);
+      final controller = StartCalibrationController(assessmentService: service);
+      controller.recordedAudioPath.value = testFile.path;
+
+      expect(controller.isCalculating.value, isFalse);
+      await controller.submitVoiceAndProceed();
+      expect(controller.isCalculating.value, isTrue);
+
+      if (await tempDir.exists()) {
+        await tempDir.delete(recursive: true);
+      }
+    });
+
+    test('submitVoiceAndProceed with speech not detected error activates hasSpeechWarning', () async {
+      final tempDir = await Directory.systemTemp.createTemp('voice_test_silence');
+      final testFile = File('${tempDir.path}/test_voice.mp3');
+      await testFile.writeAsString('silent audio');
+      await StorageService.saveAssessmentId('real-assessment-uuid-5678');
+
+      final mockClient = MockClient((request) async {
+        return http.Response(
+          jsonEncode({
+            'detail': {
+              'error': 'no_speech',
+              'message': 'No speech was detected in your recording.',
+              'hint': 'Please check your microphone and speak clearly.',
+              'retry_allowed': true,
+            }
+          }),
+          400,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final service = AssessmentService(client: mockClient);
+      final controller = StartCalibrationController(assessmentService: service);
+      controller.recordedAudioPath.value = testFile.path;
+
+      await controller.submitVoiceAndProceed();
+
+      // Calculation should NOT start on silence, but speech warning flag should be set for emulator helper
+      expect(controller.isCalculating.value, isFalse);
+      expect(controller.hasSpeechWarning.value, isTrue);
+
+      // User can proceed anyway from warning
+      await controller.proceedAnyway();
+      expect(controller.isCalculating.value, isTrue);
+      expect(controller.hasSpeechWarning.value, isFalse);
+      expect(StorageService.isVoiceSkipped, isTrue);
+
+      if (await tempDir.exists()) {
+        await tempDir.delete(recursive: true);
+      }
+    });
+
+    test('proceedToStep5 and onCalculationComplete manage isCalculating state properly', () {
+      final controller = StartCalibrationController();
+      expect(controller.isCalculating.value, isFalse);
+
+      controller.proceedToStep5();
+      expect(controller.isCalculating.value, isTrue);
+
+      controller.onCalculationComplete();
+      expect(controller.isCalculating.value, isFalse);
+    });
+
+    test('StartCalibrationController stopRecording returns existing path when not actively recording', () async {
+      final controller = StartCalibrationController();
+      expect(controller.isRecording.value, isFalse);
+
+      final emptyResult = await controller.stopRecording();
+      expect(emptyResult, isNull);
+
+      controller.recordedAudioPath.value = '/path/to/calibration_voice.m4a';
+      final pathResult = await controller.stopRecording();
+      expect(pathResult, equals('/path/to/calibration_voice.m4a'));
+    });
   });
 
   group('AssessmentResultResponse Model Tests', () {

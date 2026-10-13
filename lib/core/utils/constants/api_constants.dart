@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = 'https://studioequip-backend.vercel.app/api/v1';
+  static const String baseUrl = 'http://82.165.20.251:3001/api/v1';
 
   // Auth Endpoints
   static const String register = '$baseUrl/auth/register';
@@ -26,8 +26,7 @@ class ApiConstants {
       '$aiBaseUrl/coaching/personal-briefing';
 
   // Assessment Endpoints
-  static const String selfAssessment =
-      '$aiBaseUrl/assessment/self-assessment';
+  static const String selfAssessment = '$aiBaseUrl/assessment/self-assessment';
 
   static String assessmentVoice(String assessmentId) =>
       '$aiBaseUrl/assessment/$assessmentId/voice';

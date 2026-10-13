@@ -163,12 +163,15 @@ void main() {
   ) async {
     await tester.pumpWidget(createScreen(const StartMembershipIntroScreen()));
     await tester.pumpAndSettle();
-    expect(find.text('Great news, Aycan !'), findsOneWidget);
-    expect(find.textContaining('membership has started'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate((w) => w is RichText && w.text.toPlainText().contains('Aycan')),
+      findsWidgets,
+    );
     expect(find.text('Power Through Speech'), findsOneWidget);
     expect(find.text('Influence Through Impact'), findsOneWidget);
     expect(find.text('Authority Through Presence'), findsOneWidget);
-    expect(find.text('What do you want to achieve'), findsOneWidget);
+    expect(find.text('What do you want to achieve?'), findsOneWidget);
+    expect(find.text('Build My Training Path'), findsOneWidget);
   });
 
   testWidgets(
@@ -184,7 +187,10 @@ void main() {
       final controller = Get.put(StartMembershipController());
       await tester.pumpWidget(createScreen(const StartMembershipIntroScreen()));
       await tester.pumpAndSettle();
-      expect(find.text('Great news, John !'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate((w) => w is RichText && w.text.toPlainText().contains('John')),
+        findsWidgets,
+      );
       expect(controller.userFirstName.value, equals('John'));
     },
   );

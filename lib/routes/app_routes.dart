@@ -21,6 +21,11 @@ import '../features/start/presentation/screens/start_step2_details_screen.dart';
 import '../features/start/presentation/screens/start_step3_assessment_screen.dart';
 import '../features/start/presentation/screens/start_step4_calibration_screen.dart';
 import '../features/start/presentation/screens/start_step5_score_screen.dart';
+import '../features/practice/presentation/screens/practice_session_ready_screen.dart';
+import '../features/practice/presentation/screens/practice_coaching_brief_screen.dart';
+import '../features/practice/presentation/screens/practice_warmup_screen.dart';
+import '../features/practice/presentation/screens/practice_question_screen.dart';
+import '../features/practice/presentation/screens/practice_cues_guidance_screen.dart';
 
 class AppRoute {
   static const String splash = '/';
@@ -44,6 +49,13 @@ class AppRoute {
   static const String startStep3Assessment = '/start-step3-assessment';
   static const String startStep4Calibration = '/start-step4-calibration';
   static const String startStep5Score = '/start-step5-score';
+
+  // Phase 2 Practice Flow
+  static const String practiceSessionReady = '/practice-session-ready';
+  static const String practiceCoachingBrief = '/practice-coaching-brief';
+  static const String practiceWarmup = '/practice-warmup';
+  static const String practiceQuestion = '/practice-question';
+  static const String practiceCuesGuidance = '/practice-cues-guidance';
 
   static String getLoginScreen() => login;
 
@@ -95,6 +107,26 @@ class AppRoute {
     GetPage(
       name: startStep5Score,
       page: () => const StartStep5ScoreScreen(),
+    ),
+    GetPage(
+      name: practiceSessionReady,
+      page: () => const PracticeSessionReadyScreen(),
+    ),
+    GetPage(
+      name: practiceCoachingBrief,
+      page: () => const PracticeCoachingBriefScreen(),
+    ),
+    GetPage(
+      name: practiceWarmup,
+      page: () => const PracticeWarmupScreen(),
+    ),
+    GetPage(
+      name: practiceQuestion,
+      page: () => const PracticeQuestionScreen(),
+    ),
+    GetPage(
+      name: practiceCuesGuidance,
+      page: () => const PracticeCuesGuidanceScreen(),
     ),
   ];
 }

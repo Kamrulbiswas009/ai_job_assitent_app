@@ -11,4 +11,7 @@ class ImagePath {
   static const String spCircleBadge = 'assets/images/sp_circle_badge.png';
   static const String introWoman = 'assets/images/intro_woman.jpg';
   static const String introSpeaker = 'assets/images/intro_speaker.jpg';
+  static const String spHeaderLogo = 'assets/images/sp_header_logo.png';
+  static const String spVideoThumb = 'assets/images/sp_video_thumb.png';
+  static const String spRoleplayWoman = 'assets/images/sp_roleplay_woman.png';
 }

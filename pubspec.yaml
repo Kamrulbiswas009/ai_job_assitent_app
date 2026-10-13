@@ -58,7 +58,6 @@ dependencies:
   permission_handler: ^13.0.2
   flutter_stripe: ^14.1.0
   webview_flutter: ^4.14.1
-  ffmpeg_kit_flutter_new: ^4.6.7
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -86,6 +85,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/audio/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

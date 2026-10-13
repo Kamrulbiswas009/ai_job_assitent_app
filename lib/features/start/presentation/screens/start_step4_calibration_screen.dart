@@ -109,7 +109,102 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                             label: 'Tap to speak your Answer',
                           ),
                         ),
-                        SizedBox(height: 24.h),
+                        // Speech warning / Emulator helper card
+                        Obx(() {
+                          if (!controller.hasSpeechWarning.value) {
+                            return SizedBox(height: 24.h);
+                          }
+                          return Container(
+                            margin: EdgeInsets.only(top: 16.h, bottom: 20.h),
+                            padding: EdgeInsets.all(14.w),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFF9F5),
+                              borderRadius: BorderRadius.circular(14.r),
+                              border: Border.all(color: const Color(0xFFFFD8BF)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.mic_none_rounded,
+                                      size: 18.sp,
+                                      color: const Color(0xFFFA541C),
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    Expanded(
+                                      child: Text(
+                                        'Microphone / Emulator Detected',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w700,
+                                          color: const Color(0xFFD4380D),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 6.h),
+                                Text(
+                                  'No speech detected. On emulators without a working microphone, use sample voice to test the real AI assessment API, or proceed directly.',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12.sp,
+                                    color: const Color(0xFF595959),
+                                    height: 1.4,
+                                  ),
+                                ),
+                                SizedBox(height: 12.h),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: OutlinedButton(
+                                        onPressed: controller.submitSampleVoiceAndProceed,
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(color: Color(0xFFFA541C)),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10.r),
+                                          ),
+                                          padding: EdgeInsets.symmetric(vertical: 10.h),
+                                        ),
+                                        child: Text(
+                                          'Use Sample Voice',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFFFA541C),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10.w),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: controller.proceedAnyway,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFFFA541C),
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10.r),
+                                          ),
+                                          padding: EdgeInsets.symmetric(vertical: 10.h),
+                                        ),
+                                        child: Text(
+                                          'Proceed Anyway',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
                       ],
                     ),
                   ),
@@ -133,18 +228,46 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                         ),
                       ),
                       SizedBox(height: 12.h),
-                      Center(
-                        child: GestureDetector(
-                          onTap: controller.skipCalibration,
-                          behavior: HitTestBehavior.opaque,
-                          child: Text(
-                            'Skip Voice calibration',
-                            style: GoogleFonts.inter(
-                              fontSize: 13.5.sp,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF8E8E93),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: controller.skipCalibration,
+                              behavior: HitTestBehavior.opaque,
+                              child: Text(
+                                'Skip Voice calibration',
+                                style: GoogleFonts.inter(
+                                  fontSize: 13.5.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFF8E8E93),
+                                ),
+                              ),
                             ),
-                          ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.w),
+                              child: Text(
+                                '•',
+                                style: TextStyle(
+                                  color: const Color(0xFFC7C7CC),
+                                  fontSize: 13.sp,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: controller.submitSampleVoiceAndProceed,
+                              behavior: HitTestBehavior.opaque,
+                              child: Text(
+                                'Use Sample Voice',
+                                style: GoogleFonts.inter(
+                                  fontSize: 13.5.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

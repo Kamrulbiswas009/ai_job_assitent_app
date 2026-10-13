@@ -256,15 +256,39 @@ curl -X POST "https://rosendo-vitiable-sari.ngrok-free.dev/api/v1/assessment/265
 }
 ```
 
+#### 3. Emulator & Development Handling (Sample Voice & Skip Fallback)
+On Android Emulators and iOS Simulators, virtual microphones often send digital silence or noise. The AI audio processor (Deepgram / Whisper) detects no speech and returns `400 Bad Request` (`error: no_speech`). To prevent blocking developers during API practice and onboarding testing, the app provides a dedicated emulator workflow:
+
+1. **Bundled Sample Speech Asset (`assets/audio/sample_calibration_voice.m4a`)**:
+   - A genuine spoken speech audio sample is bundled in `assets/audio/` and registered in `pubspec.yaml`.
+   - Tapping **"Use Sample Voice"** (`submitSampleVoiceAndProceed()`) copies this asset to the local app documents directory and uploads it to `POST /api/v1/assessment/{assessment_id}/voice`.
+   - The live AI backend analyzes the speech, marks the assessment as `completed`, and returns full real Influence Scores in Step 5.
+
+2. **Microphone / Emulator Warning Helper Card**:
+   - If audio submission fails due to silence (`no_speech` / `silence`), `hasSpeechWarning` becomes `true`.
+   - An informative helper card appears on `StartStep4CalibrationScreen` with two quick actions:
+     - **"Use Sample Voice"**: Submits the test audio file to complete the full AI pipeline.
+     - **"Proceed Anyway"**: Bypasses the voice requirement (`StorageService.saveVoiceSkipped(true)`) and immediately proceeds to calculation.
+   - The bottom action bar also provides a direct **"Use Sample Voice"** link next to **"Skip Voice calibration"**.
+
+3. **Instant Step 5 Display When Voice is Skipped**:
+   - When **"Skip Voice calibration"** or **"Proceed Anyway"** is selected, `StorageService.saveVoiceSkipped(true)` is saved.
+   - In Step 5, `StartScoreController.fetchResult()` detects `isVoiceSkipped` and immediately displays the baseline fallback influence score without wasting 30 seconds polling a pending backend assessment.
+
+4. **Optimized Calculation Modal Animation**:
+   - `ScoreCalculationModal` dynamically computes timer ticks from `widget.totalDuration` (`3200ms`), providing a brisk, smooth ~3.2-second animation instead of a 12-second delay.
+
 #### UI Behavior & Transition
-1. User taps the recording card to record up to 60 seconds of voice.
+1. User taps the recording card to record up to 60 seconds of voice (or taps **"Use Sample Voice"** on an emulator).
 2. User taps **Continue**:
    - If actively recording, it automatically stops and finalizes the audio file.
-   - It submits the voice file to `POST /api/v1/assessment/{assessment_id}/voice`.
-   - Opens `ScoreCalculationModal` to display the animated progress steps.
-3. If user taps **Skip Voice calibration**:
-   - Stops recording if active and immediately opens `ScoreCalculationModal`.
-4. When `ScoreCalculationModal` finishes its calculation cycle, it navigates to `AppRoute.startStep5Score`.
+   - Submits the voice file to `POST /api/v1/assessment/{assessment_id}/voice`.
+   - On success (`status: processing` or `completed`), marks `saveVoiceSkipped(false)` and opens `ScoreCalculationModal`.
+   - If no speech is detected (e.g. emulator), displays a safe snackbar and reveals the Emulator Helper card without blocking navigation.
+3. If user taps **Skip Voice calibration** or **Proceed Anyway**:
+   - Saves `StorageService.saveVoiceSkipped(true)`.
+   - Immediately opens `ScoreCalculationModal`.
+4. When `ScoreCalculationModal` finishes its ~3.2s animation, it navigates to `AppRoute.startStep5Score`.
 
 ---
 
@@ -373,6 +397,7 @@ curl -X GET "https://rosendo-vitiable-sari.ngrok-free.dev/api/v1/assessment/265b
 | `lib/features/start/controller/start_score_controller.dart` | Step 5 reactive score, dimension breakdown, and training path controller |
 | `lib/features/start/presentation/widgets/score_calculation_modal.dart` | Step 4 score calculation animation overlay |
 | `lib/features/start/presentation/screens/start_step5_score_screen.dart` | Step 5 score breakdown screen dynamically bound with `Obx` |
+| `assets/audio/sample_calibration_voice.m4a` | Bundled 5-second human speech audio asset for emulator and simulator AI testing |
 | `test/assessment_api_test.dart` | Unit & integration tests for all assessment models, endpoints, and controllers |
 
 ---

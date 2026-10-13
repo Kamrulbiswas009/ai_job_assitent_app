@@ -8,6 +8,11 @@ import '../../features/start/controller/start_goals_controller.dart';
 import '../../features/start/controller/start_membership_controller.dart';
 import '../../features/start/controller/start_score_controller.dart';
 import '../../features/start/controller/start_step2_details_controller.dart';
+import '../../features/practice/controller/practice_session_ready_controller.dart';
+import '../../features/practice/controller/practice_coaching_brief_controller.dart';
+import '../../features/practice/controller/practice_warmup_controller.dart';
+import '../../features/practice/controller/practice_question_controller.dart';
+import '../../features/practice/controller/practice_cues_guidance_controller.dart';
 
 class ControllerBinder extends Bindings {
   @override
@@ -46,6 +51,26 @@ class ControllerBinder extends Bindings {
     );
     Get.lazyPut<StartController>(
       () => StartController(),
+      fenix: true,
+    );
+    Get.lazyPut<PracticeSessionReadyController>(
+      () => PracticeSessionReadyController(),
+      fenix: true,
+    );
+    Get.lazyPut<PracticeCoachingBriefController>(
+      () => PracticeCoachingBriefController(),
+      fenix: true,
+    );
+    Get.lazyPut<PracticeWarmupController>(
+      () => PracticeWarmupController(),
+      fenix: true,
+    );
+    Get.lazyPut<PracticeQuestionController>(
+      () => PracticeQuestionController(),
+      fenix: true,
+    );
+    Get.lazyPut<PracticeCuesGuidanceController>(
+      () => PracticeCuesGuidanceController(),
       fenix: true,
     );
   }

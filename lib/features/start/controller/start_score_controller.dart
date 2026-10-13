@@ -1,8 +1,7 @@
-import 'dart:async';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../../core/utils/logging/logger.dart';
+import '../../../../routes/app_routes.dart';
 import '../model/influence_score_model.dart';
 import '../service/assessment_service.dart';
 
@@ -17,8 +16,8 @@ class StartScoreController extends GetxController {
       AssessmentResultResponse.fallback.obs;
 
   // Polling configuration
-  static const int _maxRetries = 10;
-  static const Duration _retryDelay = Duration(seconds: 3);
+  static const int _maxRetries = 5;
+  static const Duration _retryDelay = Duration(seconds: 2);
 
   int get startingInfluenceScore => scoreResult.value.influenceScore;
   DimensionScores get dimensions => scoreResult.value.dimensions;
@@ -36,10 +35,11 @@ class StartScoreController extends GetxController {
   /// the backend race condition where the assessment is still processing after voice upload.
   Future<void> fetchResult() async {
     final assessmentId = StorageService.assessmentId ?? '';
-    if (assessmentId.isEmpty) {
-      AppLoggerHelper.warning(
-        'No assessmentId found in storage for fetching results. Using fallback.',
+    if (assessmentId.isEmpty || StorageService.isVoiceSkipped) {
+      AppLoggerHelper.info(
+        'Voice calibration was skipped or no assessmentId present. Displaying baseline fallback score immediately.',
       );
+      scoreResult.value = AssessmentResultResponse.fallback;
       return;
     }
 
@@ -74,17 +74,16 @@ class StartScoreController extends GetxController {
         'Assessment result still not ready after $_maxRetries attempts. '
         'Displaying baseline fallback.',
       );
+      scoreResult.value = AssessmentResultResponse.fallback;
     } catch (e) {
       AppLoggerHelper.error('Error fetching assessment result: $e', e);
+      scoreResult.value = AssessmentResultResponse.fallback;
     } finally {
       isLoading.value = false;
     }
   }
 
   void finishOnboarding() {
-    try {
-      EasyLoading.showSuccess('Your training session is starting!')
-          .catchError((_) {});
-    } catch (_) {}
+    Get.toNamed(AppRoute.practiceSessionReady);
   }
 }

@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -17,7 +16,10 @@ import 'start_briefing_controller.dart';
 import 'start_goals_controller.dart';
 
 class StartStep2DetailsController extends GetxController {
-  final BriefingService _briefingService = BriefingService();
+  final BriefingService _briefingService;
+
+  StartStep2DetailsController({BriefingService? briefingService})
+    : _briefingService = briefingService ?? BriefingService();
 
   late final TextEditingController interviewKeywordsController;
   late final TextEditingController roleApplyingController;
@@ -46,7 +48,8 @@ class StartStep2DetailsController extends GetxController {
   final RxInt recordDuration = 0.obs;
   final RxString recordedAudioPath = ''.obs;
   final RxBool isLoading = false.obs;
-  final RxDouble currentVolume = 0.0.obs; // 0.0 to 1.0 real-time microphone volume
+  final RxDouble currentVolume =
+      0.0.obs; // 0.0 to 1.0 real-time microphone volume
   final RxBool isVoiceDetected = false.obs;
   Timer? _timer;
   Timer? _amplitudeTimer;
@@ -67,10 +70,36 @@ class StartStep2DetailsController extends GetxController {
     isFormValid.value = hasGoal && hasRole;
   }
 
+  void _showSafeSnackbar(
+    String title,
+    String message, {
+    int durationSeconds = 3,
+    Widget? mainButton,
+  }) {
+    if (Get.context != null) {
+      try {
+        Get.snackbar(
+          title,
+          message,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: const Color(0xFF2C2C2E),
+          colorText: Colors.white,
+          duration: Duration(seconds: durationSeconds),
+          margin: const EdgeInsets.all(16),
+          mainButton: mainButton as TextButton?,
+        );
+        return;
+      } catch (_) {}
+    }
+    try {
+      EasyLoading.showInfo(message).catchError((_) {});
+    } catch (_) {}
+  }
+
   @override
   void onInit() {
     super.onInit();
-    // Initially text fields are empty as requested ("intialy textfiled is null , user can text here")
+    // Initially text fields are empty as requested
     interviewKeywordsController = TextEditingController();
     roleApplyingController = TextEditingController();
     voiceAnswerTextController = TextEditingController();
@@ -125,7 +154,9 @@ class StartStep2DetailsController extends GetxController {
   // Real-time microphone amplitude listener
   void _startAmplitudeListening() {
     _amplitudeTimer?.cancel();
-    _amplitudeTimer = Timer.periodic(const Duration(milliseconds: 65), (_) async {
+    _amplitudeTimer = Timer.periodic(const Duration(milliseconds: 65), (
+      _,
+    ) async {
       if (!isRecording.value) {
         _amplitudeTimer?.cancel();
         currentVolume.value = 0.0;
@@ -152,51 +183,54 @@ class StartStep2DetailsController extends GetxController {
 
   // Request microphone permission explicitly and return true if granted
   Future<bool> _requestMicrophonePermission() async {
-    // First check current status
-    PermissionStatus status = await Permission.microphone.status;
+    try {
+      PermissionStatus status = await Permission.microphone.status;
+      if (status.isGranted) return true;
 
-    if (status.isGranted) return true;
+      if (status.isPermanentlyDenied) {
+        _showSafeSnackbar(
+          'Microphone Access Required',
+          'Please enable microphone access in your device settings to record voice.',
+          durationSeconds: 4,
+          mainButton: TextButton(
+            onPressed: () => openAppSettings(),
+            child: const Text(
+              'Open Settings',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+        AppLoggerHelper.warning(
+          'Microphone permission permanently denied. Directing user to settings.',
+        );
+        return false;
+      }
 
-    if (status.isPermanentlyDenied) {
-      // User has permanently denied — direct to settings
-      Get.snackbar(
-        'Microphone Access Required',
-        'Please enable microphone access in your device settings to record voice.',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 4),
-        mainButton: TextButton(
-          onPressed: () => openAppSettings(),
-          child: const Text('Open Settings', style: TextStyle(color: Colors.white)),
-        ),
+      status = await Permission.microphone.request();
+      if (status.isGranted) return true;
+
+      _showSafeSnackbar(
+        'Microphone Access Denied',
+        'Voice recording requires microphone access. Please allow it to continue.',
+        durationSeconds: 3,
       );
-      AppLoggerHelper.warning('Microphone permission permanently denied. Directing user to settings.');
+      AppLoggerHelper.warning('Microphone permission denied by user.');
       return false;
+    } catch (e) {
+      AppLoggerHelper.warning('Microphone permission error: $e');
+      return true;
     }
-
-    // Request permission
-    status = await Permission.microphone.request();
-    if (status.isGranted) return true;
-
-    Get.snackbar(
-      'Microphone Access Denied',
-      'Voice recording requires microphone access. Please allow it to continue.',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
-    );
-    AppLoggerHelper.warning('Microphone permission denied by user.');
-    return false;
   }
 
-  // Start audio recording — records as AAC-LC inside an MP4 container (.mp4)
-  // Backend receives audio/mp4 which is widely supported
+  // Start audio recording — records as AAC-LC inside an MP4 container (.m4a)
   Future<void> startRecording() async {
-    // Guard: don't start a new recording if already recording
     if (isRecording.value) return;
 
-    // Request permission explicitly before trying to record
     final granted = await _requestMicrophonePermission();
     if (!granted) {
-      AppLoggerHelper.warning('Recording skipped — microphone permission not granted.');
+      AppLoggerHelper.warning(
+        'Recording skipped — microphone permission not granted.',
+      );
       return;
     }
 
@@ -211,21 +245,22 @@ class StartStep2DetailsController extends GetxController {
 
     try {
       final dir = await getApplicationDocumentsDirectory();
-      // Record as AAC-LC in .m4a — universally supported, will be converted to MP3
       final filePath =
           '${dir.path}/step2_voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
 
       await audioRecorder.start(
         const RecordConfig(
           encoder: AudioEncoder.aacLc,
-          bitRate: 128000,   // 128 kbps — good quality for speech
+          bitRate: 128000, // 128 kbps
           sampleRate: 44100, // 44.1 kHz standard sample rate
-          numChannels: 1,    // Mono — sufficient for voice, smaller file size
+          numChannels: 1, // Mono
         ),
         path: filePath,
       );
       _startAmplitudeListening();
-      AppLoggerHelper.info('Started AAC voice recording to: $filePath (will convert to MP3)');
+      AppLoggerHelper.info(
+        'Started AAC voice recording to: $filePath',
+      );
     } catch (e) {
       isRecording.value = false;
       _timer?.cancel();
@@ -233,8 +268,7 @@ class StartStep2DetailsController extends GetxController {
     }
   }
 
-  // Stop audio recording, then convert AAC/M4A → MP3 for the backend
-  // Enforces a 500ms minimum to prevent zero-byte files on fast taps
+  // Stop audio recording and return the recorded .m4a file path
   Future<String?> stopRecording() async {
     if (!isRecording.value) {
       return recordedAudioPath.value.isNotEmpty
@@ -242,7 +276,6 @@ class StartStep2DetailsController extends GetxController {
           : null;
     }
 
-    // Minimum 500ms guard — prevents empty/corrupt file on instant tap-stop
     if (recordDuration.value == 0) {
       await Future.delayed(const Duration(milliseconds: 500));
     }
@@ -254,55 +287,12 @@ class StartStep2DetailsController extends GetxController {
     isVoiceDetected.value = false;
 
     try {
-      final aacPath = await audioRecorder.stop();
-      if (aacPath == null || aacPath.isEmpty) {
-        return recordedAudioPath.value.isNotEmpty ? recordedAudioPath.value : null;
+      final path = await audioRecorder.stop();
+      if (path != null && path.isNotEmpty) {
+        recordedAudioPath.value = path;
+        AppLoggerHelper.info('Stopped AAC voice recording. Saved at: $path');
+        return path;
       }
-
-      // Immediately store the recorded audio path as the baseline.
-      // This ensures the recording is NEVER lost if FFmpeg is unavailable or fails.
-      recordedAudioPath.value = aacPath;
-      AppLoggerHelper.info('Stopped AAC recording at: $aacPath');
-
-      // Attempt FFmpeg conversion to MP3
-      try {
-        final mp3Path = aacPath.replaceAll(RegExp(r'\.(m4a|mp4|aac)$'), '.mp3');
-        AppLoggerHelper.info('Attempting MP3 conversion: $mp3Path');
-
-        // FFmpeg: transcode AAC → MP3 (128 kbps, mono, 44100 Hz)
-        // -y         : overwrite output if it exists
-        // -i         : input file
-        // -vn        : no video stream
-        // -ar 44100  : sample rate
-        // -ac 1      : mono channel
-        // -b:a 128k  : 128 kbps audio bitrate
-        final session = await FFmpegKit.execute(
-          '-y -i "$aacPath" -vn -ar 44100 -ac 1 -b:a 128k "$mp3Path"',
-        );
-        final returnCode = await session.getReturnCode();
-
-        if (ReturnCode.isSuccess(returnCode)) {
-          final mp3File = File(mp3Path);
-          if (await mp3File.exists() && await mp3File.length() > 0) {
-            // Delete the intermediate AAC file to save storage
-            try { await File(aacPath).delete(); } catch (_) {}
-            recordedAudioPath.value = mp3Path;
-            AppLoggerHelper.info('MP3 conversion successful: $mp3Path');
-            return mp3Path;
-          }
-        }
-
-        final logs = await session.getLogsAsString();
-        AppLoggerHelper.warning(
-          'MP3 conversion failed (rc=$returnCode). Falling back to recorded audio: $aacPath\nFFmpeg logs: $logs',
-        );
-      } catch (ffmpegErr) {
-        AppLoggerHelper.warning(
-          'FFmpeg conversion unavailable ($ffmpegErr). Falling back to recorded audio: $aacPath (Requires full app rebuild to link FFmpeg native binary).',
-        );
-      }
-
-      return recordedAudioPath.value;
     } catch (e) {
       AppLoggerHelper.error('Error during stop recording: $e', e);
     }
@@ -321,12 +311,18 @@ class StartStep2DetailsController extends GetxController {
   String _getUserFirstName() {
     final stored = StorageService.fullName?.trim();
     if (stored != null && stored.isNotEmpty) {
-      return stored.split(' ').first;
+      final first = stored.split(' ').first;
+      if (first.isNotEmpty) {
+        return '${first[0].toUpperCase()}${first.substring(1)}';
+      }
     }
     if (Get.isRegistered<StartGoalsController>()) {
       final name = Get.find<StartGoalsController>().userName.value.trim();
       if (name.isNotEmpty) {
-        return name.split(' ').first;
+        final first = name.split(' ').first;
+        if (first.isNotEmpty) {
+          return '${first[0].toUpperCase()}${first.substring(1)}';
+        }
       }
     }
     return 'Aycan';
@@ -335,7 +331,9 @@ class StartStep2DetailsController extends GetxController {
   Future<void> submitDetailsAndProceed() async {
     // Automatically stop voice recording if currently active
     if (isRecording.value) {
-      AppLoggerHelper.info('Continue pressed while recording. Automatically stopping voice recording...');
+      AppLoggerHelper.info(
+        'Continue pressed while recording. Automatically stopping voice recording...',
+      );
       await stopRecording();
     }
 
@@ -350,11 +348,13 @@ class StartStep2DetailsController extends GetxController {
     final goal = interviewKeywordsController.text.trim().isNotEmpty
         ? interviewKeywordsController.text.trim()
         : (voiceAnswerTextController.text.trim().isNotEmpty
-            ? voiceAnswerTextController.text.trim()
-            : keywordsHint.value.trim());
+              ? voiceAnswerTextController.text.trim()
+              : keywordsHint.value.trim());
 
     final description = voiceAnswerTextController.text.trim();
-    final voicePath = recordedAudioPath.value.trim().isNotEmpty
+    final voicePath =
+        recordedAudioPath.value.trim().isNotEmpty &&
+            File(recordedAudioPath.value.trim()).existsSync()
         ? recordedAudioPath.value.trim()
         : null;
 
@@ -370,26 +370,29 @@ class StartStep2DetailsController extends GetxController {
     isAiResponseReceived.value = false;
     isProcessingBriefing.value = true;
 
-    // Start background API call with a 60-second safety timeout (voice uploads need extra time)
+    // Start background API call with a 60-second safety timeout
     _apiFuture = _briefingService
         .getPersonalBriefing(request)
         .timeout(
           const Duration(seconds: 60),
           onTimeout: () {
-            AppLoggerHelper.warning('Personal Briefing API timed out after 60s');
+            AppLoggerHelper.warning(
+              'Personal Briefing API timed out after 60s',
+            );
             return null;
           },
         );
 
-    _apiFuture!.then((result) {
-      _cachedBriefing = result;
-      isAiResponseReceived.value = true;
-    }).catchError((err) {
-      AppLoggerHelper.error('Personal Briefing API error: $err', err);
-      isAiResponseReceived.value = true;
-    });
+    _apiFuture!
+        .then((result) {
+          _cachedBriefing = result;
+          isAiResponseReceived.value = true;
+        })
+        .catchError((err) {
+          AppLoggerHelper.error('Personal Briefing API error: $err', err);
+          isAiResponseReceived.value = true;
+        });
 
-    // Show preparation modal
     AppLoggerHelper.info(
       'Starting Personal Briefing preparation for scenario: ${selectedGoalTitle.value} (${selectedScenarioSlug.value})\n'
       'Voice File Path: ${voicePath ?? "None"}',
@@ -398,7 +401,6 @@ class StartStep2DetailsController extends GetxController {
 
   Future<void> onProcessingComplete() async {
     try {
-      // Ensure API call finishes
       if (_apiFuture != null) {
         _cachedBriefing = await _apiFuture;
       }
@@ -406,7 +408,10 @@ class StartStep2DetailsController extends GetxController {
       final firstName = _getUserFirstName();
       final scenario = selectedGoalTitle.value;
 
-      final briefingController = Get.find<StartBriefingController>();
+      final briefingController = Get.isRegistered<StartBriefingController>()
+          ? Get.find<StartBriefingController>()
+          : Get.put(StartBriefingController());
+
       if (_cachedBriefing != null) {
         AppLoggerHelper.info(
           'Successfully received briefing from AI backend for: $scenario. Navigating to briefing.',
@@ -417,14 +422,15 @@ class StartStep2DetailsController extends GetxController {
           scenario: scenario,
         );
       } else {
-        // Generate high-quality scenario tailored briefing if backend returned unsupported_scenario or is offline
         AppLoggerHelper.warning(
           'Personal Briefing API returned null or unsupported scenario. Using personalized fallback for: $scenario',
         );
 
         final role = roleApplyingController.text.trim().isNotEmpty
             ? roleApplyingController.text.trim()
-            : roleFieldHint.value.replaceFirst(RegExp(r'^e\.g\.\s*'), '').trim();
+            : roleFieldHint.value
+                  .replaceFirst(RegExp(r'^e\.g\.\s*'), '')
+                  .trim();
         final goal = interviewKeywordsController.text.trim().isNotEmpty
             ? interviewKeywordsController.text.trim()
             : keywordsHint.value.trim();

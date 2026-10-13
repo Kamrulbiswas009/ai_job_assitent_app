@@ -7,6 +7,7 @@ class StorageService {
   static const String _emailKey = 'userEmail';
   static const String _fullNameKey = 'userName';
   static const String _assessmentIdKey = 'assessmentId';
+  static const String _voiceSkippedKey = 'voiceCalibrationSkipped';
   static const String _isSubscribedKey = 'isSubscribed';
 
   static SharedPreferences? _preferences;
@@ -60,6 +61,11 @@ class StorageService {
     await _preferences?.setString(_assessmentIdKey, assessmentId);
   }
 
+  // Save voice calibration skipped status
+  static Future<void> saveVoiceSkipped(bool skipped) async {
+    await _preferences?.setBool(_voiceSkippedKey, skipped);
+  }
+
   // Save subscription status
   static Future<void> saveIsSubscribed(bool isSubscribed) async {
     await _preferences?.setBool(_isSubscribedKey, isSubscribed);
@@ -73,6 +79,8 @@ class StorageService {
   static String? get userEmail => _preferences?.getString(_emailKey);
   static String? get fullName => _preferences?.getString(_fullNameKey);
   static String? get assessmentId => _preferences?.getString(_assessmentIdKey);
+  static bool get isVoiceSkipped =>
+      _preferences?.getBool(_voiceSkippedKey) ?? false;
   static bool get isSubscribed =>
       _preferences?.getBool(_isSubscribedKey) ?? false;
 
@@ -84,6 +92,7 @@ class StorageService {
     await _preferences?.remove(_emailKey);
     await _preferences?.remove(_fullNameKey);
     await _preferences?.remove(_assessmentIdKey);
+    await _preferences?.remove(_voiceSkippedKey);
     await _preferences?.remove(_isSubscribedKey);
   }
 }

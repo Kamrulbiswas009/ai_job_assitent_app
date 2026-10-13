@@ -21,16 +21,13 @@ class AssessmentService {
   /// Backend accepts: wav, mp3, webm, ogg, m4a — we send mp3.
   MediaType _getAudioMediaType(String path) {
     final lower = path.toLowerCase();
-    // Primary: backend receives MP3
+    if (lower.endsWith('.m4a')) return MediaType('audio', 'm4a');
     if (lower.endsWith('.mp3')) return MediaType('audio', 'mpeg');
-    // Fallback containers (should not occur with current recorder config)
     if (lower.endsWith('.mp4')) return MediaType('audio', 'mp4');
-    if (lower.endsWith('.m4a')) return MediaType('audio', 'mp4');
     if (lower.endsWith('.wav')) return MediaType('audio', 'wav');
     if (lower.endsWith('.webm')) return MediaType('audio', 'webm');
     if (lower.endsWith('.ogg')) return MediaType('audio', 'ogg');
-    // Default: match recorder output
-    return MediaType('audio', 'mpeg');
+    return MediaType('audio', 'm4a');
   }
 
   /// Submits the 3 benchmark self-assessment answers to backend
@@ -152,8 +149,8 @@ class AssessmentService {
         ),
       );
 
-      final http.StreamedResponse streamedResponse = await multipartRequest
-          .send()
+      final http.StreamedResponse streamedResponse = await _client
+          .send(multipartRequest)
           .timeout(Duration(seconds: timeoutDuration));
       final http.Response response = await http.Response.fromStream(
         streamedResponse,

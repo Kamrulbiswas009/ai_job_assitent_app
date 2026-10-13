@@ -1,5 +1,9 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:studioequip_mobile_app/core/services/storage_service.dart';
+import 'package:studioequip_mobile_app/features/start/controller/start_briefing_controller.dart';
 import 'package:studioequip_mobile_app/features/start/controller/start_step2_details_controller.dart';
 import 'package:studioequip_mobile_app/features/start/model/briefing_model.dart';
 import 'package:studioequip_mobile_app/features/start/model/scenario_config.dart';
@@ -176,6 +180,59 @@ void main() {
       expect(controller.isRecording.value, isFalse);
       expect(controller.recordedAudioPath.value, equals('/test/step2_voice_answer.m4a'));
       expect(controller.isProcessingBriefing.value, isTrue);
+
+      controller.onClose();
+    });
+
+    test('onProcessingComplete with fallback briefing configures StartBriefingController correctly', () async {
+      Get.testMode = true;
+      final briefingController = Get.put(StartBriefingController());
+      final controller = StartStep2DetailsController();
+      controller.onInit();
+      controller.interviewKeywordsController.text = 'Scale my startup';
+      controller.roleApplyingController.text = 'Founder';
+
+      await controller.onProcessingComplete();
+
+      expect(controller.isProcessingBriefing.value, isFalse);
+      expect(briefingController.briefingData.value, isNotNull);
+      expect(briefingController.briefingData.value.whatWeHeard, contains('Job Interview'));
+
+      controller.onClose();
+    });
+
+    test('StartStep2DetailsController formats and capitalizes user first name properly', () async {
+      SharedPreferences.setMockInitialValues({});
+      await StorageService.init();
+      await StorageService.saveAuthData(
+        accessToken: 'tok',
+        refreshToken: 'ref',
+        fullName: 'alexander smith',
+      );
+
+      final controller = StartStep2DetailsController();
+      controller.onInit();
+
+      controller.interviewKeywordsController.text = 'Lead Team';
+      controller.roleApplyingController.text = 'VP';
+      await controller.submitDetailsAndProceed();
+
+      expect(controller.isProcessingBriefing.value, isTrue);
+
+      controller.onClose();
+    });
+
+    test('StartStep2DetailsController stopRecording returns existing recordedAudioPath when not actively recording', () async {
+      final controller = StartStep2DetailsController();
+      controller.onInit();
+
+      expect(controller.isRecording.value, isFalse);
+      final emptyResult = await controller.stopRecording();
+      expect(emptyResult, isNull);
+
+      controller.recordedAudioPath.value = '/path/to/step2_voice_answer.m4a';
+      final pathResult = await controller.stopRecording();
+      expect(pathResult, equals('/path/to/step2_voice_answer.m4a'));
 
       controller.onClose();
     });
