@@ -7,6 +7,7 @@ import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../controller/practice_warmup_controller.dart';
+import '../widgets/local_voice_player.dart';
 import '../widgets/practice_scaffold.dart';
 
 class PracticeWarmupScreen extends GetView<PracticeWarmupController> {
@@ -14,8 +15,6 @@ class PracticeWarmupScreen extends GetView<PracticeWarmupController> {
 
   @override
   Widget build(BuildContext context) {
-    final data = controller.warmupData.value;
-
     return PracticeScaffold(
       isRoot: false,
       body: SafeArea(
@@ -23,13 +22,15 @@ class PracticeWarmupScreen extends GetView<PracticeWarmupController> {
         child: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Badge: Inter 600, Size 16, Color #E60008
+              child: Obx(() {
+                final data = controller.warmupData.value;
+                return SingleChildScrollView(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     Text(
                       data.badge,
                       style: GoogleFonts.inter(
@@ -220,10 +221,119 @@ class PracticeWarmupScreen extends GetView<PracticeWarmupController> {
                         );
                       }),
                     ),
-                    SizedBox(height: 30.h),
+                    Obx(() {
+                      if (!controller.hasRecording.value) {
+                        return SizedBox(height: 30.h);
+                      }
+
+                      final isPlaying = controller.isPlayingBack.value;
+                      return Column(
+                        children: [
+                          SizedBox(height: 16.h),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(16.r),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFDF5F6),
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                color: const Color(0xFFFBE3E1),
+                                width: 1.2,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w,
+                                    vertical: 8.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.lightContainer,
+                                    borderRadius: BorderRadius.circular(10.r),
+                                  ),
+                                  child: Text(
+                                    'Recording saved — tap play to hear yourself.',
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF1F9D4A),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 12.h),
+                                Text(
+                                  'HEAR YOUR VOICE',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFFCC0000),
+                                  ),
+                                ),
+                                SizedBox(height: 12.h),
+                                GestureDetector(
+                                  onTap: controller.togglePlayback,
+                                  behavior: HitTestBehavior.opaque,
+                                  child: Container(
+                                    width: 56.r,
+                                    height: 56.r,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFCC0000),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Icon(
+                                      isPlaying
+                                          ? Icons.pause_rounded
+                                          : Icons.play_arrow_rounded,
+                                      size: 32.sp,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 10.h),
+                                LocalVoicePlayer(
+                                  filePath: controller.recordedAudioPath.value,
+                                  isPlaying: isPlaying,
+                                  onCompleted: controller.onPlaybackCompleted,
+                                ),
+                                Text(
+                                  isPlaying
+                                      ? 'Playing your recording…'
+                                      : 'Tap to hear what you recorded',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: const Color(0xFF555555),
+                                    letterSpacing: -0.5,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(height: 14.h),
+                                TextButton(
+                                  onPressed: controller.recordAgain,
+                                  child: Text(
+                                    'Record again',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFFCC0000),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 30.h),
+                        ],
+                      );
+                    }),
                   ],
                 ),
-              ),
+                );
+              }),
             ),
 
             // Bottom Continue Button if warm-up completed
@@ -240,7 +350,7 @@ class PracticeWarmupScreen extends GetView<PracticeWarmupController> {
                   ),
                 ),
                 child: SpPrimaryButton(
-                  label: 'Proceed to Question 1 →',
+                  label: 'Continue to Question 1',
                   onPressed: controller.onProceedToQuestion,
                 ),
               );

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../routes/app_routes.dart';
+import '../models/saved_session_model.dart';
 import '../utils/constants/api_constants.dart';
 import '../utils/logging/logger.dart';
 import 'network_caller.dart';
@@ -46,6 +47,27 @@ class AuthService {
     String? remoteMessage;
 
     try {
+      // 1. Snapshot active session state before clearing credentials
+      final currentRoute = Get.currentRoute;
+      if (SavedSessionModel.isResumableRoute(currentRoute)) {
+        Map<String, dynamic>? args;
+        if (Get.arguments is Map<String, dynamic>) {
+          args = Get.arguments as Map<String, dynamic>;
+        } else if (Get.arguments is Map) {
+          args = Map<String, dynamic>.from(Get.arguments as Map);
+        }
+
+        await StorageService.saveCurrentSession(
+          route: currentRoute,
+          title: SavedSessionModel.resolveRouteTitle(currentRoute),
+          assessmentId: StorageService.assessmentId,
+          arguments: args,
+        );
+        AppLoggerHelper.info(
+          'Cached previous session before logout: $currentRoute',
+        );
+      }
+
       final refreshToken = StorageService.refreshToken?.trim() ?? '';
       if (refreshToken.isNotEmpty) {
         remoteAttempted = true;

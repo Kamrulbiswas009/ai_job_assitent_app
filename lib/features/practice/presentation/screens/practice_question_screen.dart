@@ -3,20 +3,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/common/widgets/sp_shimmer.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../controller/practice_question_controller.dart';
-import '../widgets/practice_scaffold.dart';
+import '../../model/practice_cues_guidance_model.dart';
+import '../../model/practice_question_model.dart';
 import '../widgets/practice_meta_chips.dart';
+import '../widgets/practice_question_progress.dart';
+import '../widgets/practice_scaffold.dart';
 
 class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
   const PracticeQuestionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final data = controller.questionData.value;
-
     return PracticeScaffold(
       isRoot: false,
       body: SafeArea(
@@ -24,187 +26,282 @@ class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
         child: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Step Progress Tag: Inter 500, Size 16, Color #666666
-                    Text(
-                      data.stepTag,
-                      style: GoogleFonts.inter(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF666666),
-                      ),
-                    ),
-                    SizedBox(height: 9.h),
-
-                    // Progress Bar: Continuous Capsule Track with 1/3 Fill
-                    Stack(
-                      children: [
-                        Container(
-                          height: 6.h,
+              child: Obx(() {
+                final isLoading = controller.isLoading.value;
+                final data = controller.questionData.value;
+                return SingleChildScrollView(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (isLoading) ...[
+                        SpShimmer.box(
+                          width: 210.w,
+                          height: 18.h,
+                          borderRadius: 6.r,
+                        ),
+                        SizedBox(height: 9.h),
+                        SpShimmer.box(
                           width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEFEEEF),
-                            borderRadius: BorderRadius.circular(999.r),
-                          ),
+                          height: 6.h,
+                          borderRadius: 999.r,
                         ),
-                        FractionallySizedBox(
-                          widthFactor: 1 / 3,
-                          child: Container(
-                            height: 6.h,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(999.r),
-                            ),
-                          ),
+                      ] else
+                        PracticeQuestionProgress(
+                          label: controller.progressLabel,
+                          fraction: controller.progressFraction,
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 18.h),
-
-                    // Chips Row: Document + Profile + Flash
-                    PracticeMetaChips(chips: data.chips),
-                    SizedBox(height: 24.h),
-
-                    // Headline: Inter 700, Size 28, Color #0A0A0A, LetterSpacing -0.5
-                    Text(
-                      data.headline,
-                      style: GoogleFonts.inter(
-                        fontSize: 28.sp,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF0A0A0A),
-                        height: 1.3,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-
-                    // Coach Reminder Card: Pad L16 R16 T16 B16, Radius 12, Bg #FDF5F6
-                    _buildCoachReminderCard(data),
-                    SizedBox(height: 24.h),
-
-                    // Video Card with Question Overlay & Exact Figma Thumbnail
-                    _buildQuestionVideoCard(data),
-                    SizedBox(height: 24.h),
-
-                    // Before You Answer Section: Exact Book & Target Icons & Typography
-                    _buildBeforeYouAnswerSection(data),
-                    SizedBox(height: 24.h),
-                  ],
-                ),
-              ),
-            ),
-
-            // Bottom Action Area: Capsule Pill Button & Replay Link
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              decoration: const BoxDecoration(
-                color: AppColors.white,
-                border: Border(
-                  top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
-                ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Obx(() {
-                    final isRec = controller.isRecording.value;
-                    final duration = controller.formattedDuration;
-
-                    return SizedBox(
-                      width: double.infinity,
-                      height: 54.h,
-                      child: ElevatedButton(
-                        onPressed: controller.toggleRecording,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(999.r),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      SizedBox(height: 18.h),
+                      if (isLoading)
+                        Row(
                           children: [
-                            SvgPicture.asset(
-                              IconPath.spMicSvg,
-                              width: 18.r,
-                              height: 18.r,
-                              colorFilter: const ColorFilter.mode(
-                                Colors.white,
-                                BlendMode.srcIn,
-                              ),
+                            SpShimmer.box(
+                              width: 110.w,
+                              height: 22.h,
+                              borderRadius: 999.r,
                             ),
-                            SizedBox(width: 8.w),
-                            Text(
-                              isRec
-                                  ? 'Stop Recording ($duration)'
-                                  : 'Tap to record',
-                              style: GoogleFonts.inter(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
+                            SizedBox(width: 10.w),
+                            SpShimmer.box(
+                              width: 130.w,
+                              height: 22.h,
+                              borderRadius: 999.r,
+                            ),
+                            SizedBox(width: 10.w),
+                            SpShimmer.box(
+                              width: 90.w,
+                              height: 22.h,
+                              borderRadius: 999.r,
                             ),
                           ],
+                        )
+                      else
+                        PracticeMetaChips(chips: data.chips),
+                      SizedBox(height: 20.h),
+                      if (isLoading) ...[
+                        SpShimmer.box(
+                          width: double.infinity,
+                          height: 28.h,
+                          borderRadius: 6.r,
                         ),
-                      ),
-                    );
-                  }),
-                  SizedBox(height: 12.h),
-                  GestureDetector(
-                    onTap: controller.replayQuestion,
-                    behavior: HitTestBehavior.opaque,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4.h),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            IconPath.spSound,
-                            width: 16.r,
-                            height: 16.r,
-                            colorFilter: const ColorFilter.mode(
-                              AppColors.primary,
-                              BlendMode.srcIn,
-                            ),
+                        SizedBox(height: 8.h),
+                        SpShimmer.box(
+                          width: 180.w,
+                          height: 28.h,
+                          borderRadius: 6.r,
+                        ),
+                      ] else
+                        Text(
+                          data.headline,
+                          style: GoogleFonts.inter(
+                            fontSize: 28.sp,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF0A0A0A),
+                            height: 1.3,
+                            letterSpacing: -0.5,
                           ),
-                          SizedBox(width: 6.w),
-                          Text(
-                            'Hear question again',
-                            style: GoogleFonts.inter(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      SizedBox(height: 16.h),
+                      if (isLoading)
+                        _buildCoachReminderShimmer()
+                      else
+                        _buildCoachReminderCard(data),
+                      SizedBox(height: 20.h),
+                      if (isLoading)
+                        _buildQuestionVideoShimmer()
+                      else
+                        _buildQuestionVideoCard(data),
+                      SizedBox(height: 24.h),
+                      if (isLoading)
+                        _buildBeforeYouAnswerShimmer()
+                      else
+                        _buildBeforeYouAnswerSection(data),
+                      SizedBox(height: 16.h),
+                      if (isLoading)
+                        _buildGuidanceCuesShimmer()
+                      else
+                        _buildGuidanceCues(data),
+                      SizedBox(height: 24.h),
+                    ],
                   ),
-                ],
-              ),
+                );
+              }),
             ),
+            Obx(() => _buildBottomBar()),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCoachReminderCard(dynamic data) {
+  Widget _buildCoachReminderShimmer() {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: const Color(0xFFFDF5F6),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: const Color(0xFFFBE3E1),
-          width: 1,
+        border: Border.all(color: const Color(0xFFFBE3E1), width: 1),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SpShimmer.circle(size: 44.r),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SpShimmer.box(
+                  width: double.infinity,
+                  height: 16.h,
+                  borderRadius: 4.r,
+                ),
+                SizedBox(height: 8.h),
+                SpShimmer.box(width: 220.w, height: 16.h, borderRadius: 4.r),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuestionVideoShimmer() {
+    return Container(
+      width: double.infinity,
+      height: 240.h,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0F0F3),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            left: 12.w,
+            top: 12.h,
+            child: SpShimmer.box(width: 150.w, height: 28.h, borderRadius: 6.r),
+          ),
+          Positioned(
+            left: 18.w,
+            right: 18.w,
+            bottom: 16.h,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SpShimmer.box(
+                  width: double.infinity,
+                  height: 18.h,
+                  borderRadius: 4.r,
+                ),
+                SizedBox(height: 8.h),
+                SpShimmer.box(width: 200.w, height: 18.h, borderRadius: 4.r),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBeforeYouAnswerShimmer() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SpShimmer.box(width: 170.w, height: 16.h, borderRadius: 4.r),
+        SizedBox(height: 14.h),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SpShimmer.circle(size: 22.r),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SpShimmer.box(
+                    width: double.infinity,
+                    height: 14.h,
+                    borderRadius: 4.r,
+                  ),
+                  SizedBox(height: 6.h),
+                  SpShimmer.box(width: 180.w, height: 14.h, borderRadius: 4.r),
+                ],
+              ),
+            ),
+          ],
         ),
+        SizedBox(height: 16.h),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SpShimmer.circle(size: 22.r),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SpShimmer.box(width: 110.w, height: 16.h, borderRadius: 4.r),
+                  SizedBox(height: 8.h),
+                  SpShimmer.box(
+                    width: double.infinity,
+                    height: 14.h,
+                    borderRadius: 4.r,
+                  ),
+                  SizedBox(height: 6.h),
+                  SpShimmer.box(width: 210.w, height: 14.h, borderRadius: 4.r),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGuidanceCuesShimmer() {
+    return Column(
+      children: List.generate(3, (index) {
+        return Container(
+          margin: EdgeInsets.only(bottom: index == 2 ? 0 : 10.h),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(color: const Color(0xFFE5E5EA), width: 1),
+          ),
+          child: Row(
+            children: [
+              SpShimmer.circle(size: 22.r),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SpShimmer.box(width: 140.w, height: 16.h, borderRadius: 4.r),
+                    SizedBox(height: 6.h),
+                    SpShimmer.box(
+                      width: double.infinity,
+                      height: 13.h,
+                      borderRadius: 4.r,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildCoachReminderCard(PracticeQuestionModel data) {
+    return Container(
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFDF5F6),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: const Color(0xFFFBE3E1), width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,28 +317,17 @@ class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
           ),
           SizedBox(width: 12.w),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data.coachContext,
-                  style: GoogleFonts.inter(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF555555),
-                    height: 1.4,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  data.countsTag,
-                  style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF555555),
-                  ),
-                ),
-              ],
+            child: Text(
+              [
+                data.coachContext.trim(),
+                data.countsTag.trim(),
+              ].where((part) => part.isNotEmpty).join(' '),
+              style: GoogleFonts.inter(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF555555),
+                height: 1.4,
+              ),
             ),
           ),
         ],
@@ -249,21 +335,24 @@ class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
     );
   }
 
-  Widget _buildQuestionVideoCard(dynamic data) {
+  Widget _buildQuestionVideoCard(PracticeQuestionModel data) {
+    final thumbnailUrl = data.thumbnailUrl;
+
     return Container(
       width: double.infinity,
       height: 240.h,
       decoration: BoxDecoration(
         color: const Color(0xFF1C1C1E),
         borderRadius: BorderRadius.circular(12.r),
-        image: const DecorationImage(
-          image: AssetImage(ImagePath.spVideoThumb),
+        image: DecorationImage(
+          image: thumbnailUrl != null && thumbnailUrl.isNotEmpty
+              ? NetworkImage(thumbnailUrl)
+              : const AssetImage(ImagePath.spVideoThumb) as ImageProvider,
           fit: BoxFit.cover,
         ),
       ),
       child: Stack(
         children: [
-          // Top Speaker Badge: Pad L10 R10 T6 B6, Radius 6, Bg #CC0000
           Positioned(
             left: 12.w,
             top: 12.h,
@@ -274,17 +363,15 @@ class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
                 borderRadius: BorderRadius.circular(6.r),
               ),
               child: Text(
-                '${data.speakerRole} ${data.videoDuration}',
+                data.speakerRole,
                 style: GoogleFonts.inter(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFFD7D7D7),
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
               ),
             ),
           ),
-
-          // Bottom Question Overlay Banner: Pad L18 R18 T16 B16, Bg #040404 with Opacity 0.6
           Positioned(
             left: 0,
             right: 0,
@@ -313,52 +400,20 @@ class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
     );
   }
 
-  Widget _buildBeforeYouAnswerSection(dynamic data) {
+  Widget _buildBeforeYouAnswerSection(PracticeQuestionModel data) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'BEFORE YOU ANSWER',
-              style: GoogleFonts.inter(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF000000),
-              ),
-            ),
-            GestureDetector(
-              onTap: controller.openGuidance,
-              behavior: HitTestBehavior.opaque,
-              child: Row(
-                children: [
-                  Text(
-                    'Open Guidance',
-                    style: GoogleFonts.inter(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  SizedBox(width: 4.w),
-                  SvgPicture.asset(
-                    IconPath.spArrowRight,
-                    width: 14.r,
-                    height: 14.r,
-                    colorFilter: const ColorFilter.mode(
-                      AppColors.primary,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        Text(
+          'BEFORE YOU ANSWER',
+          style: GoogleFonts.inter(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF000000),
+            letterSpacing: 0.2,
+          ),
         ),
         SizedBox(height: 14.h),
-
-        // Support tip row with exact Book icon
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -381,9 +436,7 @@ class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
             ),
           ],
         ),
-        SizedBox(height: 14.h),
-
-        // Your move row with exact Target icon
+        SizedBox(height: 16.h),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -421,6 +474,205 @@ class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildGuidanceCues(PracticeQuestionModel data) {
+    return Column(
+      children: List.generate(data.cues.length, (index) {
+        final cue = data.cues[index];
+        return Padding(
+          padding: EdgeInsets.only(bottom: index == data.cues.length - 1 ? 0 : 10.h),
+          child: _buildCueCard(cue, index),
+        );
+      }),
+    );
+  }
+
+  Widget _buildCueCard(PracticePillarCueModel cue, int index) {
+    return GestureDetector(
+      onTap: () => controller.openGuidance(cueIndex: index),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: const Color(0xFFE5E5EA), width: 1),
+        ),
+        child: Row(
+          children: [
+            _cueIcon(cue.iconKey),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    cue.title,
+                    style: GoogleFonts.inter(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF0A0A0A),
+                      height: 1.3,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    cue.question,
+                    style: GoogleFonts.inter(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w400,
+                      fontStyle: FontStyle.italic,
+                      color: const Color(0xFF666666),
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _cueIcon(String key) {
+    const color = ColorFilter.mode(AppColors.primary, BlendMode.srcIn);
+    switch (key) {
+      case 'sound':
+        return SvgPicture.asset(
+          IconPath.spSound,
+          width: 22.r,
+          height: 22.r,
+          colorFilter: color,
+        );
+      case 'clock':
+        return Icon(
+          Icons.schedule_rounded,
+          size: 22.r,
+          color: AppColors.primary,
+        );
+      case 'chat':
+        return SvgPicture.asset(
+          IconPath.spUser,
+          width: 22.r,
+          height: 22.r,
+          colorFilter: color,
+        );
+      case 'heart':
+        return SvgPicture.asset(
+          IconPath.spHeart,
+          width: 22.r,
+          height: 22.r,
+          colorFilter: color,
+        );
+      case 'target':
+      default:
+        return SvgPicture.asset(
+          IconPath.spTarget,
+          width: 22.r,
+          height: 22.r,
+          colorFilter: color,
+        );
+    }
+  }
+
+  Widget _buildBottomBar() {
+    final isLoading = controller.isLoading.value;
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 8.h),
+      decoration: const BoxDecoration(
+        color: AppColors.white,
+        border: Border(
+          top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isLoading) ...[
+            SpShimmer.box(
+              width: double.infinity,
+              height: 54.h,
+              borderRadius: 999.r,
+            ),
+            SizedBox(height: 12.h),
+            SpShimmer.box(width: 170.w, height: 16.h, borderRadius: 4.r),
+          ] else ...[
+          SizedBox(
+            width: double.infinity,
+            height: 54.h,
+            child: ElevatedButton(
+              onPressed: controller.openAnswerRecord,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999.r),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    IconPath.spMicSvg,
+                    width: 18.r,
+                    height: 18.r,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    controller.questionData.value.tapToRecordLabel,
+                    style: GoogleFonts.inter(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 8.h),
+          GestureDetector(
+            onTap: controller.replayQuestion,
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    IconPath.spSound,
+                    width: 16.r,
+                    height: 16.r,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.primary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  SizedBox(width: 6.w),
+                  Text(
+                    controller.questionData.value.hearQuestionAgainLabel,
+                    style: GoogleFonts.inter(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          ],
+        ],
+      ),
     );
   }
 }

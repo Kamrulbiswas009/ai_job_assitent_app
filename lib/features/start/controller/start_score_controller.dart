@@ -27,6 +27,11 @@ class StartScoreController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    StorageService.saveCurrentSession(
+      route: AppRoute.startStep5Score,
+      title: 'Influence Score',
+      assessmentId: StorageService.assessmentId,
+    );
     fetchResult();
   }
 

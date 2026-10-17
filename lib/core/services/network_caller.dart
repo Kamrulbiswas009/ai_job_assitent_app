@@ -51,16 +51,20 @@ class NetworkCaller {
     String url, {
     dynamic body,
     String? token,
+    int? timeoutSeconds,
+    bool includeAuth = true,
   }) async {
-    final effectiveToken = (token != null && token.isNotEmpty)
-        ? token
-        : StorageService.token;
+    final effectiveToken = includeAuth
+        ? ((token != null && token.isNotEmpty) ? token : StorageService.token)
+        : null;
     final bodyString = body != null ? jsonEncode(body) : '';
     final logBody = _formatSanitizedBody(body);
     debugPrint('==================== [POST REQUEST] ====================');
     debugPrint('URL: $url');
     debugPrint('Body: $logBody');
-    if (effectiveToken != null) debugPrint('Token: $effectiveToken');
+    debugPrint(
+      'Token: ${includeAuth ? (effectiveToken ?? "None") : "Omitted"}',
+    );
     log('POST Request: $url, Body: $logBody');
 
     try {
@@ -75,7 +79,7 @@ class NetworkCaller {
                 : 'Bearer $effectiveToken',
         },
         body: bodyString.isNotEmpty ? bodyString : null,
-      ).timeout(Duration(seconds: timeoutDuration));
+      ).timeout(Duration(seconds: timeoutSeconds ?? timeoutDuration));
 
       return _handleResponse(response, requestUrl: url);
     } catch (e) {
@@ -262,7 +266,8 @@ class NetworkCaller {
           path.contains('/auth/verify-email') ||
           path.contains('/auth/forgot-password') ||
           path.contains('/auth/reset-password') ||
-          path.contains('/auth/logout')) {
+          path.contains('/auth/logout') ||
+          path.contains('/api/ai/')) {
         return;
       }
     }

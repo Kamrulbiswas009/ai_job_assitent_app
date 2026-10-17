@@ -14,4 +14,6 @@ class ImagePath {
   static const String spHeaderLogo = 'assets/images/sp_header_logo.png';
   static const String spVideoThumb = 'assets/images/sp_video_thumb.png';
   static const String spRoleplayWoman = 'assets/images/sp_roleplay_woman.png';
+  static const String loadingLottie = 'assets/lottie/loading.json';
+  static const String spHiFive = 'assets/images/sp_hi_five.jpg';
 }

@@ -6,8 +6,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../controller/practice_cues_guidance_controller.dart';
-import '../widgets/practice_scaffold.dart';
+import '../../controller/practice_question_controller.dart';
 import '../widgets/practice_meta_chips.dart';
+import '../widgets/practice_question_progress.dart';
+import '../widgets/practice_scaffold.dart';
 
 class PracticeCuesGuidanceScreen
     extends GetView<PracticeCuesGuidanceController> {
@@ -30,39 +32,14 @@ class PracticeCuesGuidanceScreen
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Step Progress Tag: Inter 500, Size 16, Color #666666
-                    Text(
-                      data.stepTag,
-                      style: GoogleFonts.inter(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF666666),
-                      ),
-                    ),
-                    SizedBox(height: 9.h),
-
-                    // Progress Bar: Continuous Capsule Track with 1/3 Fill
-                    Stack(
-                      children: [
-                        Container(
-                          height: 6.h,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEFEEEF),
-                            borderRadius: BorderRadius.circular(999.r),
-                          ),
-                        ),
-                        FractionallySizedBox(
-                          widthFactor: 1 / 3,
-                          child: Container(
-                            height: 6.h,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(999.r),
-                            ),
-                          ),
-                        ),
-                      ],
+                    PracticeQuestionProgress(
+                      label: Get.isRegistered<PracticeQuestionController>()
+                          ? Get.find<PracticeQuestionController>().progressLabel
+                          : data.stepTag,
+                      fraction: Get.isRegistered<PracticeQuestionController>()
+                          ? Get.find<PracticeQuestionController>()
+                              .progressFraction
+                          : 1 / 3,
                     ),
                     SizedBox(height: 18.h),
 

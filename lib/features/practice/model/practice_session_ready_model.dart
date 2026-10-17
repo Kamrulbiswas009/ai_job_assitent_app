@@ -2,6 +2,7 @@ import 'package:studioequip_mobile_app/core/utils/constants/image_path.dart';
 
 class RoleplayOptionModel {
   final String id;
+  final String characterId;
   final String name;
   final String subtitle;
   final String imageAsset;
@@ -13,14 +14,17 @@ class RoleplayOptionModel {
     required this.name,
     required this.subtitle,
     required this.imageAsset,
+    this.characterId = '',
     this.avatarUrl,
     this.isRecommended = false,
   });
 
   factory RoleplayOptionModel.fromJson(Map<String, dynamic> json) {
+    final name = json['name'] as String? ?? '';
     return RoleplayOptionModel(
       id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
+      characterId: _resolveCharacterId(json, name),
+      name: name,
       subtitle: json['subtitle'] as String? ?? '',
       imageAsset: json['imageAsset'] as String? ?? ImagePath.spRoleplayWoman,
       avatarUrl: json['avatarUrl'] as String?,
@@ -29,9 +33,11 @@ class RoleplayOptionModel {
   }
 
   factory RoleplayOptionModel.fromPanelJson(Map<String, dynamic> json) {
+    final name = json['name'] as String? ?? '';
     return RoleplayOptionModel(
       id: json['panelId'] as String? ?? '',
-      name: json['name'] as String? ?? '',
+      characterId: _resolveCharacterId(json, name),
+      name: name,
       subtitle: json['description'] as String? ??
           json['roleTitle'] as String? ??
           '',
@@ -43,12 +49,29 @@ class RoleplayOptionModel {
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'characterId': characterId,
         'name': name,
         'subtitle': subtitle,
         'imageAsset': imageAsset,
         'avatarUrl': avatarUrl,
         'isRecommended': isRecommended,
       };
+
+  static String _resolveCharacterId(Map<String, dynamic> json, String name) {
+    final raw = json['characterId'] ?? json['slug'] ?? json['characterSlug'];
+    if (raw != null && raw.toString().trim().isNotEmpty) {
+      return raw.toString().trim().replaceAll('-', '_');
+    }
+    return toCharacterId(name);
+  }
+
+  static String toCharacterId(String name) {
+    return name
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'^_+|_+$'), '');
+  }
 }
 
 class ChallengeModeOptionModel {
@@ -194,6 +217,7 @@ class PracticeSessionReadyModel {
       roleplays: [
         RoleplayOptionModel(
           id: 'warm_hr',
+          characterId: 'warm_hr_partner',
           name: 'Warm HR Partner',
           subtitle: 'Friendly, conversational, still probing for substance.',
           imageAsset: ImagePath.spRoleplayWoman,
@@ -201,12 +225,14 @@ class PracticeSessionReadyModel {
         ),
         RoleplayOptionModel(
           id: 'skeptical_manager',
+          characterId: 'skeptical_hiring_manager',
           name: 'Skeptical Hiring Manager',
           subtitle: 'Direct, unimpressed by default, wants proof.',
           imageAsset: ImagePath.spRoleplayWoman,
         ),
         RoleplayOptionModel(
           id: 'executive_panel',
+          characterId: 'executive_panel',
           name: 'Executive Panel',
           subtitle:
               'Formal, terse, tests composure under status pressure.',

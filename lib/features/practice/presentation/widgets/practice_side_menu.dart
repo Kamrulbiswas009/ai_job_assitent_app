@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/common/widgets/sp_loading.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../controller/practice_menu_controller.dart';
 
@@ -101,14 +102,7 @@ class PracticeSideMenu extends GetView<PracticeMenuController> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (isLoggingOut) ...[
-                          SizedBox(
-                            width: 18.r,
-                            height: 18.r,
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Color(0xFFCC0000),
-                            ),
-                          ),
+                          const SpLoading(size: 22),
                           SizedBox(width: 8.w),
                           Text(
                             'Signing out...',

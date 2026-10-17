@@ -1,5 +1,6 @@
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import '../../../core/common/widgets/sp_loading_overlay.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/storage_service.dart';
 
@@ -50,13 +51,19 @@ class PracticeMenuController extends GetxController {
     if (isLoggingOut.value) return;
 
     isLoggingOut.value = true;
-    EasyLoading.show(status: 'Signing out...');
+    SpLoadingOverlay.show(
+      title: 'Signing you out',
+      thoughts: const [
+        'Saving your place…',
+        'Clearing this session…',
+      ],
+    );
 
     late final LogoutResult result;
     try {
       result = await _authService.signOut();
     } finally {
-      EasyLoading.dismiss();
+      SpLoadingOverlay.hide();
       isLoggingOut.value = false;
     }
 

@@ -7,14 +7,14 @@ import '../../../../core/utils/constants/image_path.dart';
 
 class PracticeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isRoot;
-  final VoidCallback? onLeadingTap;
-  final VoidCallback? onProfileTap;
+  final VoidCallback? onBackTap;
+  final VoidCallback? onMenuTap;
 
   const PracticeAppBar({
     super.key,
     this.isRoot = false,
-    this.onLeadingTap,
-    this.onProfileTap,
+    this.onBackTap,
+    this.onMenuTap,
   });
 
   @override
@@ -35,40 +35,48 @@ class PracticeAppBar extends StatelessWidget implements PreferredSizeWidget {
             Center(
               child: Image.asset(
                 ImagePath.spHeaderLogo,
-                height: 80.h,
+                height: 100.h,
                 fit: BoxFit.contain,
               ),
             ),
 
-            // Leading: Menu or Back (Pinned to Left)
+            // Left: Back button
             Align(
               alignment: Alignment.centerLeft,
               child: GestureDetector(
-                onTap: onLeadingTap ?? (isRoot ? () {} : () => Get.back()),
+                onTap: onBackTap ?? () => Get.back(),
                 behavior: HitTestBehavior.opaque,
-                child: isRoot
-                    ? SizedBox(
-                        width: 38.r,
-                        height: 38.r,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            IconPath.spMenu,
-                            width: 24.r,
-                            height: 24.r,
-                          ),
-                        ),
-                      )
-                    : SizedBox(
-                        width: 38.r,
-                        height: 38.r,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            IconPath.spArrowLeft,
-                            width: 24.r,
-                            height: 24.r,
-                          ),
-                        ),
-                      ),
+                child: SizedBox(
+                  width: 38.r,
+                  height: 38.r,
+                  child: Center(
+                    child: SvgPicture.asset(
+                      IconPath.spArrowLeft,
+                      width: 24.r,
+                      height: 24.r,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Right: Menu / Hamburger button
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: onMenuTap ?? () {},
+                behavior: HitTestBehavior.opaque,
+                child: SizedBox(
+                  width: 38.r,
+                  height: 38.r,
+                  child: Center(
+                    child: SvgPicture.asset(
+                      IconPath.spMenu,
+                      width: 24.r,
+                      height: 24.r,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

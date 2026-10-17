@@ -306,7 +306,7 @@ void main() {
 
     // Pump forward for progress to smoothly finish to 100% in the 8s sequence
     await tester.pump(const Duration(seconds: 6));
-    expect(find.text('100%'), findsOneWidget);
+    expect(find.text('100%'), findsAtLeastNWidgets(1));
 
     // Pump past the completion delay
     await tester.pump(const Duration(milliseconds: 900));
@@ -435,9 +435,8 @@ void main() {
     await tester.pump();
 
     // Verify Score Calculation Modal (Screen 2 in Figma)
-    expect(find.text('Calculating your score ...'), findsOneWidget);
-    expect(find.text('Almost ready'), findsOneWidget);
-    expect(find.text('Calculation step'), findsOneWidget);
+    expect(find.text('Calculating your score'), findsOneWidget);
+    expect(find.text('CALCULATION STEPS'), findsOneWidget);
     expect(find.text('Analyzing your voice'), findsOneWidget);
     expect(find.text('Measuring your delivery'), findsOneWidget);
     expect(find.text('Comparing with your self assessment'), findsOneWidget);

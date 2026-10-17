@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../../core/utils/constants/colors.dart';
+import '../../../../routes/app_routes.dart';
 import 'practice_app_bar.dart';
 import 'practice_side_menu.dart';
 
@@ -7,12 +9,14 @@ class PracticeScaffold extends StatefulWidget {
   final bool isRoot;
   final Widget body;
   final Color backgroundColor;
+  final VoidCallback? onBack;
 
   const PracticeScaffold({
     super.key,
     required this.isRoot,
     required this.body,
     this.backgroundColor = AppColors.white,
+    this.onBack,
   });
 
   @override
@@ -26,6 +30,16 @@ class _PracticeScaffoldState extends State<PracticeScaffold> {
     _scaffoldKey.currentState?.openDrawer();
   }
 
+  void _handleBack() {
+    if (widget.onBack != null) {
+      widget.onBack!();
+    } else if (Navigator.of(context).canPop()) {
+      Get.back();
+    } else {
+      Get.offNamed(AppRoute.startStep5Score);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,8 +48,8 @@ class _PracticeScaffoldState extends State<PracticeScaffold> {
       drawer: const PracticeSideMenu(),
       appBar: PracticeAppBar(
         isRoot: widget.isRoot,
-        onLeadingTap: widget.isRoot ? _openSideMenu : null,
-        onProfileTap: _openSideMenu,
+        onBackTap: _handleBack,
+        onMenuTap: _openSideMenu,
       ),
       body: widget.body,
     );

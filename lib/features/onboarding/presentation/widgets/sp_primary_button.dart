@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/common/widgets/sp_loading.dart';
 import '../../../../core/utils/constants/colors.dart';
 
 class SpPrimaryButton extends StatelessWidget {
@@ -35,14 +36,7 @@ class SpPrimaryButton extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 16.w),
         ),
         child: isLoading
-            ? SizedBox(
-                width: 22.w,
-                height: 22.w,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
+            ? const SpLoading(size: 32)
             : FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(

@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/common/widgets/sp_loading.dart';
+import '../../../../core/common/widgets/sp_shimmer.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
@@ -20,24 +22,19 @@ class PracticeSessionReadyScreen
       isRoot: true,
       body: SafeArea(
         top: false,
-        child: Obx(() {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          return Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeaderSection(),
-                      SizedBox(height: 8.h),
-                      _buildDescriptionSection(),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding:
+                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeaderSection(),
+                    SizedBox(height: 8.h),
+                    _buildDescriptionSection(),
                     SizedBox(height: 24.h),
 
                     // Founder Insight Video Card (Figma Radius 12)
@@ -61,10 +58,6 @@ class PracticeSessionReadyScreen
                     _buildRoleplayOptions(),
                     SizedBox(height: 12.h),
 
-                    // Selected Roleplay Highlight Banner (Figma Radius 12)
-                    _buildSelectedRoleplayBanner(),
-                    SizedBox(height: 12.h),
-
                     // Roleplay Info Notice (Figma Bg #F9F8F8, Radius 12, Pad 16, Text Size 16)
                     _buildInfoNotice(
                       'You can change the roleplay character at any time in future sessions.',
@@ -79,111 +72,161 @@ class PracticeSessionReadyScreen
                     _buildInfoNotice(
                       'XP means experience points you earn through practice.',
                     ),
-                      SizedBox(height: 24.h),
-                    ],
-                  ),
+                    SizedBox(height: 24.h),
+                  ],
                 ),
               ),
-              _buildBottomBar(),
-            ],
-          );
-        }),
+            ),
+            _buildBottomBar(),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildHeaderSection() {
-    final data = controller.sessionData.value;
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: '${data.userName}, ',
-            style: GoogleFonts.inter(
-              fontSize: 28.sp,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFFE60008),
-              height: 1.3,
-              letterSpacing: -0.5,
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SpShimmer.box(width: 140.w, height: 28.h, borderRadius: 6.r),
+            SizedBox(height: 8.h),
+            SpShimmer.box(width: double.infinity, height: 28.h, borderRadius: 6.r),
+            SizedBox(height: 6.h),
+            SpShimmer.box(width: 220.w, height: 28.h, borderRadius: 6.r),
+          ],
+        );
+      }
+
+      final data = controller.sessionData.value;
+      return RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '${data.userName}, ',
+              style: GoogleFonts.inter(
+                fontSize: 28.sp,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFFE60008),
+                height: 1.3,
+                letterSpacing: -0.5,
+              ),
             ),
-          ),
-          TextSpan(
-            text: data.heading,
-            style: GoogleFonts.inter(
-              fontSize: 28.sp,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF0A0A0A),
-              height: 1.3,
-              letterSpacing: -0.5,
+            TextSpan(
+              text: data.heading,
+              style: GoogleFonts.inter(
+                fontSize: 28.sp,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF0A0A0A),
+                height: 1.3,
+                letterSpacing: -0.5,
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildDescriptionSection() {
-    return Text(
-      controller.sessionData.value.description,
-      style: GoogleFonts.inter(
-        fontSize: 16.sp,
-        fontWeight: FontWeight.w400,
-        color: const Color(0xFF666666),
-        height: 1.4,
-        letterSpacing: -0.5,
-      ),
-    );
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SpShimmer.box(width: double.infinity, height: 16.h, borderRadius: 4.r),
+            SizedBox(height: 6.h),
+            SpShimmer.box(width: 240.w, height: 16.h, borderRadius: 4.r),
+          ],
+        );
+      }
+
+      return Text(
+        controller.sessionData.value.description,
+        style: GoogleFonts.inter(
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w400,
+          color: const Color(0xFF666666),
+          height: 1.4,
+          letterSpacing: -0.5,
+        ),
+      );
+    });
   }
 
   Widget _buildBottomBar() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(
-          top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
+    return Obx(() {
+      final isBusy =
+          controller.isLoading.value || controller.isStartingSession.value;
+      final buttonLabel = controller.isStartingSession.value
+          ? 'Starting Session...'
+          : 'Preparing Session...';
+
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        decoration: const BoxDecoration(
+          color: AppColors.white,
+          border: Border(
+            top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
+          ),
         ),
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        height: 56.h,
-        child: ElevatedButton(
-          onPressed: controller.isLoading.value
-              ? null
-              : controller.onEnterSessionBrief,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFCC0000),
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r),
+        child: SizedBox(
+          width: double.infinity,
+          height: 56.h,
+          child: ElevatedButton(
+            onPressed: isBusy ? null : controller.onEnterSessionBrief,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isBusy
+                  ? const Color(0xFFCC0000).withValues(alpha: 0.5)
+                  : const Color(0xFFCC0000),
+              disabledBackgroundColor:
+                  const Color(0xFFCC0000).withValues(alpha: 0.5),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (isBusy) ...[
+                  const SpLoading(size: 22),
+                  SizedBox(width: 10.w),
+                  Text(
+                    buttonLabel,
+                    style: GoogleFonts.inter(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ] else ...[
+                  Text(
+                    'Enter Session Brief',
+                    style: GoogleFonts.inter(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  SvgPicture.asset(
+                    IconPath.spArrowRight,
+                    width: 18.r,
+                    height: 18.r,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Enter Session Brief',
-                style: GoogleFonts.inter(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(width: 10.w),
-              SvgPicture.asset(
-                IconPath.spArrowRight,
-                width: 18.r,
-                height: 18.r,
-                colorFilter: const ColorFilter.mode(
-                  Colors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ],
-          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildRoleplayAvatar(RoleplayOptionModel roleplay, double size) {
@@ -212,155 +255,239 @@ class PracticeSessionReadyScreen
   }
 
   Widget _buildVideoInsightCard() {
-    final data = controller.sessionData.value;
-    final thumbnailUrl = data.founderInsightThumbnailUrl;
-
-    return Container(
-      width: double.infinity,
-      height: 230.h,
-      decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1E),
-        borderRadius: BorderRadius.circular(12.r),
-        image: DecorationImage(
-          image: thumbnailUrl != null && thumbnailUrl.isNotEmpty
-              ? NetworkImage(thumbnailUrl)
-              : const AssetImage(ImagePath.spVideoThumb),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.r),
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withValues(alpha: 0.05),
-                  Colors.black.withValues(alpha: 0.75),
-                ],
-              ),
-            ),
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return Container(
+          width: double.infinity,
+          height: 230.h,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0F0F3),
+            borderRadius: BorderRadius.circular(12.r),
           ),
-          Center(
-            child: GestureDetector(
-              onTap: controller.toggleFounderInsightVideo,
-              behavior: HitTestBehavior.opaque,
-              child: SvgPicture.asset(
-                IconPath.spPlayCircle,
-                width: 80.r,
-                height: 80.r,
+          child: Stack(
+            children: [
+              Center(
+                child: SpShimmer.circle(size: 72.r),
               ),
-            ),
-          ),
-          Positioned(
-            left: 18.w,
-            right: 18.w,
-            bottom: 16.h,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
+              Positioned(
+                left: 18.w,
+                right: 18.w,
+                bottom: 16.h,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: 6.r,
-                      height: 6.r,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFCC0000),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    SizedBox(width: 6.w),
-                    Text(
-                      data.founderInsightTag,
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFFD7D7D7),
-                      ),
-                    ),
+                    SpShimmer.box(width: 140.w, height: 14.h, borderRadius: 4.r),
+                    SizedBox(height: 8.h),
+                    SpShimmer.box(width: 220.w, height: 18.h, borderRadius: 4.r),
                   ],
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  data.founderInsightTitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFFE8E8E8),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMissionTargetCard() {
-    final data = controller.sessionData.value;
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFDF5F6),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFFBE3E1), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              SvgPicture.asset(
-                IconPath.spTarget,
-                width: 24.r,
-                height: 24.r,
-              ),
-              SizedBox(width: 8.w),
-              Text(
-                'MISSION TARGET',
-                style: GoogleFonts.inter(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.0,
-                  color: const Color(0xFF555555),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 8.h),
-          Text(
-            data.missionTarget,
-            style: GoogleFonts.inter(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF0A0A0A),
-            ),
+        );
+      }
+
+      final data = controller.sessionData.value;
+      final thumbnailUrl = data.founderInsightThumbnailUrl;
+
+      return Container(
+        width: double.infinity,
+        height: 230.h,
+        decoration: BoxDecoration(
+          color: const Color(0xFF1C1C1E),
+          borderRadius: BorderRadius.circular(12.r),
+          image: DecorationImage(
+            image: thumbnailUrl != null && thumbnailUrl.isNotEmpty
+                ? NetworkImage(thumbnailUrl)
+                : const AssetImage(ImagePath.spVideoThumb),
+            fit: BoxFit.cover,
           ),
-          SizedBox(height: 4.h),
-          Text(
-            '"${data.missionTargetQuote}"',
-            style: GoogleFonts.inter(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w400,
-              fontStyle: FontStyle.italic,
-              color: const Color(0xFF555555),
-              height: 1.4,
-              letterSpacing: -0.5,
+        ),
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.r),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.05),
+                    Colors.black.withValues(alpha: 0.75),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+            Center(
+              child: GestureDetector(
+                onTap: controller.toggleFounderInsightVideo,
+                behavior: HitTestBehavior.opaque,
+                child: SvgPicture.asset(
+                  IconPath.spPlayCircle,
+                  width: 80.r,
+                  height: 80.r,
+                ),
+              ),
+            ),
+            Positioned(
+              left: 18.w,
+              right: 18.w,
+              bottom: 16.h,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 6.r,
+                        height: 6.r,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFCC0000),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      SizedBox(width: 6.w),
+                      Text(
+                        data.founderInsightTag,
+                        style: GoogleFonts.inter(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFFD7D7D7),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    data.founderInsightTitle,
+                    style: GoogleFonts.inter(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFFE8E8E8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildMissionTargetCard() {
+    return Obx(() {
+      final isLoading = controller.isLoading.value;
+      final data = controller.sessionData.value;
+
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16.r),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFDF5F6),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: const Color(0xFFFBE3E1), width: 1),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                SvgPicture.asset(
+                  IconPath.spTarget,
+                  width: 24.r,
+                  height: 24.r,
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  'MISSION TARGET',
+                  style: GoogleFonts.inter(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.0,
+                    color: const Color(0xFF555555),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8.h),
+            if (isLoading) ...[
+              SpShimmer.box(width: 180.w, height: 24.h, borderRadius: 6.r),
+              SizedBox(height: 8.h),
+              SpShimmer.box(width: double.infinity, height: 16.h, borderRadius: 4.r),
+              SizedBox(height: 6.h),
+              SpShimmer.box(width: 220.w, height: 16.h, borderRadius: 4.r),
+            ] else ...[
+              Text(
+                data.missionTarget,
+                style: GoogleFonts.inter(
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF0A0A0A),
+                ),
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                '"${data.missionTargetQuote}"',
+                style: GoogleFonts.inter(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w400,
+                  fontStyle: FontStyle.italic,
+                  color: const Color(0xFF555555),
+                  height: 1.4,
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ],
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildRoleplayOptions() {
     return Obx(() {
+      if (controller.isLoading.value) {
+        return Column(
+          children: List.generate(3, (index) {
+            return Container(
+              margin: EdgeInsets.only(bottom: 12.h),
+              padding: EdgeInsets.all(12.r),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: const Color(0xFFE5E5EA), width: 1),
+              ),
+              child: Row(
+                children: [
+                  SpShimmer.box(width: 50.r, height: 50.r, borderRadius: 8.r),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SpShimmer.box(width: 140.w, height: 16.h, borderRadius: 4.r),
+                        SizedBox(height: 6.h),
+                        SpShimmer.box(
+                          width: double.infinity,
+                          height: 13.h,
+                          borderRadius: 4.r,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  SpShimmer.circle(size: 20.r),
+                ],
+              ),
+            );
+          }),
+        );
+      }
+
       final roleplays = controller.sessionData.value.roleplays;
       final selectedId = controller.selectedRoleplayId.value;
 
@@ -370,7 +497,9 @@ class PracticeSessionReadyScreen
           return GestureDetector(
             onTap: () => controller.selectRoleplay(roleplay.id),
             behavior: HitTestBehavior.opaque,
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
               margin: EdgeInsets.only(bottom: 12.h),
               padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
@@ -385,126 +514,116 @@ class PracticeSessionReadyScreen
                   width: isSelected ? 1.5 : 1,
                 ),
               ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.r),
-                    child: _buildRoleplayAvatar(roleplay, 50.r),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          roleplay.name,
-                          style: GoogleFonts.inter(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF0A0A0A),
-                          ),
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8.r),
+                        child: _buildRoleplayAvatar(roleplay, 48.r),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                roleplay.name,
+                                style: GoogleFonts.inter(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF0A0A0A),
+                                ),
+                              ),
+                            ),
+                            if (roleplay.isRecommended) ...[
+                              SizedBox(width: 8.w),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 6.w,
+                                  vertical: 2.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFECEB),
+                                  borderRadius: BorderRadius.circular(4.r),
+                                ),
+                                child: Text(
+                                  'RECOMMENDED',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 9.5.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFFCC0000),
+                                    letterSpacing: 0.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
-                        SizedBox(height: 3.h),
-                        Text(
-                          roleplay.subtitle,
-                          style: GoogleFonts.inter(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: -0.5,
-                            color: const Color(0xFF555555),
-                            height: 1.35,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 20.r,
-                    height: 20.r,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
+                      ),
+                      SizedBox(width: 8.w),
+                      Icon(
+                        isSelected
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
+                        size: 22.sp,
                         color: isSelected
                             ? const Color(0xFFCC0000)
-                            : const Color(0xFFC7C7CC),
-                        width: isSelected ? 5.5 : 1.5,
+                            : const Color(0xFF8E8E93),
+                      ),
+                      SizedBox(width: 8.w),
+                      Container(
+                        width: 20.r,
+                        height: 20.r,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected
+                                ? const Color(0xFFCC0000)
+                                : const Color(0xFFC7C7CC),
+                            width: isSelected ? 5.5 : 1.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  AnimatedCrossFade(
+                    duration: const Duration(milliseconds: 220),
+                    crossFadeState: isSelected
+                        ? CrossFadeState.showFirst
+                        : CrossFadeState.showSecond,
+                    firstChild: Padding(
+                      padding: EdgeInsets.only(top: 10.h),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Divider(
+                            height: 1.h,
+                            thickness: 1.h,
+                            color: const Color(0xFFFBE3E1),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            roleplay.subtitle,
+                            style: GoogleFonts.inter(
+                              fontSize: 14.5.sp,
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: -0.4,
+                              color: const Color(0xFF444444),
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                    secondChild: const SizedBox.shrink(),
                   ),
                 ],
               ),
             ),
           );
         }).toList(),
-      );
-    });
-  }
-
-  Widget _buildSelectedRoleplayBanner() {
-    return Obx(() {
-      final roleplay = controller.selectedRoleplay;
-      if (roleplay == null) return const SizedBox.shrink();
-
-      return Container(
-        padding: EdgeInsets.all(12.r),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFDF5F6),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: const Color(0xFFFBE3E1), width: 1.2),
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: _buildRoleplayAvatar(roleplay, 46.r),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.local_fire_department_rounded,
-                        size: 14.sp,
-                        color: const Color(0xFFCC0000),
-                      ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        'SELECTED ROLEPLAY',
-                        style: GoogleFonts.inter(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.2,
-                          color: const Color(0xFF555555),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 3.h),
-                  Text(
-                    roleplay.name,
-                    style: GoogleFonts.inter(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF0A0A0A),
-                    ),
-                  ),
-                  Text(
-                    roleplay.subtitle,
-                    style: GoogleFonts.inter(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFF555555),
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       );
     });
   }
@@ -551,6 +670,59 @@ class PracticeSessionReadyScreen
           ),
           SizedBox(height: 16.h),
           Obx(() {
+            if (controller.isLoading.value) {
+              return Column(
+                children: List.generate(2, (index) {
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 12.h),
+                    padding: EdgeInsets.all(12.r),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: const Color(0xFFE5E5EA),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(top: 2.h),
+                          child: SpShimmer.circle(size: 18.r),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SpShimmer.box(
+                                width: 140.w,
+                                height: 16.h,
+                                borderRadius: 4.r,
+                              ),
+                              SizedBox(height: 6.h),
+                              SpShimmer.box(
+                                width: double.infinity,
+                                height: 13.h,
+                                borderRadius: 4.r,
+                              ),
+                              SizedBox(height: 4.h),
+                              SpShimmer.box(
+                                width: 170.w,
+                                height: 13.h,
+                              borderRadius: 4.r,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            );
+          }
+
             final modes = controller.sessionData.value.challengeModes;
             final selectedId = controller.selectedChallengeModeId.value;
 

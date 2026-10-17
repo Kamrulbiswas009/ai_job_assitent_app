@@ -8,6 +8,7 @@ import '../../../../core/services/storage_service.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../routes/app_routes.dart';
 import '../../controller/onboarding_controller.dart';
+import '../widgets/continue_session_dialog.dart';
 import '../widgets/onboarding_header.dart';
 import '../widgets/sp_primary_button.dart';
 import '../widgets/sp_underline_field.dart';
@@ -62,6 +63,37 @@ class _OnboardingLoginScreenState extends State<OnboardingLoginScreen> {
     final isSuccess = await _controller.login(email: email, password: password);
 
     if (isSuccess) {
+      if (!mounted) return;
+
+      // Check if an unfinished previous session was saved
+      if (StorageService.hasSavedSession()) {
+        final savedSession = StorageService.getLastSession();
+        if (savedSession != null) {
+          final shouldResume = await ContinueSessionDialog.show(
+            context,
+            session: savedSession,
+          );
+
+          if (shouldResume == true) {
+            // Restore any cached session identifiers
+            if (savedSession.assessmentId != null &&
+                savedSession.assessmentId!.isNotEmpty) {
+              await StorageService.saveAssessmentId(savedSession.assessmentId!);
+            }
+            await StorageService.clearSavedSession();
+
+            Get.offAllNamed(
+              savedSession.route,
+              arguments: savedSession.arguments,
+            );
+            return;
+          } else {
+            // User chose "No, Start Fresh" or dismissed
+            await StorageService.clearSavedSession();
+          }
+        }
+      }
+
       final isSubscribed =
           _controller.isUserSubscribed.value || StorageService.isSubscribed;
       if (isSubscribed) {

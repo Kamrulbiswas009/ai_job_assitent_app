@@ -26,6 +26,16 @@ import '../features/practice/presentation/screens/practice_coaching_brief_screen
 import '../features/practice/presentation/screens/practice_warmup_screen.dart';
 import '../features/practice/presentation/screens/practice_question_screen.dart';
 import '../features/practice/presentation/screens/practice_cues_guidance_screen.dart';
+import '../features/practice/presentation/screens/practice_answer_record_screen.dart';
+import '../features/practice/presentation/screens/practice_answer_review_screen.dart';
+import '../features/practice/presentation/screens/practice_coach_feedback_screen.dart';
+import '../features/practice/presentation/screens/practice_session_complete_screen.dart';
+import '../features/practice/presentation/screens/practice_session_progression_screen.dart';
+import '../features/practice/controller/practice_answer_record_controller.dart';
+import '../features/practice/controller/practice_answer_review_controller.dart';
+import '../features/practice/controller/practice_coach_feedback_controller.dart';
+import '../features/practice/controller/practice_session_complete_controller.dart';
+import '../features/practice/controller/practice_session_progression_controller.dart';
 
 class AppRoute {
   static const String splash = '/';
@@ -56,6 +66,12 @@ class AppRoute {
   static const String practiceWarmup = '/practice-warmup';
   static const String practiceQuestion = '/practice-question';
   static const String practiceCuesGuidance = '/practice-cues-guidance';
+  static const String practiceAnswerRecord = '/practice-answer-record';
+  static const String practiceAnswerReview = '/practice-answer-review';
+  static const String practiceCoachFeedback = '/practice-coach-feedback';
+  static const String practiceSessionComplete = '/practice-session-complete';
+  static const String practiceSessionProgression =
+      '/practice-session-progression';
 
   static String getLoginScreen() => login;
 
@@ -127,6 +143,50 @@ class AppRoute {
     GetPage(
       name: practiceCuesGuidance,
       page: () => const PracticeCuesGuidanceScreen(),
+    ),
+    GetPage(
+      name: practiceAnswerRecord,
+      page: () => const PracticeAnswerRecordScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(PracticeAnswerRecordController());
+      }),
+    ),
+    GetPage(
+      name: practiceAnswerReview,
+      page: () => const PracticeAnswerReviewScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(PracticeAnswerReviewController());
+      }),
+    ),
+    GetPage(
+      name: practiceCoachFeedback,
+      page: () => const PracticeCoachFeedbackScreen(),
+      binding: BindingsBuilder(() {
+        if (Get.isRegistered<PracticeCoachFeedbackController>()) {
+          Get.delete<PracticeCoachFeedbackController>();
+        }
+        Get.put(PracticeCoachFeedbackController());
+      }),
+    ),
+    GetPage(
+      name: practiceSessionComplete,
+      page: () => const PracticeSessionCompleteScreen(),
+      binding: BindingsBuilder(() {
+        if (Get.isRegistered<PracticeSessionCompleteController>()) {
+          Get.delete<PracticeSessionCompleteController>();
+        }
+        Get.put(PracticeSessionCompleteController());
+      }),
+    ),
+    GetPage(
+      name: practiceSessionProgression,
+      page: () => const PracticeSessionProgressionScreen(),
+      binding: BindingsBuilder(() {
+        if (Get.isRegistered<PracticeSessionProgressionController>()) {
+          Get.delete<PracticeSessionProgressionController>();
+        }
+        Get.put(PracticeSessionProgressionController());
+      }),
     ),
   ];
 }

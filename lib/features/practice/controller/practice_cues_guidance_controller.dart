@@ -24,14 +24,28 @@ class PracticeCuesGuidanceController extends GetxController {
   }
 
   @override
+  void onInit() {
+    super.onInit();
+    final args = Get.arguments;
+    if (args is Map && args['cueIndex'] is int) {
+      final index = args['cueIndex'] as int;
+      if (index >= 0 && index < guidanceData.value.cues.length) {
+        selectedCueIndex.value = index;
+      }
+    }
+  }
+
+  @override
   void onClose() {
     _timer?.cancel();
     _audioRecorder?.dispose().catchError((_) {});
     super.onClose();
   }
 
-  void selectCue(int index) {
+  void selectCue(int index, {bool notify = true}) {
+    if (index < 0 || index >= guidanceData.value.cues.length) return;
     selectedCueIndex.value = index;
+    if (!notify) return;
     final cue = guidanceData.value.cues[index];
     EasyLoading.showToast('Selected: ${cue.title}');
   }

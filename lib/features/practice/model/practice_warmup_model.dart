@@ -19,29 +19,34 @@ class PracticeWarmupModel {
     this.targetDurationSeconds = 60,
   });
 
-  factory PracticeWarmupModel.initial() {
-    return const PracticeWarmupModel(
-      badge: 'WARM - UP',
-      title: 'Get your voice moving before the interview begins.',
+  /// Mock voice-check step before the real practice question.
+  factory PracticeWarmupModel.voiceCheck({String? promptQuestion}) {
+    return PracticeWarmupModel(
+      badge: 'VOICE CHECK',
+      title: 'Say something and hear your voice back.',
       subtitle:
-          'Choose who SpeechPro will roleplay and how challenging you want this first session to be.',
+          'This is a mock warm-up — check your mic and tone before Question 1. Nothing here is scored.',
       alertTitle: "THIS DOESN'T COUNT TOWARD YOUR SCORE",
       alertDescription:
-          'This is a warm-up, not an interview question. Speak naturally. You can record it again if you want to.',
-      promptCategory: 'PRACTICE CUES',
-      promptQuestion: 'Tell me one thing you are proud of professionally.',
+          'Record a short answer, play it back, and re-record if you want. When you are happy with how you sound, continue to the roleplay question.',
+      promptCategory: 'TRY SAYING',
+      promptQuestion: promptQuestion?.trim().isNotEmpty == true
+          ? promptQuestion!.trim()
+          : 'Tell me one thing you are proud of professionally.',
       targetDurationSeconds: 60,
     );
   }
 
+  factory PracticeWarmupModel.initial() => PracticeWarmupModel.voiceCheck();
+
   factory PracticeWarmupModel.fromJson(Map<String, dynamic> json) {
     return PracticeWarmupModel(
-      badge: json['badge'] as String? ?? 'WARM - UP',
+      badge: json['badge'] as String? ?? 'VOICE CHECK',
       title: json['title'] as String? ?? '',
       subtitle: json['subtitle'] as String? ?? '',
       alertTitle: json['alertTitle'] as String? ?? '',
       alertDescription: json['alertDescription'] as String? ?? '',
-      promptCategory: json['promptCategory'] as String? ?? 'PRACTICE CUES',
+      promptCategory: json['promptCategory'] as String? ?? 'TRY SAYING',
       promptQuestion: json['promptQuestion'] as String? ?? '',
       targetDurationSeconds: json['targetDurationSeconds'] as int? ?? 60,
     );

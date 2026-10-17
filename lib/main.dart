@@ -16,16 +16,17 @@ void main() async {
 
 void _configEasyLoading() {
   EasyLoading.instance
-    ..displayDuration = const Duration(milliseconds: 2500)
-    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
-    ..loadingStyle = EasyLoadingStyle.dark
-    ..indicatorSize = 44.0
-    ..radius = 12.0
+    ..displayDuration = const Duration(milliseconds: 1800)
+    ..indicatorType = EasyLoadingIndicatorType.ring
+    ..loadingStyle = EasyLoadingStyle.light
+    ..toastPosition = EasyLoadingToastPosition.bottom
+    ..indicatorSize = 28
+    ..radius = 12
     ..progressColor = AppColors.primary
-    ..backgroundColor = const Color(0xFF1E1E1E)
-    ..indicatorColor = AppColors.primary
-    ..textColor = Colors.white
-    ..maskColor = Colors.black.withValues(alpha: 0.35)
+    ..backgroundColor = const Color(0xFF1C1C1E)
+    ..indicatorColor = AppColors.white
+    ..textColor = AppColors.white
+    ..maskType = EasyLoadingMaskType.none
     ..userInteractions = true
     ..dismissOnTap = true;
 }

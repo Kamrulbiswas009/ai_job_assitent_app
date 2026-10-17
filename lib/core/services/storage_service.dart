@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/saved_session_model.dart';
 
 class StorageService {
   static const String _accessTokenKey = 'accessToken';
@@ -9,6 +10,7 @@ class StorageService {
   static const String _assessmentIdKey = 'assessmentId';
   static const String _voiceSkippedKey = 'voiceCalibrationSkipped';
   static const String _isSubscribedKey = 'isSubscribed';
+  static const String _savedSessionKey = 'savedLastSession';
 
   static SharedPreferences? _preferences;
 
@@ -71,6 +73,51 @@ class StorageService {
     await _preferences?.setBool(_isSubscribedKey, isSubscribed);
   }
 
+  // Save active session snapshot for seamless resumption after logout
+  static Future<void> saveCurrentSession({
+    required String route,
+    String? title,
+    String? scenarioSlug,
+    String? assessmentId,
+    Map<String, dynamic>? arguments,
+  }) async {
+    try {
+      if (!SavedSessionModel.isResumableRoute(route)) return;
+      final session = SavedSessionModel(
+        route: route,
+        title: title ?? SavedSessionModel.resolveRouteTitle(route),
+        scenarioSlug: scenarioSlug,
+        assessmentId: assessmentId ?? StorageService.assessmentId,
+        arguments: arguments,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      );
+      await _preferences?.setString(_savedSessionKey, session.encode());
+    } catch (_) {}
+  }
+
+  // Retrieve saved session
+  static SavedSessionModel? getLastSession() {
+    try {
+      final raw = _preferences?.getString(_savedSessionKey);
+      return SavedSessionModel.decode(raw);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Check if a valid saved session exists
+  static bool hasSavedSession() {
+    final session = getLastSession();
+    return session != null && SavedSessionModel.isResumableRoute(session.route);
+  }
+
+  // Clear saved session (e.g. user selected "Start Fresh")
+  static Future<void> clearSavedSession() async {
+    try {
+      await _preferences?.remove(_savedSessionKey);
+    } catch (_) {}
+  }
+
   // Getters
   static String? get token => _preferences?.getString(_accessTokenKey);
   static String? get accessToken => _preferences?.getString(_accessTokenKey);
@@ -84,8 +131,8 @@ class StorageService {
   static bool get isSubscribed =>
       _preferences?.getBool(_isSubscribedKey) ?? false;
 
-  // Logout / clear
-  static Future<void> logoutUser() async {
+  // Logout / clear (preserves saved session progress by default)
+  static Future<void> logoutUser({bool keepSavedSession = true}) async {
     await _preferences?.remove(_accessTokenKey);
     await _preferences?.remove(_refreshTokenKey);
     await _preferences?.remove(_idKey);
@@ -94,5 +141,8 @@ class StorageService {
     await _preferences?.remove(_assessmentIdKey);
     await _preferences?.remove(_voiceSkippedKey);
     await _preferences?.remove(_isSubscribedKey);
+    if (!keepSavedSession) {
+      await clearSavedSession();
+    }
   }
 }

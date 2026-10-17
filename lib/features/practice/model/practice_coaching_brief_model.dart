@@ -73,6 +73,9 @@ class PracticeCoachingBriefModel {
   final String focusBody;
   final TodayDoctrineModel doctrine;
   final List<PracticeCueItem> cues;
+  final String founderStoryNote;
+  final String firstQuestion;
+  final String sessionId;
 
   const PracticeCoachingBriefModel({
     required this.welcomeTag,
@@ -84,7 +87,99 @@ class PracticeCoachingBriefModel {
     required this.focusBody,
     required this.doctrine,
     required this.cues,
+    this.founderStoryNote = 'The full founder story follows your practice.',
+    this.firstQuestion = '',
+    this.sessionId = '',
   });
+
+  factory PracticeCoachingBriefModel.fromAiApi(Map<String, dynamic> json) {
+    final brief = (json['brief'] as Map?)?.cast<String, dynamic>() ?? json;
+    final character =
+        (brief['roleplay_character'] as Map?)?.cast<String, dynamic>() ?? {};
+    final challenge =
+        (brief['challenge_mode'] as Map?)?.cast<String, dynamic>() ?? {};
+
+    final keyPoints = _stringList(brief['key_points']);
+    final expectedChallenges = _stringList(brief['expected_challenges']);
+    final firstQuestion = brief['first_question'] as String? ?? '';
+    final characterName = character['name'] as String? ?? '';
+    final challengeName = challenge['name'] as String? ?? '';
+    final durationMinutes =
+        (brief['estimated_duration_minutes'] as num?)?.round();
+
+    final focusBody = [
+      brief['scenario_summary'] as String? ?? '',
+      brief['session_objective'] as String? ?? '',
+      brief['opening_guidance'] as String? ?? '',
+    ].where((part) => part.trim().isNotEmpty).join('\n\n');
+
+    const cueIcons = ['sound', 'user', 'target', 'flash'];
+    final cues = <PracticeCueItem>[];
+
+    for (var i = 0; i < keyPoints.length; i++) {
+      cues.add(
+        PracticeCueItem(
+          tag: 'PRACTICE CUES',
+          title: keyPoints.length == 1 ? 'Key Focus' : 'Key Point ${i + 1}',
+          description: keyPoints[i],
+          iconKey: cueIcons[i % cueIcons.length],
+        ),
+      );
+    }
+
+    for (var i = 0; i < expectedChallenges.length; i++) {
+      cues.add(
+        PracticeCueItem(
+          tag: 'PRACTICE CUES',
+          title: expectedChallenges.length == 1
+              ? 'Expected Challenge'
+              : 'Expected Challenge ${i + 1}',
+          description: expectedChallenges[i],
+          iconKey: 'flash',
+        ),
+      );
+    }
+
+    if (firstQuestion.trim().isNotEmpty) {
+      cues.add(
+        PracticeCueItem(
+          tag: 'PRACTICE CUES',
+          title: 'Opening Question',
+          description: firstQuestion.trim(),
+          iconKey: 'chat',
+        ),
+      );
+    }
+
+    final subtitleParts = [
+      if (characterName.isNotEmpty) characterName,
+      if (challengeName.isNotEmpty) challengeName,
+    ];
+
+    return PracticeCoachingBriefModel(
+      sessionId: json['sessionId'] as String? ?? '',
+      welcomeTag: 'WELCOME TO SPEECHPRO',
+      sessionTitle: brief['title'] as String? ?? '',
+      sessionSubtitle: subtitleParts.join(' · '),
+      videoTitle: 'Your Coaching Brief',
+      videoDuration:
+          durationMinutes != null ? '$durationMinutes min' : '6 min',
+      focusHeader: brief['greeting'] as String? ?? '',
+      focusBody: focusBody,
+      doctrine: TodayDoctrineModel(
+        tag: "TODAY'S DOCTRINE",
+        title: challengeName.isNotEmpty ? challengeName : 'Challenge Mode',
+        description: challenge['difficulty_summary'] as String? ??
+            character['behavior_summary'] as String? ??
+            '',
+        actionLabel: challengeName.isNotEmpty
+            ? 'What is $challengeName?'
+            : 'What is Challenge Mode?',
+      ),
+      cues: cues,
+      firstQuestion: firstQuestion,
+    );
+  }
 
   factory PracticeCoachingBriefModel.initial() {
     return const PracticeCoachingBriefModel(
@@ -129,5 +224,13 @@ class PracticeCoachingBriefModel {
         ),
       ],
     );
+  }
+
+  static List<String> _stringList(dynamic value) {
+    if (value is! List) return const [];
+    return value
+        .map((item) => item?.toString().trim() ?? '')
+        .where((item) => item.isNotEmpty)
+        .toList();
   }
 }

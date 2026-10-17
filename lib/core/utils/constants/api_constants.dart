@@ -19,11 +19,13 @@ class ApiConstants {
 
   // AI Backend Base URL
   static const String aiBaseUrl =
-      'https://studioequip-agent-e9sb.onrender.com/api/v1';
+      'https://ai.speechpro.uk/api/v1';
+  static const String aiApiBaseUrl = 'https://ai.speechpro.uk/api/ai';
 
   // Coaching / Briefing Endpoints
   static const String personalBriefing =
       '$aiBaseUrl/coaching/personal-briefing';
+  static const String aiSessionBrief = '$aiApiBaseUrl/session-brief';
 
   // Assessment Endpoints
   static const String selfAssessment = '$aiBaseUrl/assessment/self-assessment';
@@ -37,4 +39,11 @@ class ApiConstants {
   // Practice / Session Endpoints
   static String sessionPrepare(String scenarioSlug) =>
       '$baseUrl/sessions/prepare?scenarioSlug=$scenarioSlug';
+
+  static const String sessionStart = '$baseUrl/sessions/start';
+
+  static String sessionQuestions(String sessionId) =>
+      '$baseUrl/sessions/$sessionId/questions';
+
+  static const String evaluateAnswer = '$aiApiBaseUrl/evaluate-answer';
 }

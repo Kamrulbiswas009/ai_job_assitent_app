@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../common/widgets/sp_loading_overlay.dart';
 
 class AppHelperFunctions {
   AppHelperFunctions._();
@@ -35,12 +36,13 @@ class AppHelperFunctions {
   }
 
   static void showLoading([String? status]) {
-    try {
-      EasyLoading.show(status: status ?? 'Loading...').catchError((_) {});
-    } catch (_) {}
+    SpLoadingOverlay.show(
+      title: status ?? 'Just a moment',
+    );
   }
 
   static void hideLoading() {
+    SpLoadingOverlay.hide();
     try {
       EasyLoading.dismiss().catchError((_) {});
     } catch (_) {}
