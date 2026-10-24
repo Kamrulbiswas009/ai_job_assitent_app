@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
+import '../../../../core/utils/constants/icon_path.dart';
 import '../../controller/practice_answer_review_controller.dart';
 import '../../controller/practice_question_controller.dart';
 import '../widgets/local_voice_player.dart';
@@ -142,49 +144,54 @@ class PracticeAnswerReviewScreen
 
   Widget _buildBottomActions() {
     return Container(
-      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),
       decoration: const BoxDecoration(
         color: AppColors.white,
         border: Border(
           top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            height: 54.h,
-            child: OutlinedButton(
-              onPressed: controller.recordAgain,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF0A0A0A),
-                side: const BorderSide(color: Color(0xFFE5E5EA), width: 1.2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999.r),
-                ),
-              ),
-              child: Text(
-                'Record again',
-                style: GoogleFonts.inter(
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SpPrimaryButton.outlined(
+                label: 'Record again',
+                onPressed: controller.recordAgain,
+                height: 54.h,
+                borderRadius: 999.r,
+                textColor: const Color(0xFF0A0A0A),
+                borderColor: const Color(0xFFE5E5EA),
+                textStyle: GoogleFonts.inter(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w600,
                   color: const Color(0xFF0A0A0A),
                 ),
               ),
-            ),
+              SizedBox(height: 12.h),
+              Obx(
+                () => SpPrimaryButton(
+                  label: 'Submit answer',
+                  onPressed: controller.submitAnswer,
+                  isLoading: controller.isSubmitting.value,
+                  height: 54.h,
+                  borderRadius: 999.r,
+                  suffixIcon: SvgPicture.asset(
+                    IconPath.spArrowRight,
+                    width: 18.r,
+                    height: 18.r,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 12.h),
-          Obx(
-            () => SpPrimaryButton(
-              label: 'Submit answer  →',
-              onPressed: controller.submitAnswer,
-              isLoading: controller.isSubmitting.value,
-              height: 54.h,
-              borderRadius: 999.r,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

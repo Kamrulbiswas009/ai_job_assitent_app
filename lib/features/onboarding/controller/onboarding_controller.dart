@@ -40,6 +40,7 @@ class OnboardingController extends GetxController {
   final RxBool isPasswordVisible = false.obs;
   final RxBool isConfirmPasswordVisible = false.obs;
   final RxInt resendCountdown = 30.obs;
+  final RxBool isResendLoading = false.obs;
   Timer? _timer;
 
   final RxList<MembershipPlanModel> plans = <MembershipPlanModel>[
@@ -65,16 +66,32 @@ class OnboardingController extends GetxController {
     selectedPlanIndex.value = index;
   }
 
-  void startResendTimer() {
+  void startResendTimer({int seconds = 30}) {
     _timer?.cancel();
-    resendCountdown.value = 30;
+    resendCountdown.value = seconds;
+    if (seconds <= 0) return;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (resendCountdown.value > 0) {
+      if (resendCountdown.value > 1) {
         resendCountdown.value--;
       } else {
+        resendCountdown.value = 0;
         timer.cancel();
       }
     });
+  }
+
+  void resumeResendTimerIfNeeded() {
+    if (resendCountdown.value > 0 && (_timer == null || !_timer!.isActive)) {
+      _timer?.cancel();
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (resendCountdown.value > 1) {
+          resendCountdown.value--;
+        } else {
+          resendCountdown.value = 0;
+          timer.cancel();
+        }
+      });
+    }
   }
 
   // ==================== 1. Register API ====================
@@ -172,6 +189,46 @@ class OnboardingController extends GetxController {
       return false;
     } finally {
       isVerifyLoading.value = false;
+    }
+  }
+
+  // ==================== Resend Verification Code API ====================
+  Future<bool> resendVerificationCode({required String email}) async {
+    isResendLoading.value = true;
+    try {
+      final body = {
+        'email': email.trim(),
+      };
+
+      debugPrint('Calling Resend OTP API...');
+      final response = await _networkCaller.postRequest(
+        ApiConstants.resendOtp,
+        body: body,
+      );
+
+      if (response.isSuccess) {
+        startResendTimer();
+        final message = (response.responseData is Map &&
+                response.responseData['message'] != null)
+            ? response.responseData['message']
+            : 'Verification code resent successfully';
+
+        EasyLoading.showSuccess(message);
+        return true;
+      } else {
+        EasyLoading.showError(
+          response.errorMessage.isNotEmpty
+              ? response.errorMessage
+              : 'Failed to resend verification code',
+        );
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Resend Verification Code Exception: $e');
+      EasyLoading.showError('An error occurred: $e');
+      return false;
+    } finally {
+      isResendLoading.value = false;
     }
   }
 

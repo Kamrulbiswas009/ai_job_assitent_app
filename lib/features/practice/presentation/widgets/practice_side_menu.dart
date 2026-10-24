@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/common/widgets/sp_loading.dart';
+import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../controller/practice_menu_controller.dart';
 
@@ -79,59 +79,34 @@ class PracticeSideMenu extends GetView<PracticeMenuController> {
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 20.h),
               child: Obx(() {
                 final isLoggingOut = controller.isLoggingOut.value;
-                return SizedBox(
+                return SpPrimaryButton.outlined(
+                  label: isLoggingOut ? 'Signing out...' : 'Log out',
+                  onPressed: isLoggingOut
+                      ? null
+                      : () async {
+                          Navigator.of(context).pop();
+                          await controller.logout();
+                        },
+                  isLoading: isLoggingOut,
                   height: 52.h,
-                  child: OutlinedButton(
-                    onPressed: isLoggingOut
-                        ? null
-                        : () async {
-                            Navigator.of(context).pop();
-                            await controller.logout();
-                          },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFCC0000),
-                      side: const BorderSide(
-                        color: Color(0xFFCC0000),
-                        width: 1.2,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14.r),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (isLoggingOut) ...[
-                          const SpLoading(size: 22),
-                          SizedBox(width: 8.w),
-                          Text(
-                            'Signing out...',
-                            style: GoogleFonts.inter(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
+                  borderRadius: 14.r,
+                  borderColor: const Color(0xFFCC0000),
+                  textColor: const Color(0xFFCC0000),
+                  prefixIcon: isLoggingOut
+                      ? null
+                      : SvgPicture.asset(
+                          IconPath.spUser,
+                          width: 18.r,
+                          height: 18.r,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFFCC0000),
+                            BlendMode.srcIn,
                           ),
-                        ] else ...[
-                          SvgPicture.asset(
-                            IconPath.spUser,
-                            width: 18.r,
-                            height: 18.r,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFFCC0000),
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          Text(
-                            'Log out',
-                            style: GoogleFonts.inter(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
+                        ),
+                  textStyle: GoogleFonts.inter(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFFCC0000),
                   ),
                 );
               }),
@@ -262,14 +237,17 @@ class _SideMenuTabs extends StatelessWidget {
                 : null,
           ),
           alignment: Alignment.center,
-          child: Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 14.sp,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected
-                  ? const Color(0xFF0A0A0A)
-                  : const Color(0xFF666666),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14.sp,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected
+                    ? const Color(0xFF0A0A0A)
+                    : const Color(0xFF666666),
+              ),
             ),
           ),
         ),

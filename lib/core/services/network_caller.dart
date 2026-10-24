@@ -264,6 +264,7 @@ class NetworkCaller {
       if (path.contains('/auth/login') ||
           path.contains('/auth/register') ||
           path.contains('/auth/verify-email') ||
+          path.contains('/auth/resend-otp') ||
           path.contains('/auth/forgot-password') ||
           path.contains('/auth/reset-password') ||
           path.contains('/auth/logout') ||

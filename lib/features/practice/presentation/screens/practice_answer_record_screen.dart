@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../start/presentation/widgets/voice_recorder_card.dart';
 import '../../controller/practice_answer_record_controller.dart';
@@ -160,30 +161,22 @@ class PracticeAnswerRecordScreen
           ),
           SizedBox(height: 12.h),
           Obx(
-            () => SizedBox(
-              width: double.infinity,
-              height: 44.h,
-              child: OutlinedButton(
-                onPressed: controller.isUsingDemo.value
-                    ? null
-                    : controller.useDemoVoice,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(999.r),
-                  ),
-                ),
-                child: Text(
-                  controller.isUsingDemo.value
-                      ? 'Loading demo voice…'
-                      : controller.demoVoiceButtonLabel,
-                  style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                  ),
-                ),
+            () => SpPrimaryButton.outlined(
+              label: controller.isUsingDemo.value
+                  ? 'Loading demo voice…'
+                  : controller.demoVoiceButtonLabel,
+              onPressed: controller.isUsingDemo.value
+                  ? null
+                  : controller.useDemoVoice,
+              isLoading: controller.isUsingDemo.value,
+              height: 48.h,
+              borderRadius: 999.r,
+              borderColor: AppColors.primary,
+              textColor: AppColors.primary,
+              textStyle: GoogleFonts.inter(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
               ),
             ),
           ),

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
@@ -135,30 +136,15 @@ class SplashGetStartedScreen extends StatelessWidget {
                         SizedBox(height: 20.h),
 
                         // Create Account Button
-                        SizedBox(
-                          width: double.infinity,
+                        SpPrimaryButton(
+                          label: 'Create account',
+                          onPressed: () => Get.toNamed(AppRoute.registration),
                           height: 52.h,
-                          child: ElevatedButton(
-                            onPressed: () => Get.toNamed(AppRoute.registration),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14.r),
-                              ),
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            ),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                'Create account',
-                                style: GoogleFonts.inter(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.white,
-                                ),
-                              ),
-                            ),
+                          borderRadius: 14.r,
+                          textStyle: GoogleFonts.inter(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.white,
                           ),
                         ),
                         SizedBox(height: 14.h),

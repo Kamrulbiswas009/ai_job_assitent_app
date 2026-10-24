@@ -19,6 +19,7 @@ class PracticeWarmupScreen extends GetView<PracticeWarmupController> {
       isRoot: false,
       body: SafeArea(
         top: false,
+        bottom: false,
         child: Column(
           children: [
             Expanded(
@@ -314,12 +315,18 @@ class PracticeWarmupScreen extends GetView<PracticeWarmupController> {
                                 SizedBox(height: 14.h),
                                 TextButton(
                                   onPressed: controller.recordAgain,
-                                  child: Text(
-                                    'Record again',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFFCC0000),
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                                  ),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'Record again',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFFCC0000),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -342,16 +349,23 @@ class PracticeWarmupScreen extends GetView<PracticeWarmupController> {
                 return const SizedBox.shrink();
               }
               return Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 decoration: const BoxDecoration(
                   color: AppColors.white,
                   border: Border(
                     top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
                   ),
                 ),
-                child: SpPrimaryButton(
-                  label: 'Continue to Question 1',
-                  onPressed: controller.onProceedToQuestion,
+                child: SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                    child: SpPrimaryButton(
+                      label: 'Continue to Question 1',
+                      onPressed: controller.onProceedToQuestion,
+                      height: 56.h,
+                      borderRadius: 16.r,
+                    ),
+                  ),
                 ),
               );
             }),

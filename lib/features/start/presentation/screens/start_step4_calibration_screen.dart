@@ -158,44 +158,32 @@ class StartStep4CalibrationScreen extends GetView<StartCalibrationController> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: OutlinedButton(
+                                      child: SpPrimaryButton.outlined(
+                                        label: 'Use Sample Voice',
                                         onPressed: controller.submitSampleVoiceAndProceed,
-                                        style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(color: Color(0xFFFA541C)),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10.r),
-                                          ),
-                                          padding: EdgeInsets.symmetric(vertical: 10.h),
-                                        ),
-                                        child: Text(
-                                          'Use Sample Voice',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: const Color(0xFFFA541C),
-                                          ),
+                                        height: 42.h,
+                                        borderRadius: 10.r,
+                                        borderColor: const Color(0xFFFA541C),
+                                        textColor: const Color(0xFFFA541C),
+                                        textStyle: GoogleFonts.inter(
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xFFFA541C),
                                         ),
                                       ),
                                     ),
                                     SizedBox(width: 10.w),
                                     Expanded(
-                                      child: ElevatedButton(
+                                      child: SpPrimaryButton(
+                                        label: 'Proceed Anyway',
                                         onPressed: controller.proceedAnyway,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFFFA541C),
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10.r),
-                                          ),
-                                          padding: EdgeInsets.symmetric(vertical: 10.h),
-                                        ),
-                                        child: Text(
-                                          'Proceed Anyway',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
+                                        height: 42.h,
+                                        borderRadius: 10.r,
+                                        backgroundColor: const Color(0xFFFA541C),
+                                        textStyle: GoogleFonts.inter(
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),

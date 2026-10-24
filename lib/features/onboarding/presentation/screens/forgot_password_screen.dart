@@ -112,26 +112,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 ),
                               ),
                               SizedBox(height: 12.h),
-                              SizedBox(
-                                width: double.infinity,
+                              SpPrimaryButton.outlined(
+                                label: 'Cancel',
+                                onPressed: Get.back,
                                 height: 53.h,
-                                child: OutlinedButton(
-                                  onPressed: Get.back,
-                                  style: OutlinedButton.styleFrom(
-                                    side: BorderSide(color: AppColors.divider),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16.r),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'Cancel',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.5,
-                                      color: AppColors.black,
-                                    ),
-                                  ),
+                                borderRadius: 16.r,
+                                borderColor: AppColors.divider,
+                                textColor: AppColors.black,
+                                textStyle: GoogleFonts.inter(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.black,
                                 ),
                               ),
                               SizedBox(height: 16.h),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
+import '../../../../core/utils/constants/icon_path.dart';
 import '../../controller/practice_coach_feedback_controller.dart';
 import '../widgets/local_voice_player.dart';
 import '../widgets/practice_scaffold.dart';
@@ -226,59 +228,63 @@ class PracticeCoachFeedbackScreen
 
   Widget _buildBottomBar(bool hasNext, int nextIndex) {
     return Container(
-      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),
-      color: AppColors.white,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            height: 48.h,
-            child: OutlinedButton(
-              onPressed: controller.toggleHearFeedback,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: Color(0xFFE5E5EA)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999.r),
-                ),
-              ),
-              child: Obx(() {
+      decoration: const BoxDecoration(
+        color: AppColors.white,
+        border: Border(
+          top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Obx(() {
                 final playing = controller.isPlayingFeedback.value;
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      playing
-                          ? Icons.pause_rounded
-                          : Icons.play_arrow_rounded,
-                      size: 22.r,
-                      color: AppColors.primary,
-                    ),
-                    SizedBox(width: 6.w),
-                    Text(
-                      playing ? 'Playing feedback…' : 'Hear feedback',
-                      style: GoogleFonts.inter(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ],
+                return SpPrimaryButton.outlined(
+                  label: playing ? 'Playing feedback…' : 'Hear feedback',
+                  onPressed: controller.toggleHearFeedback,
+                  height: 48.h,
+                  borderRadius: 999.r,
+                  borderColor: const Color(0xFFE5E5EA),
+                  textColor: AppColors.primary,
+                  prefixIcon: Icon(
+                    playing
+                        ? Icons.pause_rounded
+                        : Icons.play_arrow_rounded,
+                    size: 22.r,
+                    color: AppColors.primary,
+                  ),
+                  textStyle: GoogleFonts.inter(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
                 );
               }),
-            ),
+              SizedBox(height: 12.h),
+              SpPrimaryButton(
+                label: hasNext
+                    ? 'Continue to Question $nextIndex'
+                    : 'Finish practice',
+                onPressed: controller.continueToNextQuestion,
+                height: 54.h,
+                borderRadius: 999.r,
+                suffixIcon: SvgPicture.asset(
+                  IconPath.spArrowRight,
+                  width: 18.r,
+                  height: 18.r,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 12.h),
-          SpPrimaryButton(
-            label: hasNext
-                ? 'Continue to Question $nextIndex  →'
-                : 'Finish practice  →',
-            onPressed: controller.continueToNextQuestion,
-            height: 54.h,
-            borderRadius: 999.r,
-          ),
-        ],
+        ),
       ),
     );
   }

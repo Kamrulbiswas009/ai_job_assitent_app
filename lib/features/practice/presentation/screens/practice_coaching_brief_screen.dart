@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
@@ -20,6 +21,7 @@ class PracticeCoachingBriefScreen
       isRoot: false,
       body: SafeArea(
         top: false,
+        bottom: false,
         child: Column(
           children: [
             Expanded(
@@ -78,47 +80,37 @@ class PracticeCoachingBriefScreen
 
             // Bottom Sticky Button Bar (Figma Pad L120 R120 T16 B16, Radius 16, Text 16)
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               decoration: const BoxDecoration(
                 color: AppColors.white,
                 border: Border(
                   top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
                 ),
               ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56.h,
-                child: ElevatedButton(
-                  onPressed: controller.onBeginPractice,
-                  style: ElevatedButton.styleFrom(
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  child: SpPrimaryButton(
+                    label: 'Begin Practice',
+                    onPressed: controller.onBeginPractice,
+                    height: 56.h,
+                    borderRadius: 16.r,
                     backgroundColor: const Color(0xFFCC0000),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.r),
+                    textStyle: GoogleFonts.inter(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
                     ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Begin Practice',
-                        style: GoogleFonts.inter(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
+                    suffixIcon: SvgPicture.asset(
+                      IconPath.spArrowRight,
+                      width: 18.r,
+                      height: 18.r,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
                       ),
-                      SizedBox(width: 10.w),
-                      SvgPicture.asset(
-                        IconPath.spArrowRight,
-                        width: 18.r,
-                        height: 18.r,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),

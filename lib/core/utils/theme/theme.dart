@@ -16,6 +16,15 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.white,
       textTheme: AppTextTheme.lightTextTheme,
       elevatedButtonTheme: AppElevatedButtonTheme.lightElevatedButtonTheme,
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+          side: const BorderSide(color: Color(0xFFE5E5EA), width: 1.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
       appBarTheme: AppAppBarTheme.lightAppBarTheme,
       inputDecorationTheme: AppTextFormFieldTheme.lightInputDecorationTheme);
 
@@ -26,6 +35,15 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.black,
       textTheme: AppTextTheme.darkTextTheme,
       elevatedButtonTheme: AppElevatedButtonTheme.darkElevatedButtonTheme,
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+          side: const BorderSide(color: Color(0xFFE5E5EA), width: 1.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
       appBarTheme: AppAppBarTheme.darkAppBarTheme,
       inputDecorationTheme: AppTextFormFieldTheme.darkInputDecorationTheme);
 }

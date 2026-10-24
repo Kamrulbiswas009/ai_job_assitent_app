@@ -18,9 +18,9 @@ import '../../features/practice/controller/practice_cues_guidance_controller.dar
 class ControllerBinder extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<OnboardingController>(
-      () => OnboardingController(),
-      fenix: true,
+    Get.put<OnboardingController>(
+      OnboardingController(),
+      permanent: true,
     );
     Get.lazyPut<StartMembershipController>(
       () => StartMembershipController(),

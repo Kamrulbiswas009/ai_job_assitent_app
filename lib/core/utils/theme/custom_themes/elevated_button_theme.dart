@@ -28,17 +28,18 @@ class AppElevatedButtonTheme {
         const BorderSide(color: AppColors.primary),
       ),
       padding: WidgetStateProperty.all(
-        const EdgeInsets.symmetric(vertical: 18),
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       ),
       textStyle: WidgetStateProperty.all(
         const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
+          height: 1.25,
         ),
       ),
       shape: WidgetStateProperty.all(
         RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
     ),
@@ -68,17 +69,18 @@ class AppElevatedButtonTheme {
         const BorderSide(color: AppColors.primary),
       ),
       padding: WidgetStateProperty.all(
-        const EdgeInsets.symmetric(vertical: 18),
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       ),
       textStyle: WidgetStateProperty.all(
         const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
+          height: 1.25,
         ),
       ),
       shape: WidgetStateProperty.all(
         RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
     ),

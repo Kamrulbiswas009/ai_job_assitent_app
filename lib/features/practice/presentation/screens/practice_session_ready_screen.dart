@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/common/widgets/sp_loading.dart';
+import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/common/widgets/sp_shimmer.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
@@ -22,6 +22,7 @@ class PracticeSessionReadyScreen
       isRoot: true,
       body: SafeArea(
         top: false,
+        bottom: false,
         child: Column(
           children: [
             Expanded(
@@ -164,64 +165,39 @@ class PracticeSessionReadyScreen
           : 'Preparing Session...';
 
       return Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: const BoxDecoration(
           color: AppColors.white,
           border: Border(
             top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
           ),
         ),
-        child: SizedBox(
-          width: double.infinity,
-          height: 56.h,
-          child: ElevatedButton(
-            onPressed: isBusy ? null : controller.onEnterSessionBrief,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isBusy
-                  ? const Color(0xFFCC0000).withValues(alpha: 0.5)
-                  : const Color(0xFFCC0000),
-              disabledBackgroundColor:
-                  const Color(0xFFCC0000).withValues(alpha: 0.5),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            child: SpPrimaryButton(
+              label: isBusy ? buttonLabel : 'Enter Session Brief',
+              onPressed: isBusy ? null : controller.onEnterSessionBrief,
+              isLoading: isBusy,
+              height: 56.h,
+              borderRadius: 16.r,
+              backgroundColor: const Color(0xFFCC0000),
+              textStyle: GoogleFonts.inter(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
               ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (isBusy) ...[
-                  const SpLoading(size: 22),
-                  SizedBox(width: 10.w),
-                  Text(
-                    buttonLabel,
-                    style: GoogleFonts.inter(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
+              suffixIcon: isBusy
+                  ? null
+                  : SvgPicture.asset(
+                      IconPath.spArrowRight,
+                      width: 18.r,
+                      height: 18.r,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
                     ),
-                  ),
-                ] else ...[
-                  Text(
-                    'Enter Session Brief',
-                    style: GoogleFonts.inter(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(width: 10.w),
-                  SvgPicture.asset(
-                    IconPath.spArrowRight,
-                    width: 18.r,
-                    height: 18.r,
-                    colorFilter: const ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                ],
-              ],
             ),
           ),
         ),

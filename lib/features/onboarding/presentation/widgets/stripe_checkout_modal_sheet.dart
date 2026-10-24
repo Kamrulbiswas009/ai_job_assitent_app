@@ -315,11 +315,18 @@ class _StripeCheckoutModalSheetState extends State<StripeCheckoutModalSheet> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF635BFF),
                                 foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 24.w,
+                                  vertical: 10.h,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.r),
                                 ),
                               ),
-                              child: const Text('Retry'),
+                              child: const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text('Retry'),
+                              ),
                             ),
                           ],
                         ),

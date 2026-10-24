@@ -84,26 +84,17 @@ class PracticeSessionProgressionScreen
                       borderRadius: 999.r,
                     ),
                     SizedBox(height: 10.h),
-                    SizedBox(
-                      width: double.infinity,
+                    SpPrimaryButton.outlined(
+                      label: 'Return Home',
+                      onPressed: controller.returnHome,
                       height: 54.h,
-                      child: OutlinedButton(
-                        onPressed: controller.returnHome,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.pureBlack,
-                          side: const BorderSide(color: Color(0xFFE5E5EA)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(999.r),
-                          ),
-                        ),
-                        child: Text(
-                          'Return Home',
-                          style: GoogleFonts.inter(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.pureBlack,
-                          ),
-                        ),
+                      borderRadius: 999.r,
+                      textColor: AppColors.pureBlack,
+                      borderColor: const Color(0xFFE5E5EA),
+                      textStyle: GoogleFonts.inter(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.pureBlack,
                       ),
                     ),
                   ],

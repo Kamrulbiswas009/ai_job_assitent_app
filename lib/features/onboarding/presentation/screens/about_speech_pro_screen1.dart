@@ -193,34 +193,21 @@ class AboutSpeechProScreen1 extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 16.h),
-                    SizedBox(
-                      width: double.infinity,
+                    SpPrimaryButton.outlined(
+                      label: MembershipPlanModel.threeMonths.buttonText
+                          .replaceFirst('Start Training — ', ''),
+                      onPressed: () => Get.toNamed(
+                        AppRoute.membership,
+                        arguments: MembershipPlanModel.threeMonths.toMap(),
+                      ),
                       height: 52.h,
-                      child: OutlinedButton(
-                        onPressed: () => Get.toNamed(
-                          AppRoute.membership,
-                          arguments: MembershipPlanModel.threeMonths.toMap(),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(
-                            color: AppColors.primary,
-                            width: 1.2,
-                          ),
-                          backgroundColor: AppColors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14.r),
-                          ),
-                        ),
-                        child: Text(
-                          MembershipPlanModel.threeMonths.buttonText
-                              .replaceFirst('Start Training — ', ''),
-                          style: GoogleFonts.inter(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
-                          ),
-                        ),
+                      borderRadius: 14.r,
+                      borderColor: AppColors.primary,
+                      textColor: AppColors.primary,
+                      textStyle: GoogleFonts.inter(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
                       ),
                     ),
                     SizedBox(height: 16.h),

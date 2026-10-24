@@ -201,16 +201,20 @@ class CheckoutConfirmationSheet extends StatelessWidget {
               child: TextButton(
                 onPressed: () => Get.back(),
                 style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                 ),
-                child: Text(
-                  'Cancel',
-                  style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.gray,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.inter(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.gray,
+                    ),
                   ),
                 ),
               ),

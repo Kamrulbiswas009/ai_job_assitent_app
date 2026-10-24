@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../controller/practice_cues_guidance_controller.dart';
@@ -23,6 +24,7 @@ class PracticeCuesGuidanceScreen
       isRoot: false,
       body: SafeArea(
         top: false,
+        bottom: false,
         child: Column(
           children: [
             Expanded(
@@ -145,60 +147,47 @@ class PracticeCuesGuidanceScreen
 
             // Bottom Action Area: Capsule Pill Button & Replay Link
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               decoration: const BoxDecoration(
                 color: AppColors.white,
                 border: Border(
                   top: BorderSide(color: Color(0xFFE5E5EA), width: 0.8),
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Obx(() {
-                    final isRec = controller.isRecording.value;
-                    final duration = controller.formattedDuration;
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Obx(() {
+                        final isRec = controller.isRecording.value;
+                        final duration = controller.formattedDuration;
 
-                    return SizedBox(
-                      width: double.infinity,
-                      height: 54.h,
-                      child: ElevatedButton(
-                        onPressed: controller.toggleRecording,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(999.r),
+                        return SpPrimaryButton(
+                          label: isRec
+                              ? 'Stop Recording ($duration)'
+                              : 'Tap to record',
+                          onPressed: controller.toggleRecording,
+                          height: 54.h,
+                          borderRadius: 999.r,
+                          textStyle: GoogleFonts.inter(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
                           ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              IconPath.spMicSvg,
-                              width: 18.r,
-                              height: 18.r,
-                              colorFilter: const ColorFilter.mode(
-                                Colors.white,
-                                BlendMode.srcIn,
-                              ),
+                          prefixIcon: SvgPicture.asset(
+                            IconPath.spMicSvg,
+                            width: 18.r,
+                            height: 18.r,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
                             ),
-                            SizedBox(width: 8.w),
-                            Text(
-                              isRec
-                                  ? 'Stop Recording ($duration)'
-                                  : 'Tap to record',
-                              style: GoogleFonts.inter(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
+                          ),
+                        );
+                      }),
                   SizedBox(height: 12.h),
                   GestureDetector(
                     onTap: controller.replayQuestion,
@@ -230,7 +219,9 @@ class PracticeCuesGuidanceScreen
                       ),
                     ),
                   ),
-                ],
+                    ],
+                  ),
+                ),
               ),
             ),
           ],

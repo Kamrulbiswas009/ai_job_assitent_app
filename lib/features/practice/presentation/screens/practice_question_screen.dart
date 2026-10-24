@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/common/widgets/sp_shimmer.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
@@ -602,40 +603,23 @@ class PracticeQuestionScreen extends GetView<PracticeQuestionController> {
             SizedBox(height: 12.h),
             SpShimmer.box(width: 170.w, height: 16.h, borderRadius: 4.r),
           ] else ...[
-          SizedBox(
-            width: double.infinity,
+          SpPrimaryButton(
+            label: controller.questionData.value.tapToRecordLabel,
+            onPressed: controller.openAnswerRecord,
             height: 54.h,
-            child: ElevatedButton(
-              onPressed: controller.openAnswerRecord,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999.r),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    IconPath.spMicSvg,
-                    width: 18.r,
-                    height: 18.r,
-                    colorFilter: const ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Text(
-                    controller.questionData.value.tapToRecordLabel,
-                    style: GoogleFonts.inter(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+            borderRadius: 999.r,
+            textStyle: GoogleFonts.inter(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+            prefixIcon: SvgPicture.asset(
+              IconPath.spMicSvg,
+              width: 18.r,
+              height: 18.r,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
               ),
             ),
           ),

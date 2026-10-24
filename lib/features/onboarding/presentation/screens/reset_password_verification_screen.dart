@@ -23,7 +23,10 @@ class ResetPasswordVerificationScreen extends StatefulWidget {
 
 class _ResetPasswordVerificationScreenState
     extends State<ResetPasswordVerificationScreen> {
-  final OnboardingController _controller = Get.find<OnboardingController>();
+  final OnboardingController _controller =
+      Get.isRegistered<OnboardingController>()
+          ? Get.find<OnboardingController>()
+          : Get.put(OnboardingController(), permanent: true);
 
   final List<TextEditingController> _controllers =
       List.generate(6, (_) => TextEditingController());
@@ -44,6 +47,8 @@ class _ResetPasswordVerificationScreenState
     } else {
       _email = 'gulamrosul037@gmail.com';
     }
+
+    _controller.resumeResendTimerIfNeeded();
   }
 
   @override
@@ -209,8 +214,12 @@ class _ResetPasswordVerificationScreenState
                                   () {
                                     final count =
                                         _controller.resendCountdown.value;
+                                    final isLoading =
+                                        _controller.isForgotPasswordLoading.value;
+                                    final canResend =
+                                        count == 0 && !isLoading;
                                     return GestureDetector(
-                                      onTap: count == 0
+                                      onTap: canResend
                                           ? () {
                                               _controller.forgotPassword(
                                                 email: _email,
@@ -234,12 +243,16 @@ class _ResetPasswordVerificationScreenState
                                             TextSpan(
                                               text: count > 0
                                                   ? '${count}s'
-                                                  : 'Resend',
+                                                  : (isLoading
+                                                      ? 'Sending...'
+                                                      : 'Resend'),
                                               style: GoogleFonts.inter(
                                                 fontSize: 14.sp,
                                                 fontWeight: FontWeight.w600,
                                                 height: 1.5,
-                                                color: AppColors.primary,
+                                                color: canResend
+                                                    ? AppColors.primary
+                                                    : AppColors.gray,
                                               ),
                                             ),
                                           ],

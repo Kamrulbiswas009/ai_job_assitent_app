@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/common/widgets/sp_primary_button.dart';
 import '../../../../core/models/saved_session_model.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
@@ -173,74 +174,40 @@ class ContinueSessionDialog extends StatelessWidget {
               SizedBox(height: 18.h),
 
               // Primary Brand Action: Yes, Continue
-              SizedBox(
-                width: double.infinity,
+              SpPrimaryButton(
+                label: 'Yes, Continue Session',
+                onPressed: () => Navigator.of(context).pop(true),
                 height: 48.h,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    elevation: 0,
-                    padding: EdgeInsets.symmetric(horizontal: 12.w),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                  ),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Yes, Continue Session',
-                          style: GoogleFonts.inter(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        SvgPicture.asset(
-                          IconPath.spArrowRight,
-                          width: 16.r,
-                          height: 16.r,
-                          colorFilter: const ColorFilter.mode(
-                            Colors.white,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      ],
-                    ),
+                borderRadius: 14.r,
+                textStyle: GoogleFonts.inter(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+                suffixIcon: SvgPicture.asset(
+                  IconPath.spArrowRight,
+                  width: 16.r,
+                  height: 16.r,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
                   ),
                 ),
               ),
               SizedBox(height: 10.h),
 
               // Secondary Action: No, Start Fresh
-              SizedBox(
-                width: double.infinity,
+              SpPrimaryButton.outlined(
+                label: 'No, Start Fresh',
+                onPressed: () => Navigator.of(context).pop(false),
                 height: 46.h,
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFE5E5EA), width: 1.2),
-                    padding: EdgeInsets.symmetric(horizontal: 12.w),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                  ),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      'No, Start Fresh',
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF555555),
-                      ),
-                    ),
-                  ),
+                borderRadius: 14.r,
+                borderColor: const Color(0xFFE5E5EA),
+                textColor: const Color(0xFF555555),
+                textStyle: GoogleFonts.inter(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF555555),
                 ),
               ),
             ],

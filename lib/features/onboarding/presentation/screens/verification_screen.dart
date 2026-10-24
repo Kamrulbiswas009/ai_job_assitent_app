@@ -22,7 +22,10 @@ class VerificationScreen extends StatefulWidget {
 }
 
 class _VerificationScreenState extends State<VerificationScreen> {
-  final OnboardingController _controller = Get.find<OnboardingController>();
+  final OnboardingController _controller =
+      Get.isRegistered<OnboardingController>()
+          ? Get.find<OnboardingController>()
+          : Get.put(OnboardingController(), permanent: true);
 
   final List<TextEditingController> _otpControllers =
       List.generate(6, (_) => TextEditingController());
@@ -44,6 +47,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
     } else {
       _email = 'gulamrosul037@gmail.com';
     }
+
+    _controller.resumeResendTimerIfNeeded();
   }
 
   @override
@@ -76,6 +81,16 @@ class _VerificationScreenState extends State<VerificationScreen> {
         arguments: {'email': _email},
       );
     }
+  }
+
+  void _handleResend() async {
+    final email = _email.trim();
+    if (email.isEmpty) {
+      EasyLoading.showError('Email address is missing');
+      return;
+    }
+
+    await _controller.resendVerificationCode(email: email);
   }
 
   @override
@@ -217,15 +232,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                     () {
                                       final count =
                                           _controller.resendCountdown.value;
+                                      final isLoading =
+                                          _controller.isResendLoading.value;
+                                      final canResend =
+                                          count == 0 && !isLoading;
                                       return GestureDetector(
-                                        onTap: count == 0
-                                            ? () {
-                                                _controller.startResendTimer();
-                                                EasyLoading.showSuccess(
-                                                  'Verification code resent to $_email',
-                                                );
-                                              }
-                                            : null,
+                                        onTap: canResend ? _handleResend : null,
                                         child: RichText(
                                           text: TextSpan(
                                             style: GoogleFonts.inter(
@@ -243,12 +255,16 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                               TextSpan(
                                                 text: count > 0
                                                     ? '${count}s'
-                                                    : 'Resend',
+                                                    : (isLoading
+                                                        ? 'Sending...'
+                                                        : 'Resend'),
                                                 style: GoogleFonts.inter(
                                                   fontSize: 14.sp,
                                                   fontWeight: FontWeight.w600,
                                                   height: 1.5,
-                                                  color: AppColors.primary,
+                                                  color: canResend
+                                                      ? AppColors.primary
+                                                      : AppColors.gray,
                                                 ),
                                               ),
                                             ],
